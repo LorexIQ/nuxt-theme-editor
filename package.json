@@ -1,0 +1,63 @@
+{
+  "name": "nuxt-theme-editor",
+  "version": "1.0.0",
+  "keywords": [
+    "vue",
+    "nuxt",
+    "nuxt3",
+    "nuxt-module",
+    "simpfy structure"
+  ],
+  "description": "",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/LorexIQ/nuxt-theme-editor.git"
+  },
+  "author": {
+    "name": "LorexIQ",
+    "email": "dmitrymurashko0@gmail.com",
+    "url": "https://lorexiq.ru"
+  },
+  "bugs": {
+    "url": "https://github.com/LorexIQ/nuxt-theme-editor/issues"
+  },
+  "license": "MIT",
+  "type": "module",
+  "exports": {
+    ".": {
+      "types": "./dist/types.d.ts",
+      "import": "./dist/module.mjs",
+      "require": "./dist/module.cjs"
+    }
+  },
+  "main": "./dist/module.cjs",
+  "types": "./dist/types.d.ts",
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "prepack": "nuxt-module-build build",
+    "dev": "nuxi dev playground",
+    "dev:build": "nuxi build playground",
+    "dev:prepare": "nuxt-module-build build --stub && nuxt-module-build prepare && nuxi prepare playground",
+    "release": "npm run prepack && changelogen --release && npm publish && git push --follow-tags",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix"
+  },
+  "dependencies": {
+    "@nuxt/kit": "^3.14.159",
+    "glob": "^11.0.0"
+  },
+  "devDependencies": {
+    "@nuxt/devtools": "^1.6.0",
+    "@nuxt/eslint-config": "^0.7.0",
+    "@nuxt/module-builder": "^0.8.4",
+    "@nuxt/schema": "^3.14.159",
+    "@nuxt/test-utils": "^3.14.4",
+    "@types/node": "latest",
+    "changelogen": "^0.5.7",
+    "nuxt": "^3.14.159",
+    "typescript": "latest",
+    "vue-tsc": "^2.1.10"
+  }
+}
