@@ -1,22 +1,27 @@
-import { defineNuxtModule, addPlugin, createResolver } from '@nuxt/kit';
+import { defineNuxtModule, addPlugin, createResolver, addImportsDir } from '@nuxt/kit';
 import defu from 'defu';
 import { name, version } from '../package.json';
 import type { ModuleOptions } from './runtime/types';
-
-const MODULE_CONFIG_KEY = 'themeEditor';
+import { Server } from './runtime/classes/Server';
 
 export default defineNuxtModule<ModuleOptions>({
   meta: {
     name,
     version,
-    configKey: MODULE_CONFIG_KEY
+    configKey: 'themeEditor'
   },
-  defaults: {},
+  defaults: {
+    nameDefaultTheme: 'main',
+    themesDir: './themes',
+    enableDefaultThemeGenerator: false
+  },
   setup(options, nuxt) {
     // @ts-ignore
-    nuxt.options.runtimeConfig.public[MODULE_CONFIG_KEY] = defu(nuxt.options.runtimeConfig.public[MODULE_CONFIG_KEY], options);
+    nuxt.options.runtimeConfig.public['themeEditor'] = defu(nuxt.options.runtimeConfig.public['themeEditor'], options);
     const resolver = createResolver(import.meta.url);
+    const serverObject = new Server(nuxt, options);
 
+    addImportsDir(resolver.resolve('./runtime/composables'));
     addPlugin(resolver.resolve('./runtime/plugin'));
   }
 });
