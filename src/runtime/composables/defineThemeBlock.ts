@@ -1,40 +1,56 @@
-import type { ModuleDefineThemeBlockReturn, ModuleDefineThemeBlockSetting, ModuleObject } from '../types';
+import type {
+  ModuleDefineThemeBlockReturn,
+  ModuleDefineThemeBlockRootReturn,
+  ModuleDefineThemeBlockSetting
+} from '../types';
 import pipe from '../helpers/pipe';
 
+const globalStylesId = 'global';
+
+function isStyleDefine(style: ModuleDefineThemeBlockSetting) {
+  return ['defineThemeBlockRoot', 'defineThemeBlock'].includes(style.type);
+}
+
 function filterStyles(styles: ModuleDefineThemeBlockSetting[]) {
-  return styles.filter(style => (style.type === 'defineThemeBlock' && style.styles) || !style.type);
+  return styles.filter(style => isStyleDefine(style) || !style.type);
 }
 
-function unzipStyles(prefix: string, styles: ModuleDefineThemeBlockSetting[]) {
-  return styles.map((style) => {
-    const isPrefix = prefix.length;
-    return Object
-      .entries((style.type === 'defineThemeBlock' ? style.styles : style) as ModuleObject)
-      .reduce((accum, style) => {
-        const keyWithPrefix = `${prefix}${isPrefix ? style[0][0].toUpperCase() + style[0].slice(1) : style[0]}`;
-        return {
-          ...accum,
-          [keyWithPrefix]: style[1]
-        };
-      }, {} as ModuleObject);
-  });
+function mergeSelfStyles(styles: ModuleDefineThemeBlockSetting[]) {
+  const selfStyles = styles
+    .filter(style => !isStyleDefine(style))
+    .reduce((accum, style) => ({ ...accum, ...style }), {});
+  const defineStyles = styles
+    .filter(style => isStyleDefine(style));
+  return [selfStyles, ...defineStyles];
 }
 
-function flatStyles(styles: ModuleObject[]) {
-  return styles.reduce((accum, style) => ({ ...accum, ...style }), {} as ModuleObject);
+function sortStyles(styles: ModuleDefineThemeBlockSetting[]) {
+  return styles.sort((a, b) => isStyleDefine(a)
+    ? isStyleDefine(b)
+      ? a.id.localeCompare(b.id)
+      : 1
+    : -1
+  );
 }
 
-export default function (prefix: string | undefined | null, ...styles: ModuleDefineThemeBlockSetting[]): ModuleDefineThemeBlockReturn {
-  if (!prefix) prefix = '';
-
+export function defineThemeBlock(id: string, ...styles: ModuleDefineThemeBlockSetting[]): ModuleDefineThemeBlockReturn {
   return {
+    id,
     type: 'defineThemeBlock',
-    prefix,
     styles: pipe(
       styles,
       filterStyles,
-      unzipStyles.bind(null, prefix),
-      flatStyles
+      mergeSelfStyles,
+      sortStyles
     )
+  };
+}
+
+export function defineThemeBlockRoot(...styles: ModuleDefineThemeBlockSetting[]): ModuleDefineThemeBlockRootReturn {
+  const object = defineThemeBlock(globalStylesId, ...styles);
+
+  return {
+    ...object,
+    type: 'defineThemeBlockRoot'
   };
 }

@@ -1,8 +1,16 @@
 import type { ModuleObject } from './index';
 
 export type ModuleDefineThemeBlockSetting = ModuleObject | ModuleDefineThemeBlockReturn;
-export type ModuleDefineThemeBlockReturn = {
+
+export type ModuleDefineThemeBlockBaseReturn = {
+  id: string;
+  type: string;
+  styles: ModuleDefineThemeBlockSetting[];
+};
+
+export type ModuleDefineThemeBlockReturn = ModuleDefineThemeBlockBaseReturn & {
   type: 'defineThemeBlock';
-  prefix: string;
-  styles: ModuleObject;
+};
+export type ModuleDefineThemeBlockRootReturn = ModuleDefineThemeBlockBaseReturn & {
+  type: 'defineThemeBlockRoot';
 };

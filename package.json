@@ -40,13 +40,17 @@
     "dev": "nuxi dev playground",
     "dev:build": "nuxi build playground",
     "dev:prepare": "nuxt-module-build build --stub && nuxt-module-build prepare && nuxi prepare playground",
+    "deploy": "cd ./playground && npx nuxthub deploy",
     "release": "npm run prepack && changelogen --release && npm publish && git push --follow-tags",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix"
   },
   "dependencies": {
     "@nuxt/kit": "^3.14.159",
-    "glob": "^11.0.0"
+    "defu": "^6.1.4",
+    "esbuild": "^0.24.0",
+    "glob": "^11.0.0",
+    "ts-morph": "^24.0.0"
   },
   "devDependencies": {
     "@nuxt/devtools": "^1.6.0",

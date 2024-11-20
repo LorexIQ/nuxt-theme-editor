@@ -15,11 +15,14 @@ export default defineNuxtModule<ModuleOptions>({
     themesDir: './themes',
     enableDefaultThemeGenerator: false
   },
-  setup(options, nuxt) {
+  async setup(options, nuxt) {
     // @ts-ignore
     nuxt.options.runtimeConfig.public['themeEditor'] = defu(nuxt.options.runtimeConfig.public['themeEditor'], options);
     const resolver = createResolver(import.meta.url);
     const serverObject = new Server(nuxt, options);
+    await serverObject.readThemes();
+    const test = serverObject.getThemes();
+    console.log(test);
 
     addImportsDir(resolver.resolve('./runtime/composables'));
     addPlugin(resolver.resolve('./runtime/plugin'));
