@@ -36,7 +36,8 @@
     "dist"
   ],
   "scripts": {
-    "prepack": "nuxt-module-build build",
+    "cleanDevMeta": "rimraf src/runtime/meta",
+    "prepack": "npm run cleanDevMeta && nuxt-module-build build",
     "dev": "nuxi dev playground",
     "dev:build": "nuxi build playground",
     "dev:prepare": "nuxt-module-build build --stub && nuxt-module-build prepare && nuxi prepare playground",
@@ -61,6 +62,7 @@
     "@types/node": "latest",
     "changelogen": "^0.5.7",
     "nuxt": "^3.14.159",
+    "rimraf": "^6.0.1",
     "typescript": "latest",
     "vue-tsc": "^2.1.10"
   }

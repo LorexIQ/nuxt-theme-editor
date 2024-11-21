@@ -2,8 +2,8 @@ import sidebar from './sidebar';
 
 export default defineThemeBlockRoot(
   {
-    test: '#cccccc',
-    test2: '#17c039'
+    test: '#2c2c2c',
+    test2: '#d5e8d8'
   },
   sidebar,
   defineThemeBlock(

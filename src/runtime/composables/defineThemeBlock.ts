@@ -1,18 +1,25 @@
 import type {
   ModuleDefineThemeBlockReturn,
-  ModuleDefineThemeBlockRootReturn,
   ModuleDefineThemeBlockSetting
 } from '../types';
 import pipe from '../helpers/pipe';
-
-const globalStylesId = 'global';
 
 function isStyleDefine(style: ModuleDefineThemeBlockSetting) {
   return ['defineThemeBlockRoot', 'defineThemeBlock'].includes(style.type);
 }
 
 function filterStyles(styles: ModuleDefineThemeBlockSetting[]) {
-  return styles.filter(style => isStyleDefine(style) || !style.type);
+  return styles.filter((style) => {
+    if (isStyleDefine(style)) {
+      if (['', 'global'].includes(style.id)) {
+        if (import.meta.client) console.warn('The use of the id \'global\' or \'\' in defineThemeBlock is not allowed!');
+        return false;
+      }
+      return true;
+    }
+
+    return !style.type;
+  });
 }
 
 function mergeSelfStyles(styles: ModuleDefineThemeBlockSetting[]) {
@@ -33,7 +40,7 @@ function sortStyles(styles: ModuleDefineThemeBlockSetting[]) {
   );
 }
 
-export function defineThemeBlock(id: string, ...styles: ModuleDefineThemeBlockSetting[]): ModuleDefineThemeBlockReturn {
+export default function (id: string, ...styles: ModuleDefineThemeBlockSetting[]): ModuleDefineThemeBlockReturn {
   return {
     id,
     type: 'defineThemeBlock',
@@ -43,14 +50,5 @@ export function defineThemeBlock(id: string, ...styles: ModuleDefineThemeBlockSe
       mergeSelfStyles,
       sortStyles
     )
-  };
-}
-
-export function defineThemeBlockRoot(...styles: ModuleDefineThemeBlockSetting[]): ModuleDefineThemeBlockRootReturn {
-  const object = defineThemeBlock(globalStylesId, ...styles);
-
-  return {
-    ...object,
-    type: 'defineThemeBlockRoot'
   };
 }
