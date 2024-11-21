@@ -1,15 +1,16 @@
 <script setup lang="ts">
 const router = useRouter();
 const themesEditor = useThemesEditor();
+useThemeBlock('sidebar.test');
 </script>
 
 <template>
-  <div class="page-index">
-    <h4>PAGE: INDEX</h4>
-    <button @click="router.push({ path: '/second' })">
-      Go Second Page
+  <div class="page-second">
+    <h4>PAGE: SECOND</h4>
+    <button @click="router.push({ path: '/' })">
+      Go Index Page
     </button>
-    <p>Use global styles. Right block is null</p>
+    <p>Is using useThemeBlock('sidebar.test')</p>
     <div class="test-blocks">
       <div class="test-blocks__left" />
       <div class="test-blocks__right" />
@@ -23,5 +24,6 @@ const themesEditor = useThemesEditor();
   </div>
 </template>
 
-<style scoped>
+<style lang="scss" scoped>
+* {}
 </style>

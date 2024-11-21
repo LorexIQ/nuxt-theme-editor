@@ -14,6 +14,7 @@ import globSync, { globSep } from '../helpers/globSync';
 import { loadTsModule } from '../helpers/loadTsModule';
 import logger from '../helpers/logger';
 import tsMorphProject from '../helpers/tsMorphProject';
+import defineChecker from '../helpers/defineChecker';
 
 export class Server {
   private readonly config: ModuleOptionsExtend;
@@ -80,6 +81,8 @@ export class Server {
     return this.config;
   }
 
+  // Meta Generator
+
   private _metaRemove() {
     const metaDir = this.metaResolver.resolve();
     if (fs.existsSync(metaDir)) fs.rmSync(metaDir, { recursive: true });
@@ -116,7 +119,7 @@ export class Server {
   private _metaCreateThemesStructure() {
     const generateBlockCode = (writer: CodeBlockWriter, styles: ModuleDefineThemeBlockSetting[]) => {
       styles.forEach((block) => {
-        if (['defineThemeBlock', 'defineThemeBlockRoot'].includes(block.type)) {
+        if (defineChecker(block)) {
           writer.write(`'${block.id}': `);
 
           if (block.styles.length > 1) writer.inlineBlock(() => generateBlockCode(writer, block.styles as ModuleDefineThemeBlockSetting[]));
