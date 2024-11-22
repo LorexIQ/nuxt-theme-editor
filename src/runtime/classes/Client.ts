@@ -3,7 +3,7 @@ import type {
   ModuleDefineThemeBlockSetting,
   ModuleDefineThemeCleanedSetting,
   ModuleObject,
-  ModuleOptionsExtend,
+  ModuleOptionsExtend, ModuleStorage,
   ModuleThemeRootReturn,
   ModuleThemes,
   ModuleThemeType
@@ -12,23 +12,32 @@ import type {
 import connectorMeta from '../meta/connector';
 import unwrap from '../helpers/unwrap';
 import defineChecker from '../helpers/defineChecker';
+import getSystemTheme from '../helpers/getSystemTheme';
 import { useRuntimeConfig } from '#imports';
 
 export class Client {
   private readonly config = useRuntimeConfig().public.themesEditor as ModuleOptionsExtend;
-  private readonly selectedThemeName = ref<string>();
-  private readonly themes = reactive<ModuleThemes>({});
   private readonly usesDocumentProperties = reactive<ModuleObject>({});
   private readonly usesScopesProperties = reactive<ModuleObject<ModuleObject>>({});
 
+  private readonly isUseSystemTheme = ref(false);
+  private readonly selectedThemeName = ref(this.config.defaultTheme);
+  private readonly selectedSystemThemeName = getSystemTheme().theme;
+  private readonly themes = reactive<ModuleThemes>({});
+
   private readonly selectedTheme = computed(() => {
-    const selectedTheme = unwrap.get(this.selectedThemeName);
+    const selectedTheme = unwrap.get(this.isUseSystemTheme) ? this._getSystemThemeAssociation() : unwrap.get(this.selectedThemeName);
     return selectedTheme && selectedTheme in this.themes ? this.themes[selectedTheme] : undefined;
   });
 
+  private readonly savedStorage = computed<ModuleStorage>(() => ({
+    selectedThemeName: unwrap.get(this.selectedThemeName),
+    isUseSystemTheme: unwrap.get(this.isUseSystemTheme)
+  }));
+
   constructor() {
     Object.assign(this.themes, this._readSystemThemes());
-    this._readSelectedTheme();
+    this._readStorage();
     this._initWatchers();
   }
 
@@ -42,36 +51,11 @@ export class Client {
       }
     }, { immediate: true });
 
-    watch(this.usesDocumentProperties, (properties) => {
-      const styleContent = [
-        ':root {',
-        ...Object.keys(properties).map(key => `  --${key}: ${properties[key]};`),
-        '}'
-      ].join('\n');
+    watch(this.usesDocumentProperties, properties => this._appendStyleToHead(this.config.keys.style, { ':root': properties }), { immediate: true });
 
-      const _styleElement = document.getElementById(this.config.keys.style);
-      const styleElement = _styleElement ?? document.createElement('style');
-      styleElement.id = this.config.keys.style;
-      styleElement.textContent = styleContent;
-      if (!_styleElement) document.head.appendChild(styleElement);
-    }, { immediate: true });
+    watch(this.usesScopesProperties, scopes => this._appendStyleToHead(`${this.config.keys.style}:scope`, scopes, true), { immediate: true });
 
-    watch(this.usesScopesProperties, (scopes) => {
-      const styleContent = Object.keys(scopes).map((scopeId) => {
-        const scopeStyles = scopes[scopeId];
-        return [
-          `[${scopeId}] {`,
-          ...Object.keys(scopeStyles).map(key => `  --${key}: ${scopeStyles[key]};`),
-          '}'
-        ].join('\n');
-      }).join('\n\n');
-
-      const _styleElement = document.getElementById(`${this.config.keys.style}:scope`);
-      const styleElement = _styleElement ?? document.createElement('style');
-      styleElement.id = `${this.config.keys.style}:scope`;
-      styleElement.textContent = styleContent;
-      if (!_styleElement) document.head.appendChild(styleElement);
-    }, { immediate: true });
+    watch(this.savedStorage, () => this._saveStorage());
   }
 
   private _removeDocumentStyles(styles?: ModuleObject): void {
@@ -85,6 +69,23 @@ export class Client {
     for (const [key, value] of Object.entries(styles)) {
       this.usesDocumentProperties[key] = value;
     }
+  }
+
+  private _appendStyleToHead(id: string, scopes: ModuleObject<ModuleObject>, shielding = false) {
+    const styleContent = Object.keys(scopes).map((scopeId) => {
+      const scopeStyles = scopes[scopeId];
+      return [
+        shielding ? `[${scopeId}] {` : `${scopeId} {`,
+        ...Object.keys(scopeStyles).map(key => `  --${key}: ${scopeStyles[key]};`),
+        '}'
+      ].join('\n');
+    }).join('\n\n');
+
+    const _styleElement = document.getElementById(id);
+    const styleElement = _styleElement ?? document.createElement('style');
+    styleElement.id = id;
+    styleElement.textContent = styleContent;
+    if (!_styleElement) document.head.appendChild(styleElement);
   }
 
   private _prepareTheme(themeFile: ModuleDefineThemeBlockRootReturn, themeName: string, themeType: ModuleThemeType): ModuleThemeRootReturn {
@@ -123,15 +124,30 @@ export class Client {
     }
   }
 
-  private _readSelectedTheme(): void {
-    const storageValue = localStorage.getItem(this.config.keys.storage);
+  private _readStorage(): void {
+    const storage = JSON.parse(localStorage.getItem(this.config.keys.storage) as string) as ModuleStorage | null;
 
-    if (Object.keys(this.themes).length) {
-      if (storageValue && storageValue in this.themes) {
-        unwrap.set(this, 'selectedThemeName', storageValue);
-      } else if (this.config.defaultTheme in this.themes) {
-        unwrap.set(this, 'selectedThemeName', this.config.defaultTheme);
-      }
+    unwrap.set(this, 'selectedThemeName', storage && storage.selectedThemeName in this.themes
+      ? storage.selectedThemeName
+      : this.config.defaultTheme);
+
+    if (storage) {
+      unwrap.set(this, 'isUseSystemTheme', storage.isUseSystemTheme);
+    }
+  }
+
+  private _saveStorage(): void {
+    localStorage.setItem(this.config.keys.storage, JSON.stringify(unwrap.get(this.savedStorage)));
+  }
+
+  private _getSystemThemeAssociation() {
+    if (!this.config.defaultDarkTheme) return unwrap.get(this.selectedThemeName);
+
+    switch (unwrap.get(this.selectedSystemThemeName)) {
+      case 'light':
+        return this.config.defaultTheme;
+      case 'dark':
+        return this.config.defaultDarkTheme;
     }
   }
 
@@ -147,8 +163,21 @@ export class Client {
     return unwrap.get(this.selectedTheme);
   }
 
+  getAutoModeStatus() {
+    return unwrap.get(this.isUseSystemTheme);
+  }
+
+  getSelectedThemeName() {
+    return unwrap.get(this.selectedThemeName);
+  }
+
+  setAutoModeTheme(mode: boolean) {
+    unwrap.set(this, 'isUseSystemTheme', mode);
+  }
+
   selectTheme(themeName: string) {
     if (!(themeName in this.themes)) return;
+    unwrap.set(this, 'isUseSystemTheme', false);
     unwrap.set(this, 'selectedThemeName', themeName);
   }
 

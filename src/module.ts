@@ -13,7 +13,7 @@ export default defineNuxtModule<ModuleOptions>({
     configKey: MODULE_CONFIG_KEY
   },
   defaults: {
-    defaultTheme: 'main',
+    defaultTheme: 'light',
     themesDir: './themes',
     enableDefaultThemeGenerator: false
   },

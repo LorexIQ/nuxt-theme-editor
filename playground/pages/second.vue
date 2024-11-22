@@ -7,6 +7,7 @@ useThemeBlock('sidebar.test');
 <template>
   <div class="page-second">
     <h4>PAGE: SECOND</h4>
+    {{ themesEditor.getSelectedThemeName() }}
     <button @click="router.push({ path: '/' })">
       Go Index Page
     </button>
@@ -20,6 +21,9 @@ useThemeBlock('sidebar.test');
     </button>
     <button @click="themesEditor.selectTheme('dark')">
       DARK
+    </button>
+    <button @click="themesEditor.setAutoModeTheme(!themesEditor.getAutoModeStatus())">
+      AUTO [{{ themesEditor.getAutoModeStatus() ? 'ON' : 'OFF' }}]
     </button>
   </div>
 </template>
