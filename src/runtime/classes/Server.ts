@@ -1,4 +1,3 @@
-import path from 'node:path';
 import fs from 'node:fs';
 import type { Nuxt } from '@nuxt/schema';
 import { createResolver, type Resolver } from '@nuxt/kit';
@@ -10,11 +9,14 @@ import type {
   ModuleOptions,
   ModuleOptionsExtend, ModuleOptionsExtendMeta, ModuleServerThemes
 } from '../types';
-import globSync, { globSep } from '../helpers/globSync';
-import { loadTsModule } from '../helpers/loadTsModule';
+import uPath from '../helpers/uPath';
 import logger from '../helpers/logger';
 import tsMorphProject from '../helpers/tsMorphProject';
 import defineChecker from '../helpers/defineChecker';
+import { loadTsModule } from '../helpers/loadTsModule';
+
+(global as any).defineThemeBlock = defineThemeBlock;
+(global as any).defineThemeBlockRoot = defineThemeBlockRoot;
 
 export class Server {
   private readonly config: ModuleOptionsExtend;
@@ -23,7 +25,8 @@ export class Server {
   private readonly metaResolver: Resolver;
 
   private readonly themes: ModuleServerThemes = {};
-  private readonly themesPaths: string[] = [];
+  private readonly themesPaths: Set<string> = new Set();
+  private readonly themesNames: Set<string> = new Set();
 
   constructor(
     private readonly nuxt: Nuxt,
@@ -33,7 +36,9 @@ export class Server {
     this.metaResolver = createResolver(this.resolver.resolve('runtime', 'meta'));
     this.config = this._initConfig(this.nuxt.options.runtimeConfig.public.themesEditor as any);
     this.rootDir = this.nuxt.options.rootDir;
-    this.rootThemesDir = globSep(path.join(this.rootDir, this.config.themesDir));
+    this.rootThemesDir = uPath.join(this.rootDir, this.config.themesDir);
+
+    this._initThemesDir();
   }
 
   private _initConfig(options: ModuleOptions): ModuleOptionsExtend {
@@ -49,59 +54,95 @@ export class Server {
     };
   }
 
-  async readThemes() {
-    this.themesPaths.splice(0);
-    const indexThemesPaths = globSync(path.join(this.rootThemesDir, '*', 'index.ts'));
-
-    (global as any).defineThemeBlock = defineThemeBlock;
-    (global as any).defineThemeBlockRoot = defineThemeBlockRoot;
-
-    for (const themePath of indexThemesPaths) {
-      if (!fs.existsSync(themePath)) {
-        logger.warn(`Theme file wasn't found: '${themePath}'.`);
-        continue;
-      }
-
-      const themeName = themePath.slice(this.rootThemesDir.length + 1, themePath.lastIndexOf('/'));
-      const themeFile = (await loadTsModule(themePath))?.default as ModuleDefineThemeBlockRootReturn;
-
-      if (!themeFile) {
-        logger.warn(`Error loading theme file: '${themePath}'.`);
-        continue;
-      } else if (themeFile.type !== 'defineThemeBlockRoot') {
-        logger.warn(`Unknown define theme type: '${themePath}'. Use defineThemeEditorRoot as export default.`);
-        continue;
-      }
-
-      this.themesPaths.push(themePath);
-      this.config.themes.push(themeName);
-      this.themes[themeName] = themeFile;
+  private _initThemesDir(): void {
+    if (!fs.existsSync(this.rootThemesDir)) {
+      fs.mkdirSync(this.rootThemesDir, { recursive: true });
     }
   }
 
-  getConfig() {
-    return this.config;
+  private async _readThemeByPath(indexPath: string): Promise<boolean> {
+    if (!fs.existsSync(indexPath)) {
+      logger.warn(`Theme file wasn't found: '${indexPath}'.`);
+      return false;
+    }
+
+    const themeName = indexPath.slice(this.rootThemesDir.length + 1, indexPath.lastIndexOf('/'));
+    let themeFile: ModuleDefineThemeBlockRootReturn;
+
+    try {
+      themeFile = (await loadTsModule(indexPath))?.default;
+    } catch {
+      return false;
+    }
+
+    if (!themeFile) {
+      logger.warn(`Error loading theme file: '${indexPath}'.`);
+      return false;
+    } else if (themeFile.type !== 'defineThemeBlockRoot') {
+      logger.warn(`Unknown define theme type: '${indexPath}'. Use defineThemeEditorRoot as export default.`);
+      return false;
+    }
+
+    this.themesPaths.add(indexPath);
+    this.themesNames.add(themeName);
+    this.themes[themeName] = themeFile;
+    return true;
+  }
+
+  async checkAndGenerateDefaultTheme(): Promise<void> {
+    const defaultThemeDir = uPath.join(this.rootThemesDir, this.config.defaultTheme);
+    const defaultThemePath = uPath.join(defaultThemeDir, 'index.ts');
+
+    if (!await this._readThemeByPath(defaultThemePath)) {
+      logger.info('Default theme generation...');
+
+      if (!fs.existsSync(defaultThemeDir)) {
+        fs.mkdirSync(defaultThemeDir);
+      }
+
+      const themeIndexFile = tsMorphProject.createSourceFile(defaultThemePath, '', { overwrite: true });
+      themeIndexFile.addExportAssignment({
+        isExportEquals: false,
+        expression: 'defineThemeBlockRoot({})'
+      });
+      themeIndexFile.saveSync();
+    }
+  }
+
+  async readThemes(): Promise<void> {
+    this.themesPaths.clear();
+    const indexThemesPaths = uPath.glob(uPath.join(this.rootThemesDir, '*', 'index.ts'));
+
+    for (const themePath of indexThemesPaths) {
+      await this._readThemeByPath(themePath);
+    }
+  }
+
+  getConfig(): ModuleOptionsExtend {
+    return {
+      ...this.config,
+      themes: [...this.themesNames]
+    };
   }
 
   // Meta Generator
 
-  private _metaRemove() {
+  private _metaRemove(): void {
     const metaDir = this.metaResolver.resolve();
     if (fs.existsSync(metaDir)) fs.rmSync(metaDir, { recursive: true });
   }
 
-  private _metaMkDir() {
+  private _metaMkDir(): void {
     const metaDir = this.metaResolver.resolve();
     if (!fs.existsSync(metaDir)) fs.mkdirSync(metaDir);
   }
 
-  private _metaCreateConnector() {
+  private _metaCreateConnector(): void {
     const filePath = this.metaResolver.resolve('connector.js');
-    const themesConnector = Object
-      .values(this.themesPaths)
-      .flat()
+    const themesConnector = Array
+      .from(this.themesPaths)
       .map((themePath) => {
-        const themeByRootPath = path.parse(themePath).dir.slice(this.rootDir.length);
+        const themeByRootPath = uPath.parse(themePath).dir.slice(this.rootDir.length);
         const themeName = themeByRootPath.split('/').at(-1)!;
 
         return {
@@ -118,7 +159,7 @@ export class Server {
     fs.writeFileSync(filePath, fileContent, 'utf-8');
   }
 
-  private _metaCreateThemesStructure() {
+  private _metaCreateThemesStructure(): void {
     const generateBlockCode = (writer: CodeBlockWriter, styles: ModuleDefineThemeBlockSetting[]) => {
       styles.forEach((block) => {
         if (defineChecker(block)) {
@@ -153,7 +194,7 @@ export class Server {
     metaFile.saveSync();
   }
 
-  private _metaCreateThemesStyles() {
+  private _metaCreateThemesStyles(): void {
     const mergedStyles: ModuleObject = {};
 
     const generateMergedStyles = (styles: ModuleDefineThemeBlockSetting[]) => {
@@ -188,7 +229,7 @@ export class Server {
     metaFile.saveSync();
   }
 
-  createMeta() {
+  createMeta(): void {
     this._metaRemove();
     this._metaMkDir();
     this._metaCreateConnector();

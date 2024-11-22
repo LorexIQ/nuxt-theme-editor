@@ -57,27 +57,29 @@ const themes = computed(() => props.themes.filter(theme => theme.type === props.
         >
           <IconPlus />
         </div>
-        <template v-if="themes.length">
+        <div
+          v-if="themes.length"
+          class="block-themes__content__themes"
+        >
           <div
             v-for="theme of themes"
             :key="theme.name"
-            class="block-themes__content__theme"
+            class="block-themes__content__themes__theme"
           >
-            <div class="block-themes__content__theme__preview">
+            <div class="block-themes__content__themes__theme__preview">
               <slot>
                 <ThemePreview />
               </slot>
             </div>
           </div>
-        </template>
-        <template v-else>
-          <div
-            class="block-themes__content__null"
-            :class="{ 'block-themes__content__null--simplify': !isAddActive }"
-          >
-            Список тем пуст
-          </div>
-        </template>
+        </div>
+        <div
+          v-else
+          class="block-themes__content__null"
+          :class="{ 'block-themes__content__null--simplify': !isAddActive }"
+        >
+          Список тем пуст
+        </div>
       </div>
     </transition-expand>
   </div>
@@ -118,14 +120,20 @@ const themes = computed(() => props.themes.filter(theme => theme.type === props.
       padding: 5px;
       color: var(--title);
       border: 1px solid var(--border);
-      border-radius: 5px;
+      border-radius: var(--border-radius);
 
       & svg {
         font-size: 30px;
       }
     }
-    &__theme {
+    &__themes {
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
 
+      &__theme {
+
+      }
     }
     &__null {
       font-size: 12px;

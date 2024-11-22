@@ -2,8 +2,10 @@ import sidebar from './sidebar';
 
 export default defineThemeBlockRoot(
   {
-    test: '#2c2c2c',
-    test2: '#d5e8d8'
+    previewCardStyles: {
+      test: '#2c2c2c',
+      test2: '#d5e8d8'
+    }
   },
   sidebar,
   defineThemeBlock(

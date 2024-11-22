@@ -101,6 +101,7 @@ export class Client {
 
       return themeStyle;
     };
+    console.log(this.themes);
 
     return {
       name: themeName,

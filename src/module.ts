@@ -24,6 +24,7 @@ export default defineNuxtModule<ModuleOptions>({
 
     const resolver = createResolver(import.meta.url);
     const serverObject = new Server(nuxt, meta, resolver);
+    await serverObject.checkAndGenerateDefaultTheme();
     await serverObject.readThemes();
 
     // @ts-ignore

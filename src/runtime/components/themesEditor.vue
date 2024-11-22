@@ -45,6 +45,7 @@ const themes = computed(() => Object.values(themesEditor.getThemes()));
   --title: #333;
   --titleTransparent: #999;
   --border: rgba(0, 0, 0, 0.1);
+  --border-radius: 5px;
 
   display: grid;
   grid-template-rows: auto 1fr;
