@@ -1,17 +1,18 @@
-import { defineNuxtModule, addPlugin, createResolver, addImportsDir } from '@nuxt/kit';
+import { defineNuxtModule, addPlugin, createResolver, addImportsDir, addComponent, installModule } from '@nuxt/kit';
 import defu from 'defu';
 import { name, version } from '../package.json';
 import type { ModuleOptions } from './runtime/types';
 import { Server } from './runtime/classes/Server';
 
 const MODULE_CONFIG_KEY = 'themesEditor';
+const meta = {
+  name,
+  version,
+  configKey: MODULE_CONFIG_KEY
+};
 
 export default defineNuxtModule<ModuleOptions>({
-  meta: {
-    name,
-    version,
-    configKey: MODULE_CONFIG_KEY
-  },
+  meta,
   defaults: {
     defaultTheme: 'light',
     themesDir: './themes',
@@ -22,7 +23,7 @@ export default defineNuxtModule<ModuleOptions>({
     nuxt.options.runtimeConfig.public[MODULE_CONFIG_KEY] = defu(nuxt.options.runtimeConfig.public[MODULE_CONFIG_KEY], options);
 
     const resolver = createResolver(import.meta.url);
-    const serverObject = new Server(nuxt, resolver);
+    const serverObject = new Server(nuxt, meta, resolver);
     await serverObject.readThemes();
 
     // @ts-ignore
@@ -32,5 +33,12 @@ export default defineNuxtModule<ModuleOptions>({
 
     addImportsDir(resolver.resolve('./runtime/composables'));
     addPlugin(resolver.resolve('./runtime/plugin'));
+
+    await installModule('nuxt-transition-expand');
+
+    await addComponent({
+      name: 'themesEditor',
+      filePath: resolver.resolve('./runtime/components/themesEditor.vue')
+    });
   }
 });

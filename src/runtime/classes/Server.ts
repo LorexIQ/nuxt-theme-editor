@@ -8,7 +8,7 @@ import defineThemeBlockRoot from '../composables/defineThemeBlockRoot';
 import type {
   ModuleDefineThemeBlockRootReturn, ModuleDefineThemeBlockSetting, ModuleObject,
   ModuleOptions,
-  ModuleOptionsExtend, ModuleServerThemes
+  ModuleOptionsExtend, ModuleOptionsExtendMeta, ModuleServerThemes
 } from '../types';
 import globSync, { globSep } from '../helpers/globSync';
 import { loadTsModule } from '../helpers/loadTsModule';
@@ -27,10 +27,11 @@ export class Server {
 
   constructor(
     private readonly nuxt: Nuxt,
+    private readonly meta: ModuleOptionsExtendMeta,
     private readonly resolver: Resolver
   ) {
     this.metaResolver = createResolver(this.resolver.resolve('runtime', 'meta'));
-    this.config = this._initConfig(this.nuxt.options.runtimeConfig.public.themesEditor as ModuleOptions);
+    this.config = this._initConfig(this.nuxt.options.runtimeConfig.public.themesEditor as any);
     this.rootDir = this.nuxt.options.rootDir;
     this.rootThemesDir = globSep(path.join(this.rootDir, this.config.themesDir));
   }
@@ -43,7 +44,8 @@ export class Server {
         state: 'nuxt-themes-editor:state',
         storage: 'nuxt-themes-editor:selected-theme',
         style: 'nuxt-themes-editor:style'
-      }
+      },
+      meta: this.meta
     };
   }
 

@@ -17,7 +17,13 @@ type ModuleOptionsExtendKeys = {
   storage: string;
   style: string;
 };
+export type ModuleOptionsExtendMeta = {
+  name: string;
+  version: string;
+  configKey: string;
+};
 export type ModuleOptionsExtend = ModuleOptions & {
   themes: string[];
   keys: ModuleOptionsExtendKeys;
+  meta: ModuleOptionsExtendMeta;
 };

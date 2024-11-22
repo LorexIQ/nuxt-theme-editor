@@ -3,7 +3,7 @@ import clientGetter from '../helpers/clientGetter';
 import type { ModuleNestedKeys } from '../types';
 // @ts-ignore
 import type { ModuleMetaBlocks } from '../meta/themesStructure';
-import { getCurrentInstance } from '#imports';
+import { getCurrentInstance, onMounted, onUnmounted } from '#imports';
 
 function getComponentId(instance: ComponentInternalInstance) {
   const instanceType = instance.type as any;

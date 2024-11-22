@@ -1,3 +1,5 @@
+import { ref } from '#imports';
+
 const theme = ref<'light' | 'dark'>(getSystemTheme());
 
 function getSystemTheme(): 'light' | 'dark' {

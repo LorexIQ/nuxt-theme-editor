@@ -9,7 +9,7 @@ function filterStyles(styles: ModuleDefineThemeBlockSetting[]) {
   return styles.filter((style) => {
     if (defineChecker(style)) {
       if (['', 'global'].includes(style.id)) {
-        if (import.meta.client) console.warn('The use of the id \'global\' or \'\' in defineThemeBlock is not allowed!');
+        console.warn('The use of the id \'global\' or \'\' in defineThemeBlock is not allowed!');
         return false;
       }
       return true;

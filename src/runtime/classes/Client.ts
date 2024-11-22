@@ -13,7 +13,7 @@ import connectorMeta from '../meta/connector';
 import unwrap from '../helpers/unwrap';
 import defineChecker from '../helpers/defineChecker';
 import getSystemTheme from '../helpers/getSystemTheme';
-import { useRuntimeConfig } from '#imports';
+import { useRuntimeConfig, reactive, ref, computed, watch } from '#imports';
 
 export class Client {
   private readonly config = useRuntimeConfig().public.themesEditor as ModuleOptionsExtend;
@@ -105,6 +105,15 @@ export class Client {
     return {
       name: themeName,
       type: themeType,
+      meta: {
+        ...themeFile.meta,
+
+        previewCardStyles: {
+          defaultPreviewCardBG: '#000',
+
+          ...themeFile.meta.previewCardStyles
+        }
+      },
       styles: themeFile.styles.map(style => cleanThemeStyles(style, 'global'))
     };
   }
