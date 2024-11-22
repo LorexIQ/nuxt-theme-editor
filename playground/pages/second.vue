@@ -25,5 +25,4 @@ useThemeBlock('sidebar.test');
 </template>
 
 <style lang="scss" scoped>
-* {}
 </style>

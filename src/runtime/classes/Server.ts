@@ -6,7 +6,7 @@ import type { CodeBlockWriter } from 'ts-morph';
 import defineThemeBlock from '../composables/defineThemeBlock';
 import defineThemeBlockRoot from '../composables/defineThemeBlockRoot';
 import type {
-  ModuleDefineThemeBlockRootReturn, ModuleDefineThemeBlockSetting,
+  ModuleDefineThemeBlockRootReturn, ModuleDefineThemeBlockSetting, ModuleObject,
   ModuleOptions,
   ModuleOptionsExtend, ModuleServerThemes
 } from '../types';
@@ -144,7 +144,42 @@ export class Server {
       metaFile.addTypeAlias({
         name: 'ModuleMetaBlocks',
         isExported: true,
-        type: w => w.write('object')
+        type: writer => writer.write('object')
+      });
+    }
+
+    metaFile.saveSync();
+  }
+
+  private _metaCreateThemesStyles() {
+    const mergedStyles: ModuleObject = {};
+
+    const generateMergedStyles = (styles: ModuleDefineThemeBlockSetting[]) => {
+      styles.forEach((block) => {
+        if (defineChecker(block)) {
+          generateMergedStyles(block.styles as ModuleDefineThemeBlockSetting[]);
+        } else {
+          for (const key of Object.keys(block)) {
+            mergedStyles[key] = (block as any)[key];
+          }
+        }
+      });
+    };
+
+    const filePath = this.metaResolver.resolve('themesStyles.css');
+    const metaFile = tsMorphProject.createSourceFile(filePath, '', { overwrite: true });
+    const defaultTheme = this.themes[this.config.defaultTheme];
+
+    if (defaultTheme) {
+      generateMergedStyles(defaultTheme.styles);
+      metaFile.insertText(0, (writer) => {
+        writer.writeLine('/* This file does not reflect the actual colors of the variables, it is needed for IDE hints */\n');
+        writer.write(`[all-${Date.now()}] `);
+        writer.inlineBlock(() => Object.entries(mergedStyles).forEach(([key, value]) => writer.write(`--${key}: ${value};\n`)));
+      });
+    } else {
+      metaFile.insertText(0, (writer) => {
+        writer.write(`[all-${Date.now()}] {}`);
       });
     }
 
@@ -156,5 +191,6 @@ export class Server {
     this._metaMkDir();
     this._metaCreateConnector();
     this._metaCreateThemesStructure();
+    this._metaCreateThemesStyles();
   }
 }

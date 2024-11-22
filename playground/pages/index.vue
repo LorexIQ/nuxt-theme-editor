@@ -24,4 +24,7 @@ const themesEditor = useThemesEditor();
 </template>
 
 <style scoped>
+*[asd] {
+  background-color: var(--testtesttest);
+}
 </style>
