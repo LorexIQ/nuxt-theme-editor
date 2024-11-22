@@ -173,6 +173,10 @@ export class Client {
   }
 
   unregisterScopeStyles(scopeId: string) {
-    delete this.usesDocumentProperties[scopeId];
+    delete this.usesScopesProperties[scopeId];
+  }
+
+  checkScopeRegistration(scopeId: string) {
+    return !!this.usesScopesProperties[scopeId];
   }
 }

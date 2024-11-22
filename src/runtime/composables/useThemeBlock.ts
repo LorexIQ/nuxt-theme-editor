@@ -1,6 +1,7 @@
 import type { ComponentInternalInstance } from '@vue/runtime-core';
 import clientGetter from '../helpers/clientGetter';
 import type { ModuleNestedKeys } from '../types';
+// @ts-ignore
 import type { ModuleMetaBlocks } from '../meta/themesStructure';
 import { getCurrentInstance } from '#imports';
 
@@ -27,7 +28,10 @@ export default function useBlock(block: ModuleNestedKeys<ModuleMetaBlocks>) {
   const currentInstance = getCurrentInstance()!;
 
   onMounted(() => {
-    client.registerScopeStyles(block, getComponentId(currentInstance));
+    const scopeId = getComponentId(currentInstance);
+    if (client.checkScopeRegistration(scopeId))
+      console.warn(`useThemeBlock is already used in [${currentInstance.type.__file}]. The styles of the last called function will be used. Only one call is allowed.`);
+    client.registerScopeStyles(block, scopeId);
   });
   onUnmounted(() => {
     client.unregisterScopeStyles(getComponentId(currentInstance));
