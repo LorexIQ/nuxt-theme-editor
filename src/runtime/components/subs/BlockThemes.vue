@@ -1,13 +1,14 @@
 <script setup lang="ts">
 import IconArrow from '../icons/IconArrow.vue';
 import IconPlus from '../icons/IconPlus.vue';
-import type { ModuleThemeRootReturn, ModuleThemeType } from '../../types';
+import type { ModuleThemeType } from '../../types';
+import type { Client } from '../../classes/Client';
 import ThemePreview from './ThemePreview.vue';
 import { ref, computed } from '#imports';
 
 type Props = {
   type: ModuleThemeType;
-  themes: ModuleThemeRootReturn[];
+  client: Client;
   isOpen?: boolean;
 };
 
@@ -17,6 +18,7 @@ const props = withDefaults(defineProps<Props>(), {
 
 const isOpened = ref(props.isOpen);
 const isAddActive = computed(() => props.type === 'local');
+const themes = computed(() => Object.values(props.client.getThemes()).filter(theme => theme.type === props.type));
 const title = computed(() => {
   switch (props.type) {
     case 'system':
@@ -29,7 +31,6 @@ const title = computed(() => {
       return 'Unsupported';
   }
 });
-const themes = computed(() => props.themes.filter(theme => theme.type === props.type));
 </script>
 
 <template>
@@ -65,11 +66,34 @@ const themes = computed(() => props.themes.filter(theme => theme.type === props.
             v-for="theme of themes"
             :key="theme.name"
             class="block-themes__content__themes__theme"
+            :class="{ 'block-themes__content__themes__theme--active': client.getSelectedThemeName() === theme.name }"
+            @dblclick="client.selectTheme(theme.name)"
           >
-            <div class="block-themes__content__themes__theme__preview">
+            <div
+              class="block-themes__content__themes__theme__preview"
+              v-bind="{ [`theme-${theme.name}-preview`]: '' }"
+            >
               <slot>
                 <ThemePreview />
               </slot>
+            </div>
+            <div class="block-themes__content__themes__theme__info">
+              <div class="block-themes__content__themes__theme__info__name">
+                {{ theme.name }}
+              </div>
+              <div
+                class="block-themes__content__themes__theme__info__description"
+                :class="{ 'block-themes__content__themes__theme__info__description--transparent': !theme.meta.description }"
+              >
+                <span>{{ theme.meta.description ?? 'Описание не указано' }}</span>
+              </div>
+            </div>
+            <div
+              class="block-themes__content__themes__theme__status"
+            >
+              <div class="block-themes__content__themes__theme__status__active">
+                Active
+              </div>
             </div>
           </div>
         </div>
@@ -132,7 +156,96 @@ const themes = computed(() => props.themes.filter(theme => theme.type === props.
       gap: 5px;
 
       &__theme {
+        display: grid;
+        grid-template-columns: 90px auto 0;
+        align-items: center;
+        width: 100%;
+        height: 60px;
+        border: 1px solid var(--border);
+        border-radius: var(--border-radius);
+        overflow: hidden;
+        cursor: pointer;
+        transition: .3s;
 
+        &__preview {
+          width: 100%;
+          aspect-ratio: 3 / 2;
+          border-right: 1px solid var(--border);
+        }
+        &__info {
+          position: relative;
+          display: grid;
+          grid-template-rows: 26px auto;
+          align-content: center;
+          gap: 2px;
+          width: 100%;
+          height: 100%;
+          padding: 0 10px 5px;
+          overflow: hidden;
+
+          &__name {
+            font-size: 20px;
+            font-weight: 600;
+            display: flex;
+            align-items: flex-end;
+            width: 100%;
+            text-wrap: nowrap;
+            overflow: hidden;
+
+            &::after {
+              position: absolute;
+              content: '';
+              top: 0;
+              right: 0;
+              width: 50px;
+              height: 26px;
+              background: linear-gradient(90deg, transparent 0%, var(--bg) 100%);
+            }
+          }
+          &__description {
+            font-size: 12px;
+            padding-bottom: 5px;
+            overflow-x: hidden;
+            overflow-y: auto;
+
+            &--transparent {
+              color: var(--titleTransparent)
+            }
+
+            &::after {
+              position: absolute;
+              content: '';
+              bottom: 0;
+              left: 0;
+              right: 4px;
+              height: 15px;
+              background: linear-gradient(180deg, transparent 0%, var(--bg) 100%);
+            }
+          }
+        }
+        &__status {
+          font-size: 12px;
+          height: 100%;
+          writing-mode: vertical-rl;
+          overflow: hidden;
+
+          & > div {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            height: 100%;
+          }
+          &__active {
+            height: 100%;
+            color: var(--status-active-title);
+            background-color: var(--status-active-bg);
+          }
+        }
+
+        &--active {
+          grid-template-columns: 90px auto 20px;
+        }
       }
     }
     &__null {

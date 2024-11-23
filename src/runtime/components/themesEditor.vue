@@ -1,11 +1,8 @@
 <script setup lang="ts">
 import useThemesEditor from '../composables/useThemesEditor';
 import BlockThemes from './subs/BlockThemes.vue';
-import { computed } from '#imports';
 
 const themesEditor = useThemesEditor();
-
-const themes = computed(() => Object.values(themesEditor.getThemes()));
 </script>
 
 <template>
@@ -21,22 +18,22 @@ const themes = computed(() => Object.values(themesEditor.getThemes()));
     <div class="themes-editor__content">
       <BlockThemes
         type="system"
-        :themes="themes"
         is-open
+        :client="themesEditor"
       />
       <BlockThemes
         type="global"
-        :themes="themes"
+        :client="themesEditor"
       />
       <BlockThemes
         type="local"
-        :themes="themes"
+        :client="themesEditor"
       />
     </div>
   </div>
 </template>
 
-<style scoped lang="scss">
+<style lang="scss">
 .themes-editor {
   --bg: #fff;
   --bgHeader: #f6f6f6;
@@ -46,7 +43,31 @@ const themes = computed(() => Object.values(themesEditor.getThemes()));
   --titleTransparent: #999;
   --border: rgba(0, 0, 0, 0.1);
   --border-radius: 5px;
+  --status-active-bg: #85f585;
+  --status-active-title: #777;
 
+  & * {
+    font-family: 'Roboto', sans-serif;
+    box-sizing: border-box;
+
+    &::-webkit-scrollbar {
+      height: 4px;
+      width: 4px;
+    }
+    &::-webkit-scrollbar-track {
+      border-radius: 2px;
+      background-color: var(--bg);
+    }
+    &::-webkit-scrollbar-thumb {
+      border-radius: 2px;
+      background-color: var(--border);
+    }
+  }
+}
+</style>
+
+<style scoped lang="scss">
+.themes-editor {
   display: grid;
   grid-template-rows: auto 1fr;
   height: 100%;
@@ -55,9 +76,6 @@ const themes = computed(() => Object.values(themesEditor.getThemes()));
   overflow: hidden;
   user-select: none;
 
-  & * {
-    font-family: 'Roboto', sans-serif;
-  }
   &__header {
     position: relative;
     display: grid;

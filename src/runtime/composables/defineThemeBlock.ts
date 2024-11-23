@@ -43,7 +43,7 @@ function sortStyles(styles: ModuleDefineThemeBlockSetting[]) {
   );
 }
 
-export default function (id: string, ...styles: ModuleDefineThemeBlockSetting[]): ModuleDefineThemeBlockReturn {
+export default function (id: string, styles: ModuleDefineThemeBlockSetting[]): ModuleDefineThemeBlockReturn {
   return {
     id,
     type: 'defineThemeBlock',

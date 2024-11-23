@@ -1,3 +1,5 @@
-export default defineThemeBlock('test', {
-  testtesttest: '#ff0000'
-});
+export default defineThemeBlock('test', [
+  {
+    testtesttest: '#ff0000'
+  }
+]);

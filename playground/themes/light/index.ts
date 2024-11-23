@@ -1,22 +1,21 @@
 import sidebar from './sidebar';
 
-export default defineThemeBlockRoot(
+export default defineThemeBlockRoot({
+  description: 'Стандартная светлая тема фырв шщрфшщырв шщрфышвр щшфырщв рфырв шщфршырв щшфырщшв рфыр фылдв фыв рфырвд фыдвр дфыырлвр фыдрдвр',
+  previewCardStyles: {
+  }
+}, [
   {
-    previewCardStyles: {
-      test: '#cccccc',
-      test2: '#17c039'
-    }
+    test: '#cccccc'
   },
   sidebar,
-  defineThemeBlock(
-    'navbar',
-    defineThemeBlock(
-      'road',
+  defineThemeBlock('navbar', [
+    defineThemeBlock('road', [
       {
         test1: '#fff',
         a: '#f1f1f1'
       }
-    ),
+    ]),
     {
       test1: '#f50000',
       a: '#f1f1f1'
@@ -25,19 +24,17 @@ export default defineThemeBlockRoot(
       test2: '#f50000',
       a: '#f1f1f1'
     }
-  ),
-  defineThemeBlock(
-    'abc',
+  ]),
+  defineThemeBlock('abc', [
     {
       a: '#fff',
       b: '#000'
     }
-  ),
-  defineThemeBlock(
-    'abcd',
+  ]),
+  defineThemeBlock('abcd', [
     {
       a: '#fff',
       b: '#000'
     }
-  )
-);
+  ])
+]);

@@ -1,7 +1,16 @@
 import type { ModuleObject } from './index';
 
+export type ModuleDefineThemeMetaPreview = ModuleObject & Partial<{
+  defaultPreviewCardBG1: string;
+  defaultPreviewCardBG2: string;
+  defaultPreviewCardBG3: string;
+  defaultPreviewCardBG4: string;
+  defaultPreviewCardBG5: string;
+  defaultPreviewCardBG6: string;
+}>;
 export type ModuleDefineThemeMeta = {
-  previewCardStyles?: ModuleObject;
+  description?: string;
+  previewCardStyles?: ModuleDefineThemeMetaPreview;
 };
 export type ModuleDefineThemeBlockSetting = ModuleObject | ModuleDefineThemeBlockReturn;
 

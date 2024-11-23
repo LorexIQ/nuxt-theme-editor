@@ -55,6 +55,8 @@ export class Client {
 
     watch(this.usesScopesProperties, scopes => this._appendStyleToHead(`${this.config.keys.style}:scope`, scopes, true), { immediate: true });
 
+    watch(this.themes, themes => this._appendStyleToHead(`${this.config.keys.style}:preview`, Object.values(themes).reduce((accum, theme) => ({ ...accum, [`theme-${theme.name}-preview`]: theme.meta.previewCardStyles }), {}), true), { immediate: true });
+
     watch(this.savedStorage, () => this._saveStorage());
   }
 
@@ -101,7 +103,6 @@ export class Client {
 
       return themeStyle;
     };
-    console.log(this.themes);
 
     return {
       name: themeName,
@@ -110,7 +111,12 @@ export class Client {
         ...themeFile.meta,
 
         previewCardStyles: {
-          defaultPreviewCardBG: '#000',
+          defaultPreviewCardBG1: '#FFFFFF',
+          defaultPreviewCardBG2: '#CCCCCC',
+          defaultPreviewCardBG3: '#999999',
+          defaultPreviewCardBG4: '#666666',
+          defaultPreviewCardBG5: '#333333',
+          defaultPreviewCardBG6: '#000000',
 
           ...themeFile.meta.previewCardStyles
         }
