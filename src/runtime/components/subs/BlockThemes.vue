@@ -68,7 +68,7 @@ const title = computed(() => {
             class="block-themes__content__themes__theme"
             :class="{ 'block-themes__content__themes__theme--active': client.getSelectedThemeName() === theme.name }"
             @dblclick="client.selectTheme(theme.name)"
-            @contextmenu.prevent="client.openContextMenu($event, theme)"
+            @contextmenu.prevent="client.getSandbox().openContextMenu($event, theme)"
           >
             <div
               class="block-themes__content__themes__theme__preview"

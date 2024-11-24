@@ -1,28 +1,25 @@
-import { h, render } from 'vue';
 import type {
   ModuleDefineThemeBlockRootReturn,
   ModuleDefineThemeBlockSetting,
   ModuleThemeCleanedSetting,
   ModuleObject,
-  ModuleOptionsExtend, ModuleSandboxComponents, ModuleStorage,
+  ModuleOptionsExtend,
+  ModuleStorage,
   ModuleThemeRootReturn,
   ModuleThemes,
-  ModuleThemeType, ModuleSandboxContextMenuItem
+  ModuleThemeType
 } from '../types';
 // @ts-ignore
 import connectorMeta from '../meta/connector';
 import unwrap from '../helpers/unwrap';
 import defineChecker from '../helpers/defineChecker';
 import getSystemTheme from '../helpers/getSystemTheme';
-import ModuleSandbox from '../components/subs/ModuleSandbox.vue';
-import ContextMenu from '../components/subs/ContextMenu.vue';
-import { useRuntimeConfig, reactive, ref, computed, watch, markRaw } from '#imports';
-
-const CONTEXT_MENU_ID = 'context-menu';
+import { Sandbox } from './Sandbox';
+import { useRuntimeConfig, reactive, ref, computed, watch } from '#imports';
 
 export class Client {
   private readonly config = useRuntimeConfig().public.themesEditor as ModuleOptionsExtend;
-  private readonly sandboxComponents = reactive<ModuleSandboxComponents>([]);
+  private readonly sandbox = new Sandbox(this, this.config.keys.sandbox);
   private readonly usesScopesProperties = reactive<ModuleObject<ModuleObject>>({});
 
   private readonly isUseSystemTheme = ref(false);
@@ -44,7 +41,6 @@ export class Client {
     Object.assign(this.themes, this._readSystemThemes());
     this._readStorage();
     this._initWatchers();
-    this._initSandbox();
   }
 
   private _initWatchers(): void {
@@ -61,21 +57,6 @@ export class Client {
     watch(this.themes, themes => this._appendStyleToHead(`${this.config.keys.style}:preview`, Object.values(themes).reduce((accum, theme) => ({ ...accum, [`theme-${theme.name}-preview`]: theme.meta.previewStyles }), {}), true), { immediate: true });
 
     watch(this.savedStorage, () => this._saveStorage());
-  }
-
-  private _initSandbox(): void {
-    if (import.meta.client) {
-      const nuxtElement = document.getElementById('__nuxt');
-      const sandboxElement = document.getElementById(this.config.keys.sandbox);
-
-      if (nuxtElement && !sandboxElement) {
-        const container = document.createElement('div');
-        nuxtElement.insertAdjacentElement('afterend', container);
-
-        render(h(ModuleSandbox, { client: this }), container);
-        container.replaceWith(...container.childNodes);
-      }
-    }
   }
 
   private _appendStyleToHead(id: string, scopes: ModuleObject<ModuleObject>, shielding = false) {
@@ -191,49 +172,12 @@ export class Client {
     }
   }
 
-  closeContextMenu(): void {
-    const contextMenuComponentIndex = this.sandboxComponents.findIndex(component => component.id === CONTEXT_MENU_ID);
-    if (contextMenuComponentIndex !== -1) this.sandboxComponents.splice(contextMenuComponentIndex, 1);
-  }
-
-  openContextMenu(event: MouseEvent, theme: ModuleThemeRootReturn): void {
-    this.closeContextMenu();
-    const clickPosition = { x: event.pageX, y: event.pageY };
-
-    const isSelectedTheme = unwrap.get(this.selectedThemeName) === theme.name;
-
-    this.sandboxComponents.push({
-      id: CONTEXT_MENU_ID,
-      component: markRaw(ContextMenu),
-      transitionName: 'fade',
-      props: {
-        clickPosition,
-        items: <ModuleSandboxContextMenuItem[]>[
-          {
-            title: isSelectedTheme ? 'Тема выбрана' : 'Выбрать тему',
-            isDisabled: () => isSelectedTheme,
-            icon: isSelectedTheme ? 'Check' : undefined,
-            iconColor: 'var(--contextMenuStatusActive)',
-            action: () => this.selectTheme(theme.name)
-          },
-          {
-            title: 'Выбрать как тёмную тему',
-            action: () => console.log('Тема выбрана!')
-          }
-        ]
-      },
-      emits: {
-        close: () => this.closeContextMenu()
-      }
-    });
-  }
-
   getConfig() {
     return this.config;
   }
 
-  getSandboxComponents() {
-    return this.sandboxComponents;
+  getSandbox() {
+    return this.sandbox;
   }
 
   getThemes() {

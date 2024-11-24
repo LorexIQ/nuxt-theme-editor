@@ -1,14 +1,14 @@
 <script setup lang="ts">
-import type { Client } from '../../classes/Client';
+import type { Sandbox } from '../../classes/Sandbox';
 
 type Props = {
-  client: Client;
+  sandbox: Sandbox;
 };
 
 const props = defineProps<Props>();
-const client = props.client;
-const sandboxId = client.getConfig().keys.sandbox;
-const components = client.getSandboxComponents();
+const sandbox = props.sandbox;
+const sandboxId = sandbox.getId();
+const components = sandbox.getComponents();
 </script>
 
 <template>
