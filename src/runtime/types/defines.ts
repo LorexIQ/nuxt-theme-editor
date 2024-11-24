@@ -8,9 +8,25 @@ export type ModuleDefineThemeMetaPreview = ModuleObject & Partial<{
   defaultPreviewCardBG5: string;
   defaultPreviewCardBG6: string;
 }>;
+export type ModuleDefineThemeMetaUI = Partial<{
+  bg: string;
+  bgHover: string;
+  bgHeader: string;
+  bgBlockHeader: string;
+  bgGlass: string;
+  blurGlass: string;
+  shadow: string;
+  border: string;
+  title: string;
+  titleTransparent: string;
+  statusActiveBg: string;
+  statusActiveTitle: string;
+  contextMenuStatusActive: string;
+}>;
 export type ModuleDefineThemeMeta = {
   description?: string;
-  previewCardStyles?: ModuleDefineThemeMetaPreview;
+  previewStyles?: ModuleDefineThemeMetaPreview;
+  uiStyles?: ModuleDefineThemeMetaUI;
 };
 export type ModuleDefineThemeBlockSetting = ModuleObject | ModuleDefineThemeBlockReturn;
 

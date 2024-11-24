@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import IconArrow from '../icons/IconArrow.vue';
-import IconPlus from '../icons/IconPlus.vue';
 import type { ModuleThemeType } from '../../types';
 import type { Client } from '../../classes/Client';
+import IconArrow from '../icons/IconArrow.vue';
+import IconPlus from '../icons/IconPlus.vue';
 import ThemePreview from './ThemePreview.vue';
 import { ref, computed } from '#imports';
 
@@ -68,6 +68,7 @@ const title = computed(() => {
             class="block-themes__content__themes__theme"
             :class="{ 'block-themes__content__themes__theme--active': client.getSelectedThemeName() === theme.name }"
             @dblclick="client.selectTheme(theme.name)"
+            @contextmenu.prevent="client.openContextMenu($event, theme)"
           >
             <div
               class="block-themes__content__themes__theme__preview"
@@ -85,7 +86,7 @@ const title = computed(() => {
                 class="block-themes__content__themes__theme__info__description"
                 :class="{ 'block-themes__content__themes__theme__info__description--transparent': !theme.meta.description }"
               >
-                <span>{{ theme.meta.description ?? 'Описание не указано' }}</span>
+                <span>{{ theme.meta.description || 'Описание не указано' }}</span>
               </div>
             </div>
             <div
@@ -162,7 +163,7 @@ const title = computed(() => {
         width: 100%;
         height: 60px;
         border: 1px solid var(--border);
-        border-radius: var(--border-radius);
+        border-radius: 5px;
         overflow: hidden;
         cursor: pointer;
         transition: .3s;
@@ -238,8 +239,8 @@ const title = computed(() => {
           }
           &__active {
             height: 100%;
-            color: var(--status-active-title);
-            background-color: var(--status-active-bg);
+            color: var(--statusActiveTitle);
+            background-color: var(--statusActiveBg);
           }
         }
 

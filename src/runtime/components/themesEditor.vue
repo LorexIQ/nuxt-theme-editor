@@ -6,7 +6,10 @@ const themesEditor = useThemesEditor();
 </script>
 
 <template>
-  <div class="themes-editor">
+  <div
+    :id="themesEditor.getConfig().keys.editor"
+    class="themes-editor"
+  >
     <div class="themes-editor__header">
       <div class="themes-editor__header__title">
         ThemesEditor
@@ -35,17 +38,6 @@ const themesEditor = useThemesEditor();
 
 <style lang="scss">
 .themes-editor {
-  --bg: #fff;
-  --bgHeader: #f6f6f6;
-  --bgBlockHeader: #f6f6f6;
-  --shadow: rgba(0, 0, 0, 0.1);
-  --title: #333;
-  --titleTransparent: #999;
-  --border: rgba(0, 0, 0, 0.1);
-  --border-radius: 5px;
-  --status-active-bg: #85f585;
-  --status-active-title: #777;
-
   & * {
     font-family: 'Roboto', sans-serif;
     box-sizing: border-box;

@@ -3,6 +3,8 @@ import sidebar from './sidebar';
 export default defineThemeBlockRoot({
   description: 'Стандартная светлая тема фырв шщрфшщырв шщрфышвр щшфырщв рфырв шщфршырв щшфырщшв рфыр фылдв фыв рфырвд фыдвр дфыырлвр фыдрдвр',
   previewCardStyles: {
+  },
+  uiStyles: {
   }
 }, [
   {

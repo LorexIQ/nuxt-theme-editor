@@ -8,16 +8,17 @@ export type ModuleServerThemes = { [name: string]: ModuleDefineThemeBlockRootRet
 export type ModuleThemes = { [name: string]: ModuleThemeRootReturn };
 
 export type ModuleThemeType = 'system' | 'global' | 'local';
+export type ModuleIcons = 'Arrow' | 'Check' | 'Plus';
 
-export type ModuleDefineThemeCleanedSetting = ModuleObject | ModuleThemeStyleBlockReturn;
+export type ModuleThemeCleanedSetting = ModuleObject | ModuleThemeStyleBlockReturn;
 
 export type ModuleThemeStyleBlockReturn = {
   id: string;
-  styles: ModuleDefineThemeCleanedSetting[];
+  styles: ModuleThemeCleanedSetting[];
 };
 export type ModuleThemeRootReturn = {
   name: string;
   type: ModuleThemeType;
   meta: Required<ModuleDefineThemeMeta>;
-  styles: ModuleDefineThemeCleanedSetting[];
+  styles: ModuleThemeCleanedSetting[];
 };

@@ -1,5 +1,6 @@
 export * from './defines';
 export * from './helpers';
+export * from './sandbox';
 export * from './storage';
 export * from './themes';
 
@@ -16,6 +17,8 @@ type ModuleOptionsExtendKeys = {
   state: string;
   storage: string;
   style: string;
+  sandbox: string;
+  editor: string;
 };
 export type ModuleOptionsExtendMeta = {
   name: string;

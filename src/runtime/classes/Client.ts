@@ -1,23 +1,28 @@
+import { h, render } from 'vue';
 import type {
   ModuleDefineThemeBlockRootReturn,
   ModuleDefineThemeBlockSetting,
-  ModuleDefineThemeCleanedSetting,
+  ModuleThemeCleanedSetting,
   ModuleObject,
-  ModuleOptionsExtend, ModuleStorage,
+  ModuleOptionsExtend, ModuleSandboxComponents, ModuleStorage,
   ModuleThemeRootReturn,
   ModuleThemes,
-  ModuleThemeType
+  ModuleThemeType, ModuleSandboxContextMenuItem
 } from '../types';
 // @ts-ignore
 import connectorMeta from '../meta/connector';
 import unwrap from '../helpers/unwrap';
 import defineChecker from '../helpers/defineChecker';
 import getSystemTheme from '../helpers/getSystemTheme';
-import { useRuntimeConfig, reactive, ref, computed, watch } from '#imports';
+import ModuleSandbox from '../components/subs/ModuleSandbox.vue';
+import ContextMenu from '../components/subs/ContextMenu.vue';
+import { useRuntimeConfig, reactive, ref, computed, watch, markRaw } from '#imports';
+
+const CONTEXT_MENU_ID = 'context-menu';
 
 export class Client {
   private readonly config = useRuntimeConfig().public.themesEditor as ModuleOptionsExtend;
-  private readonly usesDocumentProperties = reactive<ModuleObject>({});
+  private readonly sandboxComponents = reactive<ModuleSandboxComponents>([]);
   private readonly usesScopesProperties = reactive<ModuleObject<ModuleObject>>({});
 
   private readonly isUseSystemTheme = ref(false);
@@ -27,7 +32,7 @@ export class Client {
 
   private readonly selectedTheme = computed(() => {
     const selectedTheme = unwrap.get(this.isUseSystemTheme) ? this._getSystemThemeAssociation() : unwrap.get(this.selectedThemeName);
-    return selectedTheme && selectedTheme in this.themes ? this.themes[selectedTheme] : undefined;
+    return selectedTheme && selectedTheme in this.themes ? this.themes[selectedTheme] : this.themes[this.config.defaultTheme];
   });
 
   private readonly savedStorage = computed<ModuleStorage>(() => ({
@@ -39,37 +44,37 @@ export class Client {
     Object.assign(this.themes, this._readSystemThemes());
     this._readStorage();
     this._initWatchers();
+    this._initSandbox();
   }
 
-  private _initWatchers() {
+  private _initWatchers(): void {
+    const rootStylesKey = ':root';
+    const uiStylesKey = `#${this.config.keys.sandbox.replaceAll(':', '\\:')}, #${this.config.keys.editor.replaceAll(':', '\\:')}`;
+
     watch(this.selectedTheme, (theme) => {
-      this._removeDocumentStyles();
-
-      if (theme) {
-        const globalStyles = theme.styles.find(block => block.id === 'global')!;
-        this._registerDocumentStyles(globalStyles.styles[0] as ModuleObject);
-      }
+      this._appendStyleToHead(`${this.config.keys.style}:root`, { [rootStylesKey]: theme.styles[0].styles[0] as ModuleObject });
+      this._appendStyleToHead(`${this.config.keys.style}:ui`, { [uiStylesKey]: theme.meta.uiStyles });
     }, { immediate: true });
-
-    watch(this.usesDocumentProperties, properties => this._appendStyleToHead(this.config.keys.style, { ':root': properties }), { immediate: true });
 
     watch(this.usesScopesProperties, scopes => this._appendStyleToHead(`${this.config.keys.style}:scope`, scopes, true), { immediate: true });
 
-    watch(this.themes, themes => this._appendStyleToHead(`${this.config.keys.style}:preview`, Object.values(themes).reduce((accum, theme) => ({ ...accum, [`theme-${theme.name}-preview`]: theme.meta.previewCardStyles }), {}), true), { immediate: true });
+    watch(this.themes, themes => this._appendStyleToHead(`${this.config.keys.style}:preview`, Object.values(themes).reduce((accum, theme) => ({ ...accum, [`theme-${theme.name}-preview`]: theme.meta.previewStyles }), {}), true), { immediate: true });
 
     watch(this.savedStorage, () => this._saveStorage());
   }
 
-  private _removeDocumentStyles(styles?: ModuleObject): void {
-    const removesProperties = Object.keys(this.usesDocumentProperties).filter(property => styles ? property in styles : true);
-    for (const propertyName of removesProperties) {
-      delete this.usesDocumentProperties[propertyName];
-    }
-  }
+  private _initSandbox(): void {
+    if (import.meta.client) {
+      const nuxtElement = document.getElementById('__nuxt');
+      const sandboxElement = document.getElementById(this.config.keys.sandbox);
 
-  private _registerDocumentStyles(styles: ModuleObject): void {
-    for (const [key, value] of Object.entries(styles)) {
-      this.usesDocumentProperties[key] = value;
+      if (nuxtElement && !sandboxElement) {
+        const container = document.createElement('div');
+        nuxtElement.insertAdjacentElement('afterend', container);
+
+        render(h(ModuleSandbox, { client: this }), container);
+        container.replaceWith(...container.childNodes);
+      }
     }
   }
 
@@ -91,7 +96,7 @@ export class Client {
   }
 
   private _prepareTheme(themeFile: ModuleDefineThemeBlockRootReturn, themeName: string, themeType: ModuleThemeType): ModuleThemeRootReturn {
-    const cleanThemeStyles = (themeStyle: ModuleDefineThemeBlockSetting, selfId?: string): ModuleDefineThemeCleanedSetting => {
+    const cleanThemeStyles = (themeStyle: ModuleDefineThemeBlockSetting, selfId?: string): ModuleThemeCleanedSetting => {
       if (defineChecker(themeStyle, 'block')) return {
         id: themeStyle.id,
         styles: (themeStyle.styles as ModuleDefineThemeBlockSetting[]).map(style => cleanThemeStyles(style))
@@ -108,9 +113,11 @@ export class Client {
       name: themeName,
       type: themeType,
       meta: {
+        description: '',
+
         ...themeFile.meta,
 
-        previewCardStyles: {
+        previewStyles: {
           defaultPreviewCardBG1: '#FFFFFF',
           defaultPreviewCardBG2: '#CCCCCC',
           defaultPreviewCardBG3: '#999999',
@@ -118,7 +125,24 @@ export class Client {
           defaultPreviewCardBG5: '#333333',
           defaultPreviewCardBG6: '#000000',
 
-          ...themeFile.meta.previewCardStyles
+          ...themeFile.meta.previewStyles
+        },
+        uiStyles: {
+          bg: '#fff',
+          bgHover: '#f6f6f6',
+          bgHeader: '#f6f6f6',
+          bgBlockHeader: '#f6f6f6',
+          bgGlass: 'rgba(0, 0, 0, 0.1)',
+          blurGlass: '3px',
+          shadow: 'rgba(0, 0, 0, 0.1)',
+          border: 'rgba(0, 0, 0, 0.1)',
+          title: '#333',
+          titleTransparent: '#999',
+          statusActiveBg: '#85f585',
+          statusActiveTitle: '#777',
+          contextMenuStatusActive: '#00ca00',
+
+          ...themeFile.meta.uiStyles
         }
       },
       styles: themeFile.styles.map(style => cleanThemeStyles(style, 'global'))
@@ -156,7 +180,7 @@ export class Client {
     localStorage.setItem(this.config.keys.storage, JSON.stringify(unwrap.get(this.savedStorage)));
   }
 
-  private _getSystemThemeAssociation() {
+  private _getSystemThemeAssociation(): string {
     if (!this.config.defaultDarkTheme) return unwrap.get(this.selectedThemeName);
 
     switch (unwrap.get(this.selectedSystemThemeName)) {
@@ -167,8 +191,49 @@ export class Client {
     }
   }
 
+  closeContextMenu(): void {
+    const contextMenuComponentIndex = this.sandboxComponents.findIndex(component => component.id === CONTEXT_MENU_ID);
+    if (contextMenuComponentIndex !== -1) this.sandboxComponents.splice(contextMenuComponentIndex, 1);
+  }
+
+  openContextMenu(event: MouseEvent, theme: ModuleThemeRootReturn): void {
+    this.closeContextMenu();
+    const clickPosition = { x: event.pageX, y: event.pageY };
+
+    const isSelectedTheme = unwrap.get(this.selectedThemeName) === theme.name;
+
+    this.sandboxComponents.push({
+      id: CONTEXT_MENU_ID,
+      component: markRaw(ContextMenu),
+      transitionName: 'fade',
+      props: {
+        clickPosition,
+        items: <ModuleSandboxContextMenuItem[]>[
+          {
+            title: isSelectedTheme ? 'Тема выбрана' : 'Выбрать тему',
+            isDisabled: () => isSelectedTheme,
+            icon: isSelectedTheme ? 'Check' : undefined,
+            iconColor: 'var(--contextMenuStatusActive)',
+            action: () => this.selectTheme(theme.name)
+          },
+          {
+            title: 'Выбрать как тёмную тему',
+            action: () => console.log('Тема выбрана!')
+          }
+        ]
+      },
+      emits: {
+        close: () => this.closeContextMenu()
+      }
+    });
+  }
+
   getConfig() {
     return this.config;
+  }
+
+  getSandboxComponents() {
+    return this.sandboxComponents;
   }
 
   getThemes() {
@@ -198,7 +263,7 @@ export class Client {
   }
 
   registerScopeStyles(blockPath: string, scopeId: string) {
-    const searchDefineStylesByPath = (blockName: string[], styles?: ModuleDefineThemeCleanedSetting[]): ModuleObject => {
+    const searchDefineStylesByPath = (blockName: string[], styles?: ModuleThemeCleanedSetting[]): ModuleObject => {
       if (styles) {
         for (const style of styles) {
           if (style.id && Array.isArray(style.styles)) {
