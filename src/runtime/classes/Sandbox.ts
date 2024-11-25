@@ -14,12 +14,11 @@ import { markRaw, reactive } from '#imports';
 const CONTEXT_MENU_ID = 'context-menu';
 
 export class Sandbox {
+  private readonly id: string;
   private readonly components = reactive<ModuleSandboxComponents>([]);
 
-  constructor(
-    private readonly ctx: Client,
-    private readonly id: string
-  ) {
+  constructor(private readonly ctx: Client) {
+    this.id = ctx.getConfig().keys.sandbox;
     this._initSandbox();
   }
 

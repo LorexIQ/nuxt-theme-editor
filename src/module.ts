@@ -30,7 +30,7 @@ export default defineNuxtModule<ModuleOptions>({
     // @ts-ignore
     nuxt.options.runtimeConfig.public[MODULE_CONFIG_KEY] = serverObject.getConfig();
 
-    nuxt.hook('build:before', () => serverObject.createMeta());
+    nuxt.hook('build:before', () => serverObject.getMetaFiles().create());
 
     addImportsDir(resolver.resolve('./runtime/composables'));
     addPlugin(resolver.resolve('./runtime/plugin'));

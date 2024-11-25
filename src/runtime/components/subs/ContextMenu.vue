@@ -36,6 +36,9 @@ function getIconByName(icon?: ModuleIcons) {
 }
 function selectItem(item: ModuleSandboxContextMenuItem) {
   item.action();
+  closeContextMenu();
+}
+function closeContextMenu() {
   emit('close');
 }
 </script>
@@ -43,8 +46,8 @@ function selectItem(item: ModuleSandboxContextMenuItem) {
 <template>
   <div
     class="context-menu"
-    @click.self="emit('close')"
-    @contextmenu.prevent
+    @contextmenu.prevent="closeContextMenu"
+    @click.self="closeContextMenu"
   >
     <div
       class="context-menu__menu"

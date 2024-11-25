@@ -19,7 +19,7 @@ import { useRuntimeConfig, reactive, ref, computed, watch } from '#imports';
 
 export class Client {
   private readonly config = useRuntimeConfig().public.themesEditor as ModuleOptionsExtend;
-  private readonly sandbox = new Sandbox(this, this.config.keys.sandbox);
+  private readonly sandbox = new Sandbox(this);
   private readonly usesScopesProperties = reactive<ModuleObject<ModuleObject>>({});
 
   private readonly isUseSystemTheme = ref(false);
