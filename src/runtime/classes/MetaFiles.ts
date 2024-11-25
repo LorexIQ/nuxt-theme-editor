@@ -3,7 +3,12 @@ import type { CodeBlockWriter } from 'ts-morph';
 import type { Resolver } from '@nuxt/kit';
 import { createResolver } from '@nuxt/kit';
 import uPath from '../helpers/uPath';
-import type { ModuleDefineThemeBlockSetting, ModuleObject, ModuleOptionsExtend } from '../types';
+import type {
+  ModuleDefineThemeBlockSetting,
+  ModuleMetaFilesWatcherHash,
+  ModuleObject,
+  ModuleOptionsExtend
+} from '../types';
 import defineChecker from '../helpers/defineChecker';
 import tsMorphProject from '../helpers/tsMorphProject';
 import type { Server } from './Server';
@@ -11,6 +16,9 @@ import type { Server } from './Server';
 export class MetaFiles {
   private readonly metaResolver: Resolver;
   private readonly config: ModuleOptionsExtend;
+
+  private readonly watcherHash: ModuleMetaFilesWatcherHash = {};
+  private watcherDelay: NodeJS.Timeout | undefined;
 
   constructor(private readonly ctx: Server) {
     this.metaResolver = createResolver(this.ctx.getResolver().resolve('runtime', 'meta'));
@@ -117,6 +125,25 @@ export class MetaFiles {
     }
 
     metaFile.saveSync();
+  }
+
+  async checkPathAndUpdate(path: string): Promise<void> {
+    if (this.watcherHash[path] !== undefined && !this.watcherHash[path]) return;
+
+    clearTimeout(this.watcherDelay);
+    this.watcherDelay = setTimeout(async () => {
+      const pFull = uPath.join(this.ctx.getRootDir(), path);
+
+      console.log(this.watcherHash, this.ctx.getThemesDirs(), uPath.join(this.ctx.getRootDir(), path), path);
+      if (this.watcherHash[path] || this.ctx.getThemesDirs().some(themePath => pFull.includes(themePath))) {
+        this.watcherHash[path] = true;
+        await this.ctx.readThemes();
+        this._createThemesStructure();
+        this._createThemesStyles();
+      } else {
+        this.watcherHash[path] = false;
+      }
+    }, 2000);
   }
 
   create(): void {

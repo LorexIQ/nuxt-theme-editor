@@ -1,4 +1,4 @@
-import path, { sep } from 'node:path';
+import path from 'node:path';
 import { glob, type GlobOptionsWithFileTypesFalse } from 'glob';
 
 function _glob(pattern: string | string[], options?: GlobOptionsWithFileTypesFalse) {
@@ -8,7 +8,7 @@ function _glob(pattern: string | string[], options?: GlobOptionsWithFileTypesFal
 }
 
 function _sep(p: string) {
-  return p.replaceAll(sep, '/');
+  return p.replaceAll('\\', '/');
 }
 
 function _join(...ps: string[]) {

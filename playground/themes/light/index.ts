@@ -9,7 +9,9 @@ export default defineThemeBlockRoot({
   }
 }, [
   {
-    test: '#cccccc'
+    test: '#cccccc',
+    dsd: '#002',
+    dssssss3: '#001'
   },
   sidebar,
   defineThemeBlock('navbar', [

@@ -25,6 +25,7 @@ export class Server {
   private readonly themes: ModuleServerThemes = {};
   private readonly themesPaths: Set<string> = new Set();
   private readonly themesNames: Set<string> = new Set();
+  private readonly themesDirs: string[] = [];
 
   private readonly metaFiles: MetaFiles;
 
@@ -114,11 +115,17 @@ export class Server {
 
   async readThemes(): Promise<void> {
     this.themesPaths.clear();
+    this.themesNames.clear();
+    this.themesDirs.splice(0);
+    Object.keys(this.themes).forEach(key => delete this.themes[key]);
+
     const indexThemesPaths = uPath.glob(uPath.join(this.rootThemesDir, '*', 'index.ts'));
 
     for (const themePath of indexThemesPaths) {
       await this._readThemeByPath(themePath);
     }
+
+    Object.assign(this.themesDirs, this.getThemesPaths().map(e => uPath.parse(e).dir));
   }
 
   getRootDir(): string {
@@ -127,6 +134,10 @@ export class Server {
 
   getThemesPaths(): string[] {
     return Array.from(this.themesPaths);
+  }
+
+  getThemesDirs(): string[] {
+    return this.themesDirs;
   }
 
   getThemes(): ModuleServerThemes {

@@ -1,5 +1,6 @@
 export * from './defines';
 export * from './helpers';
+export * from './metaFiles';
 export * from './sandbox';
 export * from './storage';
 export * from './themes';
