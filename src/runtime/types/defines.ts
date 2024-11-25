@@ -21,6 +21,12 @@ export type ModuleDefineThemeMetaUI = Partial<{
   titleTransparent: string;
   statusActiveBg: string;
   statusActiveTitle: string;
+  statusLightDarkBg: string;
+  statusLightDarkTitle: string;
+  statusLightBg: string;
+  statusLightTitle: string;
+  statusDarkBg: string;
+  statusDarkTitle: string;
   contextMenuStatusActive: string;
 }>;
 export type ModuleDefineThemeMeta = {

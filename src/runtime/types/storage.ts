@@ -1,4 +1,6 @@
 export type ModuleStorage = {
-  selectedThemeName: string;
   isUseSystemTheme: boolean;
+  selectedThemeName?: string;
+  selectedLightThemeName?: string;
+  selectedDarkThemeName?: string;
 };

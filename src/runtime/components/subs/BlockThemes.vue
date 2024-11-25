@@ -66,7 +66,7 @@ const title = computed(() => {
             v-for="theme of themes"
             :key="theme.name"
             class="block-themes__content__themes__theme"
-            :class="{ 'block-themes__content__themes__theme--active': client.getSelectedThemeName() === theme.name }"
+            :class="{ 'block-themes__content__themes__theme--active': [client.getSelectedLightThemeName(), client.getSelectedDarkThemeName()].includes(theme.name) || client.getSelectedTheme().name === theme.name }"
             @dblclick="client.selectTheme(theme.name)"
             @contextmenu.prevent="client.getSandbox().openContextMenu($event, theme)"
           >
@@ -89,12 +89,33 @@ const title = computed(() => {
                 <span>{{ theme.meta.description || 'Описание не указано' }}</span>
               </div>
             </div>
-            <div
-              class="block-themes__content__themes__theme__status"
-            >
-              <div class="block-themes__content__themes__theme__status__active">
-                Active
-              </div>
+            <div class="block-themes__content__themes__theme__status">
+              <transition name="fade">
+                <div
+                  v-if="client.getSelectedTheme().name === theme.name"
+                  class="block-themes__content__themes__theme__status__active"
+                >
+                  Active
+                </div>
+                <div
+                  v-else-if="client.getSelectedLightThemeName() === theme.name && client.getSelectedDarkThemeName() === theme.name"
+                  class="block-themes__content__themes__theme__status__light_dark"
+                >
+                  Light/Dark
+                </div>
+                <div
+                  v-else-if="client.getSelectedLightThemeName() === theme.name"
+                  class="block-themes__content__themes__theme__status__light"
+                >
+                  Light
+                </div>
+                <div
+                  v-else-if="client.getSelectedDarkThemeName() === theme.name"
+                  class="block-themes__content__themes__theme__status__dark"
+                >
+                  Dark
+                </div>
+              </transition>
             </div>
           </div>
         </div>
@@ -225,12 +246,14 @@ const title = computed(() => {
           }
         }
         &__status {
+          position: relative;
           font-size: 12px;
           height: 100%;
           writing-mode: vertical-rl;
           overflow: hidden;
 
           & > div {
+            position: absolute;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -238,9 +261,22 @@ const title = computed(() => {
             height: 100%;
           }
           &__active {
-            height: 100%;
             color: var(--statusActiveTitle);
             background-color: var(--statusActiveBg);
+            z-index: 1;
+          }
+          &__light_dark {
+            font-size: 10px;
+            color: var(--statusLightDarkTitle);
+            background-color: var(--statusLightDarkBg);
+          }
+          &__light {
+            color: var(--statusLightTitle);
+            background-color: var(--statusLightBg);
+          }
+          &__dark {
+            color: var(--statusDarkTitle);
+            background-color: var(--statusDarkBg);
           }
         }
 
@@ -259,6 +295,18 @@ const title = computed(() => {
         padding-top: 0;
       }
     }
+  }
+}
+
+.fade {
+  &-enter-active, &-leave-active {
+    transition: .3s;
+  }
+  &-enter-to, &-leave-from {
+    opacity: 1;
+  }
+  &-leave-to, &-enter-from {
+    opacity: 0;
   }
 }
 </style>

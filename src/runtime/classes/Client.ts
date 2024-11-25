@@ -23,24 +23,58 @@ export class Client {
   private readonly usesScopesProperties = reactive<ModuleObject<ModuleObject>>({});
 
   private readonly isUseSystemTheme = ref(false);
-  private readonly selectedThemeName = ref(this.config.defaultTheme);
+  private readonly selectedThemeName = ref<string>();
+  private readonly selectedLightThemeName = ref<string>();
+  private readonly selectedDarkThemeName = ref<string>();
   private readonly selectedSystemThemeName = getSystemTheme().theme;
   private readonly themes = reactive<ModuleThemes>({});
 
   private readonly selectedTheme = computed(() => {
     const selectedTheme = unwrap.get(this.isUseSystemTheme) ? this._getSystemThemeAssociation() : unwrap.get(this.selectedThemeName);
-    return selectedTheme && selectedTheme in this.themes ? this.themes[selectedTheme] : this.themes[this.config.defaultTheme];
+    return selectedTheme ? this.themes[selectedTheme] : this.themes[unwrap.get(this.selectedLightThemeName)!];
   });
 
   private readonly savedStorage = computed<ModuleStorage>(() => ({
+    isUseSystemTheme: unwrap.get(this.isUseSystemTheme),
     selectedThemeName: unwrap.get(this.selectedThemeName),
-    isUseSystemTheme: unwrap.get(this.isUseSystemTheme)
+    selectedLightThemeName: unwrap.get(this.selectedLightThemeName),
+    selectedDarkThemeName: unwrap.get(this.selectedDarkThemeName)
   }));
 
   constructor() {
-    Object.assign(this.themes, this._readSystemThemes());
+    this._readSystemThemes();
+    this._initDefaultThemes();
     this._readStorage();
     this._initWatchers();
+  }
+
+  private _readSystemThemes(): void {
+    Object.keys(this.themes).forEach(key => delete this.themes[key]);
+    Object.assign(this.themes, this.config.themes.reduce((accum, themeName) => {
+      const theme = (connectorMeta as any)[`THEME_${themeName}`] as ModuleDefineThemeBlockRootReturn;
+
+      return {
+        ...accum,
+        [themeName]: this._prepareTheme(theme, themeName, 'system')
+      };
+    }, {}));
+  }
+
+  private _initDefaultThemes(): void {
+    unwrap.set(this, 'selectedLightThemeName', this._checkThemeAvailableAndGetActual(this.config.defaultTheme));
+    unwrap.set(this, 'selectedDarkThemeName', this._checkThemeAvailableAndGetActual(this.config.defaultDarkTheme));
+    unwrap.set(this, 'selectedThemeName', unwrap.get(this.selectedLightThemeName));
+  }
+
+  private _readStorage(): void {
+    const storage = JSON.parse(localStorage.getItem(this.config.keys.storage) as string) as ModuleStorage | null;
+
+    if (storage) {
+      unwrap.set(this, 'selectedLightThemeName', this._checkThemeAvailableAndGetActual(storage.selectedLightThemeName, 'light'));
+      unwrap.set(this, 'selectedDarkThemeName', this._checkThemeAvailableAndGetActual(storage.selectedDarkThemeName, 'dark'));
+      this.setAutoModeTheme(storage.isUseSystemTheme);
+      unwrap.set(this, 'selectedThemeName', this._checkThemeAvailableAndGetActual(storage.selectedThemeName, unwrap.get(this.isUseSystemTheme) ? 'system' : unwrap.get(this.selectedLightThemeName)));
+    }
   }
 
   private _initWatchers(): void {
@@ -57,23 +91,6 @@ export class Client {
     watch(this.themes, themes => this._appendStyleToHead(`${this.config.keys.style}:preview`, Object.values(themes).reduce((accum, theme) => ({ ...accum, [`theme-${theme.name}-preview`]: theme.meta.previewStyles }), {}), true), { immediate: true });
 
     watch(this.savedStorage, () => this._saveStorage());
-  }
-
-  private _appendStyleToHead(id: string, scopes: ModuleObject<ModuleObject>, shielding = false) {
-    const styleContent = Object.keys(scopes).map((scopeId) => {
-      const scopeStyles = scopes[scopeId];
-      return [
-        shielding ? `[${scopeId}] {` : `${scopeId} {`,
-        ...Object.keys(scopeStyles).map(key => `  --${key}: ${scopeStyles[key]};`),
-        '}'
-      ].join('\n');
-    }).join('\n\n');
-
-    const _styleElement = document.getElementById(id);
-    const styleElement = _styleElement ?? document.createElement('style');
-    styleElement.id = id;
-    styleElement.textContent = styleContent;
-    if (!_styleElement) document.head.appendChild(styleElement);
   }
 
   private _prepareTheme(themeFile: ModuleDefineThemeBlockRootReturn, themeName: string, themeType: ModuleThemeType): ModuleThemeRootReturn {
@@ -121,6 +138,12 @@ export class Client {
           titleTransparent: '#999',
           statusActiveBg: '#85f585',
           statusActiveTitle: '#777',
+          statusLightDarkBg: '#dab6e2',
+          statusLightDarkTitle: '#3b003d',
+          statusLightBg: '#ffd9a6',
+          statusLightTitle: '#5f3700',
+          statusDarkBg: '#9e9eff',
+          statusDarkTitle: '#fff',
           contextMenuStatusActive: '#00ca00',
 
           ...themeFile.meta.uiStyles
@@ -130,31 +153,32 @@ export class Client {
     };
   }
 
-  private _readSystemThemes(): ModuleThemes {
-    if (this.config.themes.length) {
-      return this.config.themes.reduce((accum, themeName) => {
-        const theme = (connectorMeta as any)[`THEME_${themeName}`] as ModuleDefineThemeBlockRootReturn;
+  private _checkThemeAvailableAndGetActual(themeName?: string, def?: 'light' | 'dark' | 'system' | string): string | undefined {
+    const isInThemes = themeName && themeName in this.themes;
 
-        return {
-          ...accum,
-          [themeName]: this._prepareTheme(theme, themeName, 'system')
-        };
-      }, {});
-    } else {
-      return {};
-    }
+    if (isInThemes) return themeName;
+    else if (def === 'light') return this._checkThemeAvailableAndGetActual(this.config.defaultTheme);
+    else if (def === 'dark') return this._checkThemeAvailableAndGetActual(this.config.defaultDarkTheme);
+    else if (def === 'system') return this._getSystemThemeAssociation();
+    else if (def) return this._checkThemeAvailableAndGetActual(def);
+    else return undefined;
   }
 
-  private _readStorage(): void {
-    const storage = JSON.parse(localStorage.getItem(this.config.keys.storage) as string) as ModuleStorage | null;
+  private _appendStyleToHead(id: string, scopes: ModuleObject<ModuleObject>, shielding = false) {
+    const styleContent = Object.keys(scopes).map((scopeId) => {
+      const scopeStyles = scopes[scopeId];
+      return [
+        shielding ? `[${scopeId}] {` : `${scopeId} {`,
+        ...Object.keys(scopeStyles).map(key => `  --${key}: ${scopeStyles[key]};`),
+        '}'
+      ].join('\n');
+    }).join('\n\n');
 
-    unwrap.set(this, 'selectedThemeName', storage && storage.selectedThemeName in this.themes
-      ? storage.selectedThemeName
-      : this.config.defaultTheme);
-
-    if (storage) {
-      unwrap.set(this, 'isUseSystemTheme', storage.isUseSystemTheme);
-    }
+    const _styleElement = document.getElementById(id);
+    const styleElement = _styleElement ?? document.createElement('style');
+    styleElement.id = id;
+    styleElement.textContent = styleContent;
+    if (!_styleElement) document.head.appendChild(styleElement);
   }
 
   private _saveStorage(): void {
@@ -162,48 +186,12 @@ export class Client {
   }
 
   private _getSystemThemeAssociation(): string {
-    if (!this.config.defaultDarkTheme) return unwrap.get(this.selectedThemeName);
-
     switch (unwrap.get(this.selectedSystemThemeName)) {
       case 'light':
-        return this.config.defaultTheme;
+        return this._checkThemeAvailableAndGetActual(unwrap.get(this.selectedLightThemeName), 'light')!;
       case 'dark':
-        return this.config.defaultDarkTheme;
+        return this._checkThemeAvailableAndGetActual(unwrap.get(this.selectedDarkThemeName), 'dark')!;
     }
-  }
-
-  getConfig() {
-    return this.config;
-  }
-
-  getSandbox() {
-    return this.sandbox;
-  }
-
-  getThemes() {
-    return this.themes;
-  }
-
-  getSelectedTheme() {
-    return unwrap.get(this.selectedTheme);
-  }
-
-  getAutoModeStatus() {
-    return unwrap.get(this.isUseSystemTheme);
-  }
-
-  getSelectedThemeName() {
-    return unwrap.get(this.selectedThemeName);
-  }
-
-  setAutoModeTheme(mode: boolean) {
-    unwrap.set(this, 'isUseSystemTheme', mode);
-  }
-
-  selectTheme(themeName: string) {
-    if (!(themeName in this.themes)) return;
-    unwrap.set(this, 'isUseSystemTheme', false);
-    unwrap.set(this, 'selectedThemeName', themeName);
   }
 
   registerScopeStyles(blockPath: string, scopeId: string) {
@@ -232,5 +220,58 @@ export class Client {
 
   checkScopeRegistration(scopeId: string) {
     return !!this.usesScopesProperties[scopeId];
+  }
+
+  getConfig() {
+    return this.config;
+  }
+
+  getSandbox() {
+    return this.sandbox;
+  }
+
+  getThemes() {
+    return this.themes;
+  }
+
+  getSelectedTheme() {
+    return unwrap.get(this.selectedTheme);
+  }
+
+  getSelectedThemeName() {
+    return unwrap.get(this.selectedThemeName);
+  }
+
+  getSelectedLightThemeName() {
+    return unwrap.get(this.selectedLightThemeName);
+  }
+
+  getSelectedDarkThemeName() {
+    return unwrap.get(this.selectedDarkThemeName);
+  }
+
+  getAutoModeStatus() {
+    return unwrap.get(this.isUseSystemTheme);
+  }
+
+  setAutoModeTheme(mode: boolean) {
+    if (!unwrap.get(this.selectedDarkThemeName)) return;
+    unwrap.set(this, 'isUseSystemTheme', mode);
+  }
+
+  selectTheme(themeName: string) {
+    if (!(themeName in this.themes)) return;
+    unwrap.set(this, 'isUseSystemTheme', false);
+    unwrap.set(this, 'selectedThemeName', themeName);
+  }
+
+  selectLightTheme(themeName: string) {
+    if (!(themeName in this.themes)) return;
+    unwrap.set(this, 'selectedLightThemeName', themeName);
+  }
+
+  selectDarkTheme(themeName: string) {
+    if (!(themeName in this.themes)) return;
+    unwrap.set(this, 'selectedDarkThemeName', themeName);
   }
 }

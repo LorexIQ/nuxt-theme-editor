@@ -25,6 +25,10 @@ useThemeBlock('sidebar.test');
     <button @click="themesEditor.setAutoModeTheme(!themesEditor.getAutoModeStatus())">
       AUTO [{{ themesEditor.getAutoModeStatus() ? 'ON' : 'OFF' }}]
     </button>
+    <log-object
+      :value="themesEditor"
+      :replaces="{ ctx: '[CTX]' }"
+    />
   </div>
 </template>
 

@@ -5,7 +5,6 @@ import type {
   ModuleSandboxMousePosition,
   ModuleThemeRootReturn
 } from '../types';
-import unwrap from '../helpers/unwrap';
 import ContextMenu from '../components/subs/ContextMenu.vue';
 import ModuleSandbox from '../components/subs/ModuleSandbox.vue';
 import type { Client } from './Client';
@@ -53,7 +52,9 @@ export class Sandbox {
   openContextMenu(event: MouseEvent, theme: ModuleThemeRootReturn): void {
     this.closeContextMenu();
     const clickPosition: ModuleSandboxMousePosition = { x: event.pageX, y: event.pageY };
-    const isSelectedTheme = unwrap.get(this.ctx.getSelectedThemeName()) === theme.name;
+    const isSelectedTheme = this.ctx.getSelectedTheme().name === theme.name;
+    const isSelectedLightTheme = this.ctx.getSelectedLightThemeName() === theme.name;
+    const isSelectedDarkTheme = this.ctx.getSelectedDarkThemeName() === theme.name;
 
     this.components.push({
       id: CONTEXT_MENU_ID,
@@ -70,8 +71,18 @@ export class Sandbox {
             action: () => this.ctx.selectTheme(theme.name)
           },
           {
-            title: 'Выбрать как тёмную тему',
-            action: () => console.log('Тема выбрана!')
+            title: isSelectedLightTheme ? 'Назначена светлой темой' : 'Назначить светлой темой',
+            isDisabled: () => isSelectedLightTheme,
+            icon: isSelectedLightTheme ? 'Check' : undefined,
+            iconColor: 'var(--contextMenuStatusActive)',
+            action: () => this.ctx.selectLightTheme(theme.name)
+          },
+          {
+            title: isSelectedDarkTheme ? 'Назначена тёмной темой' : 'Назначить тёмной темой',
+            isDisabled: () => isSelectedDarkTheme,
+            icon: isSelectedDarkTheme ? 'Check' : undefined,
+            iconColor: 'var(--contextMenuStatusActive)',
+            action: () => this.ctx.selectDarkTheme(theme.name)
           }
         ]
       },

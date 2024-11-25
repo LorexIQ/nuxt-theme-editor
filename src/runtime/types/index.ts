@@ -8,9 +8,9 @@ export type ModuleObject<T = string> = { [name: string]: T };
 
 export type ModuleOptions = {
   defaultTheme: string;
-  defaultDarkTheme: string;
   themesDir: string;
   enableDefaultThemeGenerator: boolean;
+  defaultDarkTheme?: string;
 };
 
 type ModuleOptionsExtendKeys = {
