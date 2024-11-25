@@ -84,6 +84,9 @@ const title = computed(() => {
 <style scoped lang="scss">
 .block-themes {
   &__title {
+    position: sticky;
+    top: 0;
+    z-index: 1;
     font-size: 12px;
     font-weight: 600;
     display: grid;

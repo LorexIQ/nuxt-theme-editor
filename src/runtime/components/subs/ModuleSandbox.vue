@@ -19,6 +19,7 @@ const sandboxRef = ref<HTMLDivElement>();
   <transition-group
     :id="sandboxId"
     ref="sandboxRef"
+    class="sandbox"
     name="list"
     tag="div"
   >
@@ -27,6 +28,7 @@ const sandboxRef = ref<HTMLDivElement>();
       v-for="_component in components"
       :id="`${sandboxId}:${_component.id}`"
       :key="_component.id"
+      class="sandbox__component"
       v-bind="{ ...(_component.props ?? {}), class: _component.transitionName }"
       v-on="_component.emits ?? {}"
     />
@@ -40,7 +42,7 @@ const sandboxRef = ref<HTMLDivElement>();
 </template>
 
 <style scoped lang="scss">
-div {
+.sandbox {
   position: absolute;
   top: 0;
   right: 0;
@@ -48,7 +50,8 @@ div {
   left: 0;
   pointer-events: none;
 
-  & > * {
+  &__component {
+    z-index: 10;
     pointer-events: all;
   }
 }

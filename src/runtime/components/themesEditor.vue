@@ -70,6 +70,7 @@ const themesEditor = useThemesEditor();
 
   &__header {
     position: relative;
+    z-index: 2;
     display: grid;
     grid-template-columns: auto 0;
     align-items: center;
