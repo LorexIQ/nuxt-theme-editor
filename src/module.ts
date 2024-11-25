@@ -16,7 +16,7 @@ export default defineNuxtModule<ModuleOptions>({
   defaults: {
     defaultTheme: 'light',
     themesDir: './themes',
-    enableDefaultThemeGenerator: false
+    enableDefaultThemeGenerator: true
   },
   async setup(options, nuxt) {
     // @ts-ignore

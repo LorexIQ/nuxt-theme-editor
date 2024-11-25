@@ -7,7 +7,7 @@ import type {
   ModuleStorage,
   ModuleThemeRootReturn,
   ModuleThemes,
-  ModuleThemeType
+  ModuleThemeType, ModuleDefineThemeMetaUI, ModuleDefineThemeMetaPreview
 } from '../types';
 // @ts-ignore
 import connectorMeta from '../meta/connector';
@@ -17,28 +17,58 @@ import getSystemTheme from '../helpers/getSystemTheme';
 import { Sandbox } from './Sandbox';
 import { useRuntimeConfig, reactive, ref, computed, watch } from '#imports';
 
+const DEFAULT_PREVIEW_STYLES: Required<ModuleDefineThemeMetaPreview> = {
+  defaultPreviewCardBG1: '#FFFFFF',
+  defaultPreviewCardBG2: '#CCCCCC',
+  defaultPreviewCardBG3: '#999999',
+  defaultPreviewCardBG4: '#666666',
+  defaultPreviewCardBG5: '#333333',
+  defaultPreviewCardBG6: '#000000'
+};
+const DEFAULT_UI_STYLES: Required<ModuleDefineThemeMetaUI> = {
+  bg: '#fff',
+  bgHover: '#f6f6f6',
+  bgHeader: '#f6f6f6',
+  bgBlockHeader: '#f6f6f6',
+  bgGlass: 'rgba(0, 0, 0, 0.1)',
+  blurGlass: '3px',
+  shadow: 'rgba(0, 0, 0, 0.1)',
+  border: 'rgba(0, 0, 0, 0.1)',
+  title: '#333',
+  titleTransparent: '#999',
+  statusActiveBg: '#85f585',
+  statusActiveTitle: '#245024',
+  statusLightDarkBg: '#dab6e2',
+  statusLightDarkTitle: '#3b003d',
+  statusLightBg: '#ffd9a6',
+  statusLightTitle: '#5f3700',
+  statusDarkBg: '#9e9eff',
+  statusDarkTitle: '#fff',
+  contextMenuStatusActive: '#00ca00'
+};
+
 export class Client {
   private readonly config = useRuntimeConfig().public.themesEditor as ModuleOptionsExtend;
   private readonly sandbox = new Sandbox(this);
   private readonly usesScopesProperties = reactive<ModuleObject<ModuleObject>>({});
 
   private readonly isUseSystemTheme = ref(false);
-  private readonly selectedThemeName = ref<string>();
-  private readonly selectedLightThemeName = ref<string>();
-  private readonly selectedDarkThemeName = ref<string>();
-  private readonly selectedSystemThemeName = getSystemTheme().theme;
+  private readonly selectedThemeId = ref<string>();
+  private readonly selectedLightThemeId = ref<string>();
+  private readonly selectedDarkThemeId = ref<string>();
+  private readonly selectedSystemThemeId = getSystemTheme().theme;
   private readonly themes = reactive<ModuleThemes>({});
 
   private readonly selectedTheme = computed(() => {
-    const selectedTheme = unwrap.get(this.isUseSystemTheme) ? this._getSystemThemeAssociation() : unwrap.get(this.selectedThemeName);
-    return selectedTheme ? this.themes[selectedTheme] : this.themes[unwrap.get(this.selectedLightThemeName)!];
+    const selectedTheme = unwrap.get(this.isUseSystemTheme) ? this._getSystemThemeAssociation() : unwrap.get(this.selectedThemeId);
+    return selectedTheme ? this.themes[selectedTheme] : undefined;
   });
 
   private readonly savedStorage = computed<ModuleStorage>(() => ({
     isUseSystemTheme: unwrap.get(this.isUseSystemTheme),
-    selectedThemeName: unwrap.get(this.selectedThemeName),
-    selectedLightThemeName: unwrap.get(this.selectedLightThemeName),
-    selectedDarkThemeName: unwrap.get(this.selectedDarkThemeName)
+    selectedThemeId: unwrap.get(this.selectedThemeId),
+    selectedLightThemeId: unwrap.get(this.selectedLightThemeId),
+    selectedDarkThemeId: unwrap.get(this.selectedDarkThemeId)
   }));
 
   constructor() {
@@ -61,19 +91,19 @@ export class Client {
   }
 
   private _initDefaultThemes(): void {
-    unwrap.set(this, 'selectedLightThemeName', this._checkThemeAvailableAndGetActual(this.config.defaultTheme));
-    unwrap.set(this, 'selectedDarkThemeName', this._checkThemeAvailableAndGetActual(this.config.defaultDarkTheme));
-    unwrap.set(this, 'selectedThemeName', unwrap.get(this.selectedLightThemeName));
+    unwrap.set(this, 'selectedLightThemeId', this._checkThemeAvailableAndGetActual(this.config.defaultTheme));
+    unwrap.set(this, 'selectedDarkThemeId', this._checkThemeAvailableAndGetActual(this.config.defaultDarkTheme));
+    unwrap.set(this, 'selectedThemeId', unwrap.get(this.selectedLightThemeId));
   }
 
   private _readStorage(): void {
     const storage = JSON.parse(localStorage.getItem(this.config.keys.storage) as string) as ModuleStorage | null;
 
     if (storage) {
-      unwrap.set(this, 'selectedLightThemeName', this._checkThemeAvailableAndGetActual(storage.selectedLightThemeName, 'light'));
-      unwrap.set(this, 'selectedDarkThemeName', this._checkThemeAvailableAndGetActual(storage.selectedDarkThemeName, 'dark'));
+      unwrap.set(this, 'selectedLightThemeId', this._checkThemeAvailableAndGetActual(storage.selectedLightThemeId, 'light'));
+      unwrap.set(this, 'selectedDarkThemeId', this._checkThemeAvailableAndGetActual(storage.selectedDarkThemeId, 'dark'));
       this.setAutoModeTheme(storage.isUseSystemTheme);
-      unwrap.set(this, 'selectedThemeName', this._checkThemeAvailableAndGetActual(storage.selectedThemeName, unwrap.get(this.isUseSystemTheme) ? 'system' : unwrap.get(this.selectedLightThemeName)));
+      unwrap.set(this, 'selectedThemeId', this._checkThemeAvailableAndGetActual(storage.selectedThemeId, unwrap.get(this.isUseSystemTheme) ? 'system' : unwrap.get(this.selectedLightThemeId)));
     }
   }
 
@@ -82,13 +112,25 @@ export class Client {
     const uiStylesKey = `#${this.config.keys.sandbox.replaceAll(':', '\\:')}, #${this.config.keys.editor.replaceAll(':', '\\:')}`;
 
     watch(this.selectedTheme, (theme) => {
-      this._appendStyleToHead(`${this.config.keys.style}:root`, { [rootStylesKey]: theme.styles[0].styles[0] as ModuleObject });
-      this._appendStyleToHead(`${this.config.keys.style}:ui`, { [uiStylesKey]: theme.meta.uiStyles });
+      this._appendStyleToHead(`${this.config.keys.style}:root`, theme ? { [rootStylesKey]: theme.styles[0].styles[0] as ModuleObject } : {});
+      this._appendStyleToHead(`${this.config.keys.style}:ui`, { [uiStylesKey]: { ...DEFAULT_UI_STYLES, ...theme?.meta.uiStyles } });
     }, { immediate: true });
 
     watch(this.usesScopesProperties, scopes => this._appendStyleToHead(`${this.config.keys.style}:scope`, scopes, true), { immediate: true });
 
-    watch(this.themes, themes => this._appendStyleToHead(`${this.config.keys.style}:preview`, Object.values(themes).reduce((accum, theme) => ({ ...accum, [`theme-${theme.name}-preview`]: theme.meta.previewStyles }), {}), true), { immediate: true });
+    watch(this.themes, (themes) => {
+      this._appendStyleToHead(
+        `${this.config.keys.style}:preview`,
+        Object
+          .values(themes)
+          .reduce((accum, theme) => ({
+            ...accum,
+            [`theme-${theme.id}-preview`]: {
+              ...DEFAULT_PREVIEW_STYLES,
+              ...theme.meta.previewStyles
+            }
+          }), {}), true);
+    }, { immediate: true });
 
     watch(this.savedStorage, () => this._saveStorage());
   }
@@ -108,46 +150,17 @@ export class Client {
     };
 
     return {
-      name: themeName,
+      id: themeName,
+      name: themeFile.meta.name ?? themeName,
       type: themeType,
       meta: {
+        name: themeName,
         description: '',
 
         ...themeFile.meta,
 
-        previewStyles: {
-          defaultPreviewCardBG1: '#FFFFFF',
-          defaultPreviewCardBG2: '#CCCCCC',
-          defaultPreviewCardBG3: '#999999',
-          defaultPreviewCardBG4: '#666666',
-          defaultPreviewCardBG5: '#333333',
-          defaultPreviewCardBG6: '#000000',
-
-          ...themeFile.meta.previewStyles
-        },
-        uiStyles: {
-          bg: '#fff',
-          bgHover: '#f6f6f6',
-          bgHeader: '#f6f6f6',
-          bgBlockHeader: '#f6f6f6',
-          bgGlass: 'rgba(0, 0, 0, 0.1)',
-          blurGlass: '3px',
-          shadow: 'rgba(0, 0, 0, 0.1)',
-          border: 'rgba(0, 0, 0, 0.1)',
-          title: '#333',
-          titleTransparent: '#999',
-          statusActiveBg: '#85f585',
-          statusActiveTitle: '#245024',
-          statusLightDarkBg: '#dab6e2',
-          statusLightDarkTitle: '#3b003d',
-          statusLightBg: '#ffd9a6',
-          statusLightTitle: '#5f3700',
-          statusDarkBg: '#9e9eff',
-          statusDarkTitle: '#fff',
-          contextMenuStatusActive: '#00ca00',
-
-          ...themeFile.meta.uiStyles
-        }
+        previewStyles: themeFile.meta.previewStyles!,
+        uiStyles: themeFile.meta.uiStyles!
       },
       styles: themeFile.styles.map(style => cleanThemeStyles(style, 'global'))
     };
@@ -186,11 +199,11 @@ export class Client {
   }
 
   private _getSystemThemeAssociation(): string {
-    switch (unwrap.get(this.selectedSystemThemeName)) {
+    switch (unwrap.get(this.selectedSystemThemeId)) {
       case 'light':
-        return this._checkThemeAvailableAndGetActual(unwrap.get(this.selectedLightThemeName), 'light')!;
+        return this._checkThemeAvailableAndGetActual(unwrap.get(this.selectedLightThemeId), 'light')!;
       case 'dark':
-        return this._checkThemeAvailableAndGetActual(unwrap.get(this.selectedDarkThemeName), 'dark')!;
+        return this._checkThemeAvailableAndGetActual(unwrap.get(this.selectedDarkThemeId), 'dark')!;
     }
   }
 
@@ -238,16 +251,16 @@ export class Client {
     return unwrap.get(this.selectedTheme);
   }
 
-  getSelectedThemeName() {
-    return unwrap.get(this.selectedThemeName);
+  getSelectedThemeId() {
+    return unwrap.get(this.selectedThemeId);
   }
 
-  getSelectedLightThemeName() {
-    return unwrap.get(this.selectedLightThemeName);
+  getSelectedLightThemeId() {
+    return unwrap.get(this.selectedLightThemeId);
   }
 
-  getSelectedDarkThemeName() {
-    return unwrap.get(this.selectedDarkThemeName);
+  getSelectedDarkThemeId() {
+    return unwrap.get(this.selectedDarkThemeId);
   }
 
   getAutoModeStatus() {
@@ -255,23 +268,23 @@ export class Client {
   }
 
   setAutoModeTheme(mode: boolean) {
-    if (!unwrap.get(this.selectedDarkThemeName)) return;
+    if (!unwrap.get(this.selectedDarkThemeId)) return;
     unwrap.set(this, 'isUseSystemTheme', mode);
   }
 
   selectTheme(themeName: string) {
-    if (!(themeName in this.themes)) return;
+    if (!(themeName in this.themes) || unwrap.get(this.selectedThemeId) === themeName) return;
     unwrap.set(this, 'isUseSystemTheme', false);
-    unwrap.set(this, 'selectedThemeName', themeName);
+    unwrap.set(this, 'selectedThemeId', themeName);
   }
 
   selectLightTheme(themeName: string) {
-    if (!(themeName in this.themes)) return;
-    unwrap.set(this, 'selectedLightThemeName', themeName);
+    if (!(themeName in this.themes) || unwrap.get(this.selectedLightThemeId) === themeName) return;
+    unwrap.set(this, 'selectedLightThemeId', themeName);
   }
 
   selectDarkTheme(themeName: string) {
-    if (!(themeName in this.themes)) return;
-    unwrap.set(this, 'selectedDarkThemeName', themeName);
+    if (!(themeName in this.themes) || unwrap.get(this.selectedDarkThemeId) === themeName) return;
+    unwrap.set(this, 'selectedDarkThemeId', themeName);
   }
 }

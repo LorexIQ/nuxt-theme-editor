@@ -30,6 +30,7 @@ export type ModuleDefineThemeMetaUI = Partial<{
   contextMenuStatusActive: string;
 }>;
 export type ModuleDefineThemeMeta = {
+  name?: string;
   description?: string;
   previewStyles?: ModuleDefineThemeMetaPreview;
   uiStyles?: ModuleDefineThemeMetaUI;

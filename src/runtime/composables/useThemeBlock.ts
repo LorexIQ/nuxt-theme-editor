@@ -13,10 +13,10 @@ function getComponentId(instance: ComponentInternalInstance) {
   if (!subTree.scopeId) {
     if (subTree.type === Symbol.for('v-fgt')) {
       for (const child of subTree.children as any[]) {
-        child.el?.setAttribute(scopeId, '');
+        child.el?.setAttribute?.(scopeId, '');
       }
     } else {
-      subTree.el?.setAttribute(scopeId, '');
+      subTree.el?.setAttribute?.(scopeId, '');
     }
   }
 

@@ -1,8 +1,9 @@
 import sidebar from './sidebar';
 
 export default defineThemeBlockRoot({
+  name: 'Light',
   description: 'Стандартная светлая тема фырв шщрфшщырв шщрфышвр щшфырщв рфырв шщфршырв щшфырщшв рфыр фылдв фыв рфырвд фыдвр дфыырлвр фыдрдвр',
-  previewCardStyles: {
+  previewStyles: {
   },
   uiStyles: {
   }

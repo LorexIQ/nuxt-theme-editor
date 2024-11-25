@@ -63,9 +63,9 @@ export class Sandbox {
   openContextMenu(event: MouseEvent, theme: ModuleThemeRootReturn): void {
     this.closeContextMenu();
     const clickPosition: ModuleSandboxMousePosition = { x: event.pageX, y: event.pageY };
-    const isSelectedTheme = this.ctx.getSelectedTheme().name === theme.name;
-    const isSelectedLightTheme = this.ctx.getSelectedLightThemeName() === theme.name;
-    const isSelectedDarkTheme = this.ctx.getSelectedDarkThemeName() === theme.name;
+    const isSelectedTheme = this.ctx.getSelectedTheme()?.id === theme.id;
+    const isSelectedLightTheme = this.ctx.getSelectedLightThemeId() === theme.id;
+    const isSelectedDarkTheme = this.ctx.getSelectedDarkThemeId() === theme.id;
 
     this.components.push({
       id: CONTEXT_MENU_ID,
@@ -80,21 +80,21 @@ export class Sandbox {
             isDisabled: () => isSelectedTheme,
             icon: isSelectedTheme ? 'Check' : undefined,
             iconColor: 'var(--contextMenuStatusActive)',
-            action: () => this.ctx.selectTheme(theme.name)
+            action: () => this.ctx.selectTheme(theme.id)
           },
           {
             title: isSelectedLightTheme ? 'Назначена светлой темой' : 'Назначить светлой темой',
             isDisabled: () => isSelectedLightTheme,
             icon: isSelectedLightTheme ? 'Check' : undefined,
             iconColor: 'var(--contextMenuStatusActive)',
-            action: () => this.ctx.selectLightTheme(theme.name)
+            action: () => this.ctx.selectLightTheme(theme.id)
           },
           {
             title: isSelectedDarkTheme ? 'Назначена тёмной темой' : 'Назначить тёмной темой',
             isDisabled: () => isSelectedDarkTheme,
             icon: isSelectedDarkTheme ? 'Check' : undefined,
             iconColor: 'var(--contextMenuStatusActive)',
-            action: () => this.ctx.selectDarkTheme(theme.name)
+            action: () => this.ctx.selectDarkTheme(theme.id)
           }
         ]
       },

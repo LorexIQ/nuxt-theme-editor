@@ -67,13 +67,14 @@ onMounted(() => {
 <template>
   <div
     class="context-menu"
-    @contextmenu.prevent="closeContextMenu"
+    @contextmenu.self.prevent="closeContextMenu"
     @click.self="closeContextMenu"
   >
     <div
       ref="menuRef"
       class="context-menu__menu"
       :style="menuPosition"
+      @contextmenu.prevent
     >
       <div class="context-menu__menu__tip">
         Выберите действие

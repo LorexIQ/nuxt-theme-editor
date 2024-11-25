@@ -95,17 +95,18 @@ export class Server {
     const defaultThemeDir = uPath.join(this.rootThemesDir, this.config.defaultTheme);
     const defaultThemePath = uPath.join(defaultThemeDir, 'index.ts');
 
-    if (!await this._readThemeByPath(defaultThemePath)) {
+    if (this.config.enableDefaultThemeGenerator && !fs.existsSync(defaultThemePath)) {
       logger.info('Default theme generation...');
 
       if (!fs.existsSync(defaultThemeDir)) {
         fs.mkdirSync(defaultThemeDir);
       }
-
       const themeIndexFile = tsMorphProject.createSourceFile(defaultThemePath, '', { overwrite: true });
+
+      themeIndexFile.removeDefaultExport();
       themeIndexFile.addExportAssignment({
         isExportEquals: false,
-        expression: 'defineThemeBlockRoot({})'
+        expression: 'defineThemeBlockRoot({}, [])'
       });
       themeIndexFile.saveSync();
     }

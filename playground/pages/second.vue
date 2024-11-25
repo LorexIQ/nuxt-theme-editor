@@ -7,7 +7,7 @@ useThemeBlock('sidebar.test');
 <template>
   <div class="page-second">
     <h4>PAGE: SECOND</h4>
-    {{ themesEditor.getSelectedThemeName() }}
+    {{ themesEditor.getSelectedThemeId() }}
     <button @click="router.push({ path: '/' })">
       Go Index Page
     </button>

@@ -1,7 +1,8 @@
 import sidebar from './sidebar';
 
 export default defineThemeBlockRoot({
-  previewCardStyles: {
+  name: 'Dark',
+  previewStyles: {
   }
 }, [
   {

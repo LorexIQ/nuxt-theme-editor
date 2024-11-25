@@ -17,6 +17,7 @@ export type ModuleThemeStyleBlockReturn = {
   styles: ModuleThemeCleanedSetting[];
 };
 export type ModuleThemeRootReturn = {
+  id: string;
   name: string;
   type: ModuleThemeType;
   meta: Required<ModuleDefineThemeMeta>;
