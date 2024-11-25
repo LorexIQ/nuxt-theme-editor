@@ -1,12 +1,18 @@
 <script lang="ts" setup>
 import { h } from 'vue';
-import type { ModuleIcons, ModuleSandboxContextMenuItem, ModuleSandboxMousePosition } from '../../types';
+import type {
+  ModuleIcons,
+  ModuleSandboxContextMenuItem,
+  ModuleSandboxMousePosition,
+  ModuleSandboxSize
+} from '../../types';
 import IconArrow from '../icons/IconArrow.vue';
 import IconCheck from '../icons/IconCheck.vue';
 import IconPlus from '../icons/IconPlus.vue';
-import { computed } from '#imports';
+import { computed, onMounted, ref } from '#imports';
 
 type Props = {
+  sandboxSize: ModuleSandboxSize;
   clickPosition: ModuleSandboxMousePosition;
   items: ModuleSandboxContextMenuItem[];
 };
@@ -16,11 +22,20 @@ type Emits = {
 
 const props = defineProps<Props>();
 const emit = defineEmits<Emits>();
+const sandboxSize = props.sandboxSize;
 
-const menuPosition = computed(() => ({
-  left: props.clickPosition.x + 'px',
-  top: props.clickPosition.y + 'px'
-}));
+const menuRef = ref<HTMLDivElement>();
+const menuBoundingRect = ref<DOMRect>();
+const menuPosition = computed(() => {
+  const menuRect = menuBoundingRect.value;
+  const left = menuRect && menuRect.right > sandboxSize.width ? sandboxSize.width - menuRect.width : props.clickPosition.x;
+  const top = menuRect && menuRect.bottom > sandboxSize.height ? sandboxSize.height - menuRect.height : props.clickPosition.y;
+
+  return {
+    left: left + 'px',
+    top: top + 'px'
+  };
+});
 
 function getIconByName(icon?: ModuleIcons) {
   switch (icon) {
@@ -41,6 +56,12 @@ function selectItem(item: ModuleSandboxContextMenuItem) {
 function closeContextMenu() {
   emit('close');
 }
+
+onMounted(() => {
+  if (menuRef.value) {
+    menuBoundingRect.value = menuRef.value.getBoundingClientRect();
+  }
+});
 </script>
 
 <template>
@@ -50,6 +71,7 @@ function closeContextMenu() {
     @click.self="closeContextMenu"
   >
     <div
+      ref="menuRef"
       class="context-menu__menu"
       :style="menuPosition"
     >

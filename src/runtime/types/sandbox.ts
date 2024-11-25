@@ -18,3 +18,8 @@ export type ModuleSandboxContextMenuItem = {
   isDisabled?: () => boolean;
   action: () => void;
 };
+
+export type ModuleSandboxSize = {
+  width: number;
+  height: number;
+};

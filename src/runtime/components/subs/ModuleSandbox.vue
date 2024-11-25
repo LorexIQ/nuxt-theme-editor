@@ -1,5 +1,7 @@
 <script setup lang="ts">
 import type { Sandbox } from '../../classes/Sandbox';
+import ResizeObserver from '../helpers/ResizeObserver.vue';
+import { ref } from '#imports';
 
 type Props = {
   sandbox: Sandbox;
@@ -9,11 +11,14 @@ const props = defineProps<Props>();
 const sandbox = props.sandbox;
 const sandboxId = sandbox.getId();
 const components = sandbox.getComponents();
+
+const sandboxRef = ref<HTMLDivElement>();
 </script>
 
 <template>
   <transition-group
     :id="sandboxId"
+    ref="sandboxRef"
     name="list"
     tag="div"
   >
@@ -24,6 +29,12 @@ const components = sandbox.getComponents();
       :key="_component.id"
       v-bind="{ ...(_component.props ?? {}), class: _component.transitionName }"
       v-on="_component.emits ?? {}"
+    />
+
+    <ResizeObserver
+      key="resize-observer"
+      emit-on-mount
+      @notify="sandbox.setBoxSize($event)"
     />
   </transition-group>
 </template>

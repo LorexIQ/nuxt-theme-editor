@@ -137,7 +137,7 @@ export class Client {
           title: '#333',
           titleTransparent: '#999',
           statusActiveBg: '#85f585',
-          statusActiveTitle: '#777',
+          statusActiveTitle: '#245024',
           statusLightDarkBg: '#dab6e2',
           statusLightDarkTitle: '#3b003d',
           statusLightBg: '#ffd9a6',
