@@ -25,15 +25,17 @@ function getComponentId(instance: ComponentInternalInstance) {
 
 export default function useBlock(block: ModuleNestedKeys<ModuleMetaBlocks>) {
   const client = clientGetter().value;
+  const blockStyles = client.getStylesByPath(block);
   const currentInstance = getCurrentInstance()!;
 
   onMounted(() => {
     const scopeId = getComponentId(currentInstance);
-    if (client.checkScopeRegistration(scopeId))
-      console.warn(`useThemeBlock is already used in [${currentInstance.type.__file}]. The styles of the last called function will be used. Only one call is allowed.`);
-    client.registerScopeStyles(block, scopeId);
+    if (client.checkScopeRegistration(scopeId)) console.warn(`useThemeBlock is already used in [${currentInstance.type.__file}]. The styles of the last called function will be used. Only one call is allowed.`);
+    client.registerScopeStyles(scopeId, blockStyles);
   });
   onUnmounted(() => {
     client.unregisterScopeStyles(getComponentId(currentInstance));
   });
+
+  return blockStyles;
 }

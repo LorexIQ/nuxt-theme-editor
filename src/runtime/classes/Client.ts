@@ -1,3 +1,4 @@
+import type { ComputedRef } from 'vue';
 import type {
   ModuleDefineThemeBlockRootReturn,
   ModuleDefineThemeBlockSetting,
@@ -207,7 +208,19 @@ export class Client {
     }
   }
 
-  registerScopeStyles(blockPath: string, scopeId: string) {
+  registerScopeStyles(scopeId: string, styles: ComputedRef<ModuleObject>): void {
+    (this.usesScopesProperties as ModuleObject<any>)[scopeId] = styles;
+  }
+
+  unregisterScopeStyles(scopeId: string): void {
+    delete this.usesScopesProperties[scopeId];
+  }
+
+  checkScopeRegistration(scopeId: string): boolean {
+    return !!this.usesScopesProperties[scopeId];
+  }
+
+  getStylesByPath(blockPath: string): ComputedRef<ModuleObject> {
     const searchDefineStylesByPath = (blockName: string[], styles?: ModuleThemeCleanedSetting[]): ModuleObject => {
       if (styles) {
         for (const style of styles) {
@@ -224,66 +237,58 @@ export class Client {
       return {};
     };
 
-    (this.usesScopesProperties as any)[scopeId] = computed(() => searchDefineStylesByPath(blockPath.split('.'), unwrap.get(this.selectedTheme)?.styles));
+    return computed(() => searchDefineStylesByPath(blockPath.split('.'), unwrap.get(this.selectedTheme)?.styles));
   }
 
-  unregisterScopeStyles(scopeId: string) {
-    delete this.usesScopesProperties[scopeId];
-  }
-
-  checkScopeRegistration(scopeId: string) {
-    return !!this.usesScopesProperties[scopeId];
-  }
-
-  getConfig() {
+  getConfig(): ModuleOptionsExtend {
     return this.config;
   }
 
-  getSandbox() {
+  getSandbox(): Sandbox {
     return this.sandbox;
   }
 
-  getThemes() {
+  getThemes(): ModuleThemes {
     return this.themes;
   }
 
-  getSelectedTheme() {
+  getSelectedTheme(): ModuleThemeRootReturn | undefined {
     return unwrap.get(this.selectedTheme);
   }
 
-  getSelectedThemeId() {
+  getSelectedThemeId(): string | undefined {
     return unwrap.get(this.selectedThemeId);
   }
 
-  getSelectedLightThemeId() {
+  getSelectedLightThemeId(): string | undefined {
     return unwrap.get(this.selectedLightThemeId);
   }
 
-  getSelectedDarkThemeId() {
+  getSelectedDarkThemeId(): string | undefined {
     return unwrap.get(this.selectedDarkThemeId);
   }
 
-  getAutoModeStatus() {
+  getAutoModeStatus(): boolean {
     return unwrap.get(this.isUseSystemTheme);
   }
 
-  setAutoModeTheme(mode: boolean) {
+  setAutoModeTheme(mode: boolean): void {
     if (!unwrap.get(this.selectedDarkThemeId)) return;
     unwrap.set(this, 'isUseSystemTheme', mode);
   }
 
-  selectTheme(themeName: string) {
+  selectTheme(themeName: string): void {
     if (!(themeName in this.themes) || unwrap.get(this.selectedThemeId) === themeName) return;
     unwrap.set(this, 'isUseSystemTheme', false);
     unwrap.set(this, 'selectedThemeId', themeName);
   }
 
-  selectLightTheme(themeName: string) {
+  selectLightTheme(themeName: string): void {
     if (!(themeName in this.themes) || unwrap.get(this.selectedLightThemeId) === themeName) return;
     unwrap.set(this, 'selectedLightThemeId', themeName);
   }
 
-  selectDarkTheme(themeName: string) {
+  selectDarkTheme(themeName: string): void {
     if (!(themeName in this.themes) || unwrap.get(this.selectedDarkThemeId) === themeName) return;
     unwrap.set(this, 'selectedDarkThemeId', themeName);
   }
