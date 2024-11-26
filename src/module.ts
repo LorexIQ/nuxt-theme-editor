@@ -30,10 +30,7 @@ export default defineNuxtModule<ModuleOptions>({
     // @ts-ignore
     nuxt.options.runtimeConfig.public[MODULE_CONFIG_KEY] = serverObject.getConfig();
 
-    // nuxt.hook('builder:watch', (_, path) => {
-    //   console.log('UPDATE', _);
-    //   serverObject.getMetaFiles().checkPathAndUpdate(path);
-    // });
+    nuxt.hook('builder:watch', (_, path) => serverObject.getMetaFiles().checkPathAndUpdate(path));
     nuxt.hook('build:before', () => serverObject.getMetaFiles().create());
 
     addImportsDir(resolver.resolve('./runtime/composables'));

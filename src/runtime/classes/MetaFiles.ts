@@ -18,7 +18,7 @@ export class MetaFiles {
   private readonly config: ModuleOptionsExtend;
 
   private readonly watcherHash: ModuleMetaFilesWatcherHash = {};
-  private watcherDelay: NodeJS.Timeout | undefined;
+  private watcherLastUpdate = Date.now();
 
   constructor(private readonly ctx: Server) {
     this.metaResolver = createResolver(this.ctx.getResolver().resolve('runtime', 'meta'));
@@ -128,22 +128,18 @@ export class MetaFiles {
   }
 
   async checkPathAndUpdate(path: string): Promise<void> {
-    if (this.watcherHash[path] !== undefined && !this.watcherHash[path]) return;
-
-    clearTimeout(this.watcherDelay);
-    this.watcherDelay = setTimeout(async () => {
+    if (this.watcherHash[path] === undefined) {
       const pFull = uPath.join(this.ctx.getRootDir(), path);
+      this.watcherHash[path] = this.ctx.getThemesDirs().some(themePath => pFull.includes(themePath));
+    }
+    if (!this.watcherHash[path]) return;
+    if (Date.now() - this.watcherLastUpdate < 1000) return;
 
-      console.log(this.watcherHash, this.ctx.getThemesDirs(), uPath.join(this.ctx.getRootDir(), path), path);
-      if (this.watcherHash[path] || this.ctx.getThemesDirs().some(themePath => pFull.includes(themePath))) {
-        this.watcherHash[path] = true;
-        await this.ctx.readThemes();
-        this._createThemesStructure();
-        this._createThemesStyles();
-      } else {
-        this.watcherHash[path] = false;
-      }
-    }, 2000);
+    console.log('UPDATE');
+    await this.ctx.readThemes();
+    this._createThemesStructure();
+    this._createThemesStyles();
+    this.watcherLastUpdate = Date.now();
   }
 
   create(): void {

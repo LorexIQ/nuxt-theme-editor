@@ -1,16 +1,17 @@
-import path from 'node:path';
 import fs from 'node:fs';
 import { pathToFileURL } from 'node:url';
 import esbuild from 'esbuild';
 import { resolveAlias } from '@nuxt/kit';
 import type { SourceFile } from 'ts-morph';
+import uPath from './uPath';
 import tsMorphProject from './tsMorphProject';
+import type { ModuleLoadTsModuleBaseReturn } from '~/src/runtime/types';
 
-function clearTemp(tempPath: string, file?: SourceFile) {
+function clearTemp(tempPath: string, file?: SourceFile): void {
   if (fs.existsSync(tempPath)) fs.unlinkSync(tempPath);
   file && tsMorphProject.removeSourceFile(file);
 }
-function isFileExists(filePath: string) {
+function isFileExists(filePath: string): string | undefined {
   const checkedTypes = ['.ts', '.js'];
 
   for (const checkedType of checkedTypes) {
@@ -21,9 +22,9 @@ function isFileExists(filePath: string) {
 
   return undefined;
 }
-function getImportPath(ctxPath: string, p: string) {
+function getImportPath(ctxPath: string, p: string): string | undefined {
   const asAliasResolve = resolveAlias(p);
-  const asPathResolve = path.resolve(ctxPath, p);
+  const asPathResolve = uPath.resolve(ctxPath, p);
   const isAliasPath = asAliasResolve !== p;
   const isRelativePath = p.startsWith('.') || p.startsWith('/');
   const importPath = isRelativePath ? asPathResolve : asAliasResolve;
@@ -31,22 +32,23 @@ function getImportPath(ctxPath: string, p: string) {
   if (isAliasPath || isRelativePath) {
     let fileExists = isFileExists(importPath);
 
-    if (!fileExists) fileExists = isFileExists(path.join(importPath, 'index'));
+    if (!fileExists) fileExists = isFileExists(uPath.join(importPath, 'index'));
     if (fileExists) return fileExists;
   }
 
   return undefined;
 }
-function getTempName(p: string, t: 'ts' | 'js') {
-  return p.replace(/\.ts$/, `.temp.${t}`);
+function getTempName(path: string, timestamp: number, scope: 'ts' | 'js'): string {
+  return path.replace(/\.ts$/, `.${timestamp}.temp.${scope}`);
 }
 
-export async function loadTsModuleBase(modulePath: string) {
+export async function loadTsModuleBase(modulePath: string): Promise<ModuleLoadTsModuleBaseReturn> {
   const tempCleaners: (() => void)[] = [];
-  const fullPath = path.resolve(modulePath);
-  const parsedPath = path.parse(fullPath);
-  const tempTsFilePath = getTempName(fullPath, 'ts');
-  const tempJsFilePath = getTempName(fullPath, 'js');
+  const fullPath = uPath.resolve(modulePath);
+  const parsedPath = uPath.parse(fullPath);
+  const fileReadTimestamp = Date.now();
+  const tempTsFilePath = getTempName(fullPath, fileReadTimestamp, 'ts');
+  const tempJsFilePath = getTempName(fullPath, fileReadTimestamp, 'js');
   let sourceFile: SourceFile | undefined = undefined;
 
   try {
@@ -56,11 +58,11 @@ export async function loadTsModuleBase(modulePath: string) {
     for (const imp of sourceFile.getImportDeclarations()) {
       const importPath = getImportPath(parsedPath.dir, imp.getStructure().moduleSpecifier);
       if (importPath) {
-        const dir = path.parse(modulePath).dir;
-        const relativePath = './' + path.relative(path.parse(modulePath).dir, importPath);
-        const importFilePath = path.join(dir, relativePath);
+        const dir = uPath.parse(modulePath).dir;
+        const relativePath = './' + uPath.relative(uPath.parse(modulePath).dir, importPath);
+        const importFilePath = uPath.join(dir, relativePath);
         const loadedImport = await loadTsModuleBase(importFilePath);
-        imp.setModuleSpecifier(getTempName(relativePath, 'js'));
+        imp.setModuleSpecifier(getTempName(relativePath, loadedImport.timestamp, 'js'));
         tempCleaners.push(loadedImport.clearTemp);
 
         if (!fs.existsSync(importFilePath)) imp.remove();
@@ -74,18 +76,20 @@ export async function loadTsModuleBase(modulePath: string) {
 
     return {
       clearTemp: clearTemp.bind(null, tempJsFilePath, sourceFile),
+      timestamp: fileReadTimestamp,
       module
     };
   } catch (e) {
     console.error(e);
     return {
       clearTemp: clearTemp.bind(null, tempJsFilePath, sourceFile),
+      timestamp: fileReadTimestamp,
       module: undefined
     };
   }
 }
 
-export async function loadTsModule(modulePath: string) {
+export async function loadTsModule(modulePath: string): Promise<any> {
   const loader = await loadTsModuleBase(modulePath);
   loader.clearTemp();
   return loader.module;
