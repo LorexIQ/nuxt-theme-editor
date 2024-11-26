@@ -22,53 +22,53 @@ const isBoxActive = computed(() => isLightTheme.value || isDarkTheme.value || is
 
 <template>
   <div
-    class="theme-block"
-    :class="{ 'theme-block--active': isBoxActive }"
+    class="TE-theme-block"
+    :class="{ 'TE-theme-block--active': isBoxActive }"
     @dblclick="client.selectTheme(theme.id)"
-    @contextmenu.prevent="client.getSandbox().openContextMenu($event, theme)"
+    @contextmenu.prevent="client.getSandbox().openSystemThemeContextMenu($event, theme)"
   >
     <div
-      class="theme-block__preview"
+      class="TE-theme-block__preview"
       v-bind="{ [`theme-${theme.id}-preview`]: '' }"
     >
       <slot>
         <ThemePreview />
       </slot>
     </div>
-    <div class="theme-block__info">
-      <div class="theme-block__info__name">
+    <div class="TE-theme-block__info">
+      <div class="TE-theme-block__info__name">
         {{ theme.name }}
       </div>
       <div
-        class="theme-block__info__description"
-        :class="{ 'theme-block__info__description--transparent': !theme.meta.description }"
+        class="TE-theme-block__info__description"
+        :class="{ 'TE-theme-block__info__description--transparent': !theme.meta.description }"
       >
         <span>{{ theme.meta.description || 'Описание не задано' }}</span>
       </div>
     </div>
-    <div class="theme-block__status">
+    <div class="TE-theme-block__status">
       <transition name="fade">
         <div
           v-if="isActiveTheme"
-          class="theme-block__status__active"
+          class="TE-theme-block__status__active"
         >
           Active
         </div>
         <div
           v-else-if="isLightDartTheme"
-          class="theme-block__status__light_dark"
+          class="TE-theme-block__status__light_dark"
         >
           Light/Dark
         </div>
         <div
           v-else-if="isLightTheme"
-          class="theme-block__status__light"
+          class="TE-theme-block__status__light"
         >
           Light
         </div>
         <div
           v-else-if="isDarkTheme"
-          class="theme-block__status__dark"
+          class="TE-theme-block__status__dark"
         >
           Dark
         </div>
@@ -78,7 +78,7 @@ const isBoxActive = computed(() => isLightTheme.value || isDarkTheme.value || is
 </template>
 
 <style scoped lang="scss">
-.theme-block {
+.TE-theme-block {
   display: grid;
   grid-template-columns: 90px auto 0;
   align-items: center;

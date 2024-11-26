@@ -1,18 +1,16 @@
 <template>
-  <div class="theme-preview">
-    <div class="theme-preview__block" />
-    <div class="theme-preview__block" />
-    <div class="theme-preview__block" />
-    <div class="theme-preview__block" />
-    <div class="theme-preview__block" />
-    <div class="theme-preview__block" />
+  <div class="TE-theme-preview">
+    <div class="TE-theme-preview__block" />
+    <div class="TE-theme-preview__block" />
+    <div class="TE-theme-preview__block" />
+    <div class="TE-theme-preview__block" />
+    <div class="TE-theme-preview__block" />
+    <div class="TE-theme-preview__block" />
   </div>
 </template>
 
 <style scoped lang="scss">
-$rectSize: 20px;
-
-.theme-preview {
+.TE-theme-preview {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   grid-template-rows: repeat(2, 1fr);

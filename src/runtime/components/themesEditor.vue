@@ -1,43 +1,31 @@
 <script setup lang="ts">
 import useThemesEditor from '../composables/useThemesEditor';
-import BlockThemes from './subs/BlockThemes.vue';
+import ThemesList from './views/ThemesList.vue';
 
-const themesEditor = useThemesEditor();
+const client = useThemesEditor();
 </script>
 
 <template>
   <div
-    :id="themesEditor.getConfig().keys.editor"
-    class="themes-editor"
+    :id="client.getConfig().keys.editor"
+    class="TE-root"
   >
-    <div class="themes-editor__header">
-      <div class="themes-editor__header__title">
+    <div class="TE-root__header">
+      <div class="TE-root__header__title">
         ThemesEditor
       </div>
-      <div class="themes-editor__header__version">
-        {{ themesEditor.getConfig().meta.version }}
+      <div class="TE-root__header__version">
+        {{ client.getConfig().meta.version }}
       </div>
     </div>
-    <div class="themes-editor__content">
-      <BlockThemes
-        type="system"
-        is-open
-        :client="themesEditor"
-      />
-      <BlockThemes
-        type="global"
-        :client="themesEditor"
-      />
-      <BlockThemes
-        type="local"
-        :client="themesEditor"
-      />
+    <div class="TE-root__content">
+      <ThemesList :client="client" />
     </div>
   </div>
 </template>
 
 <style lang="scss">
-.themes-editor {
+.TE-root {
   & * {
     font-family: 'Roboto', sans-serif;
     box-sizing: border-box;
@@ -59,7 +47,7 @@ const themesEditor = useThemesEditor();
 </style>
 
 <style scoped lang="scss">
-.themes-editor {
+.TE-root {
   display: grid;
   grid-template-rows: auto 1fr;
   height: 100%;

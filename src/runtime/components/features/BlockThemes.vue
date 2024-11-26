@@ -34,15 +34,15 @@ const title = computed(() => {
 </script>
 
 <template>
-  <div class="block-themes">
+  <div class="TE-block-themes">
     <div
-      class="block-themes__title"
+      class="TE-block-themes__title"
       @click="isOpened = !isOpened"
     >
       {{ title }}
       <div
-        class="block-themes__title__icon"
-        :class="{ 'block-themes__title__icon--open': isOpened }"
+        class="TE-block-themes__title__icon"
+        :class="{ 'TE-block-themes__title__icon--open': isOpened }"
       >
         <IconArrow />
       </div>
@@ -50,17 +50,17 @@ const title = computed(() => {
     <transition-expand>
       <div
         v-if="isOpened"
-        class="block-themes__content"
+        class="TE-block-themes__content"
       >
         <div
           v-if="isAddActive"
-          class="block-themes__content__add"
+          class="TE-block-themes__content__add"
         >
           <IconPlus />
         </div>
         <div
           v-if="themes.length"
-          class="block-themes__content__themes"
+          class="TE-block-themes__content__themes"
         >
           <ThemeBlock
             v-for="theme of themes"
@@ -71,8 +71,8 @@ const title = computed(() => {
         </div>
         <div
           v-else
-          class="block-themes__content__null"
-          :class="{ 'block-themes__content__null--simplify': !isAddActive }"
+          class="TE-block-themes__content__null"
+          :class="{ 'TE-block-themes__content__null--simplify': !isAddActive }"
         >
           Список тем пуст
         </div>
@@ -82,7 +82,7 @@ const title = computed(() => {
 </template>
 
 <style scoped lang="scss">
-.block-themes {
+.TE-block-themes {
   &__title {
     position: sticky;
     top: 0;
@@ -119,10 +119,16 @@ const title = computed(() => {
       padding: 5px;
       color: var(--title);
       border: 1px solid var(--border);
-      border-radius: var(--border-radius);
+      border-radius: 5px;
+      cursor: pointer;
+      transition: .3s;
 
       & svg {
         font-size: 30px;
+      }
+
+      &:hover {
+        background-color: var(--bgHover);
       }
     }
     &__themes {

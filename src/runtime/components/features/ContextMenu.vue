@@ -15,6 +15,7 @@ type Props = {
   sandboxSize: ModuleSandboxSize;
   clickPosition: ModuleSandboxMousePosition;
   items: ModuleSandboxContextMenuItem[];
+  tipText?: string;
 };
 type Emits = {
   (e: 'close'): void;
@@ -66,33 +67,36 @@ onMounted(() => {
 
 <template>
   <div
-    class="context-menu"
+    class="TE-context-menu"
     @contextmenu.self.prevent="closeContextMenu"
     @click.self="closeContextMenu"
   >
     <div
       ref="menuRef"
-      class="context-menu__menu"
+      class="TE-context-menu__menu"
       :style="menuPosition"
       @contextmenu.prevent
     >
-      <div class="context-menu__menu__tip">
-        Выберите действие
+      <div
+        v-if="tipText"
+        class="TE-context-menu__menu__tip"
+      >
+        {{ tipText }}
       </div>
-      <div class="context-menu__menu__items">
+      <div class="TE-context-menu__menu__items">
         <div
           v-for="item of items"
           :key="item.title"
-          class="context-menu__menu__items__item"
+          class="TE-context-menu__menu__items__item"
           :class="{
-            'context-menu__menu__items__item--disabled': item.isDisabled?.(),
-            'context-menu__menu__items__item--with-icon': item.icon,
+            'TE-context-menu__menu__items__item--disabled': item.isDisabled?.(),
+            'TE-context-menu__menu__items__item--with-icon': item.icon,
           }"
           @click="selectItem(item)"
         >
           <div
             v-if="item.icon"
-            class="context-menu__menu__items__item__icon"
+            class="TE-context-menu__menu__items__item__icon"
             :style="`color: ${item.iconColor};`"
           >
             <component :is="getIconByName(item.icon)" />
@@ -105,7 +109,7 @@ onMounted(() => {
 </template>
 
 <style scoped lang="scss">
-.context-menu {
+.TE-context-menu {
   position: fixed;
   top: 0;
   right: 0;

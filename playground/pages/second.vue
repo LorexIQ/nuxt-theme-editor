@@ -1,7 +1,8 @@
 <script setup lang="ts">
 const router = useRouter();
 const themesEditor = useThemesEditor();
-useThemeBlock('sidebar.test');
+const scopeStyles = useThemeBlock('sidebar.test');
+console.log('second.vue useThemeBlock =>', scopeStyles.value);
 </script>
 
 <template>
@@ -27,7 +28,7 @@ useThemeBlock('sidebar.test');
     </button>
     <log-object
       :value="themesEditor"
-      :replaces="{ ctx: '[CTX]' }"
+      :replaces="{ ctx: '[CTX]', styles: '[STYLES]' }"
     />
   </div>
 </template>

@@ -6,8 +6,8 @@ import type {
   ModuleSandboxSize,
   ModuleThemeRootReturn
 } from '../types';
-import ContextMenu from '../components/subs/ContextMenu.vue';
-import ModuleSandbox from '../components/subs/ModuleSandbox.vue';
+import ContextMenu from '../components/features/ContextMenu.vue';
+import ModuleSandbox from '../components/features/ModuleSandbox.vue';
 import type { Client } from './Client';
 import { markRaw, reactive } from '#imports';
 
@@ -60,7 +60,7 @@ export class Sandbox {
     if (contextMenuComponentIndex !== -1) this.components.splice(contextMenuComponentIndex, 1);
   }
 
-  openContextMenu(event: MouseEvent, theme: ModuleThemeRootReturn): void {
+  openSystemThemeContextMenu(event: MouseEvent, theme: ModuleThemeRootReturn): void {
     this.closeContextMenu();
     const clickPosition: ModuleSandboxMousePosition = { x: event.pageX, y: event.pageY };
     const isSelectedTheme = this.ctx.getSelectedTheme()?.id === theme.id;
@@ -74,6 +74,7 @@ export class Sandbox {
       props: {
         clickPosition,
         sandboxSize: this.boxSize,
+        tipText: 'Выберите действие',
         items: <ModuleSandboxContextMenuItem[]>[
           {
             title: isSelectedTheme ? 'Тема активна' : 'Выбрать тему',
