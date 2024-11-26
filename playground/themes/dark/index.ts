@@ -6,7 +6,7 @@ export default defineThemeBlockRoot({
   }
 }, [
   {
-    test: '#676767'
+    test: '#676764'
   },
   sidebar,
   defineThemeBlock('navbar', [

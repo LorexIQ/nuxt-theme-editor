@@ -40,7 +40,7 @@ export class MetaFiles {
     const themesConnector = this.ctx
       .getThemesPaths()
       .map((themePath) => {
-        const themeByRootPath = uPath.parse(themePath).dir.slice(this.ctx.getRootDir().length);
+        const themeByRootPath = uPath.parse(themePath).dir.slice(this.ctx.getRootResolver().resolve().length);
         const themeName = themeByRootPath.split('/').at(-1)!;
 
         return {
@@ -128,15 +128,13 @@ export class MetaFiles {
   }
 
   async checkPathAndUpdate(path: string): Promise<void> {
-    if (this.watcherHash[path] === undefined) {
-      const pFull = uPath.join(this.ctx.getRootDir(), path);
-      this.watcherHash[path] = this.ctx.getThemesDirs().some(themePath => pFull.includes(themePath));
-    }
-    if (!this.watcherHash[path]) return;
-    if (Date.now() - this.watcherLastUpdate < 1000) return;
+    const pathFull = this.ctx.getRootResolver().resolve(path);
 
-    console.log('UPDATE');
-    await this.ctx.readThemes();
+    if (this.watcherHash[path] === undefined) this.watcherHash[path] = pathFull.endsWith(`/${this.ctx.getConfig().defaultTheme}/index.ts`);
+    if (!this.watcherHash[path]) return;
+    if (Date.now() - this.watcherLastUpdate < 2000) return;
+
+    await this.ctx.readThemeByPath(pathFull);
     this._createThemesStructure();
     this._createThemesStyles();
     this.watcherLastUpdate = Date.now();

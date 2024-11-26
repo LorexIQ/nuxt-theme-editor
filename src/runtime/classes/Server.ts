@@ -1,6 +1,6 @@
 import fs from 'node:fs';
 import type { Nuxt } from '@nuxt/schema';
-import type { Resolver } from '@nuxt/kit';
+import { createResolver, type Resolver } from '@nuxt/kit';
 import defineThemeBlock from '../composables/defineThemeBlock';
 import defineThemeBlockRoot from '../composables/defineThemeBlockRoot';
 import type {
@@ -19,13 +19,13 @@ import { MetaFiles } from './MetaFiles';
 
 export class Server {
   private readonly config: ModuleOptionsExtend;
-  private readonly rootDir: string;
-  private readonly rootThemesDir: string;
+  private readonly rootResolver: Resolver;
+  private readonly themesResolver: Resolver;
 
   private readonly themes: ModuleServerThemes = {};
+  private readonly themesDirs: Set<string> = new Set();
   private readonly themesPaths: Set<string> = new Set();
   private readonly themesNames: Set<string> = new Set();
-  private readonly themesDirs: string[] = [];
 
   private readonly metaFiles: MetaFiles;
 
@@ -35,8 +35,8 @@ export class Server {
     private readonly resolver: Resolver
   ) {
     this.config = this._initConfig(this.nuxt.options.runtimeConfig.public.themesEditor as any);
-    this.rootDir = this.nuxt.options.rootDir;
-    this.rootThemesDir = uPath.join(this.rootDir, this.config.themesDir);
+    this.rootResolver = createResolver(this.nuxt.options.rootDir);
+    this.themesResolver = createResolver(this.rootResolver.resolve(this.config.themesDir));
     this.metaFiles = new MetaFiles(this);
 
     this._initThemesDir();
@@ -58,43 +58,15 @@ export class Server {
   }
 
   private _initThemesDir(): void {
-    if (!fs.existsSync(this.rootThemesDir)) {
-      fs.mkdirSync(this.rootThemesDir, { recursive: true });
+    const themesDir = this.themesResolver.resolve();
+    if (!fs.existsSync(themesDir)) {
+      fs.mkdirSync(themesDir, { recursive: true });
     }
-  }
-
-  private async _readThemeByPath(indexPath: string): Promise<boolean> {
-    if (!fs.existsSync(indexPath)) {
-      logger.warn(`Theme file wasn't found: '${indexPath}'.`);
-      return false;
-    }
-
-    const themeName = indexPath.slice(this.rootThemesDir.length + 1, indexPath.lastIndexOf('/'));
-    let themeFile: ModuleDefineThemeBlockRootReturn;
-
-    try {
-      themeFile = (await loadTsModule(indexPath))?.default;
-    } catch {
-      return false;
-    }
-
-    if (!themeFile) {
-      logger.warn(`Error loading theme file: '${indexPath}'.`);
-      return false;
-    } else if (themeFile.type !== 'defineThemeBlockRoot') {
-      logger.warn(`Unknown define theme type: '${indexPath}'. Use defineThemeEditorRoot as export default.`);
-      return false;
-    }
-
-    this.themesPaths.add(indexPath);
-    this.themesNames.add(themeName);
-    this.themes[themeName] = themeFile;
-    return true;
   }
 
   async checkAndGenerateDefaultTheme(): Promise<void> {
-    const defaultThemeDir = uPath.join(this.rootThemesDir, this.config.defaultTheme);
-    const defaultThemePath = uPath.join(defaultThemeDir, 'index.ts');
+    const defaultThemeDir = this.themesResolver.resolve(this.config.defaultTheme);
+    const defaultThemePath = this.themesResolver.resolve(this.config.defaultTheme, 'index.ts');
 
     if (this.config.enableDefaultThemeGenerator && !fs.existsSync(defaultThemePath)) {
       logger.info('Default theme generation...');
@@ -113,23 +85,55 @@ export class Server {
     }
   }
 
+  async readThemeByPath(indexPath: string): Promise<boolean> {
+    if (!fs.existsSync(indexPath)) {
+      logger.warn(`Theme file wasn't found: '${indexPath}'.`);
+      return false;
+    }
+
+    const themeName = indexPath.slice(this.themesResolver.resolve().length + 1, indexPath.lastIndexOf('/'));
+    let themeFile: ModuleDefineThemeBlockRootReturn;
+
+    try {
+      themeFile = (await loadTsModule(indexPath))?.default;
+    } catch {
+      return false;
+    }
+
+    if (!themeFile) {
+      logger.warn(`Error loading theme file: '${indexPath}'.`);
+      return false;
+    } else if (themeFile.type !== 'defineThemeBlockRoot') {
+      logger.warn(`Unknown define theme type: '${indexPath}'. Use defineThemeEditorRoot as export default.`);
+      return false;
+    }
+
+    this.themesDirs.add(uPath.parse(indexPath).dir);
+    this.themesPaths.add(indexPath);
+    this.themesNames.add(themeName);
+    this.themes[themeName] = themeFile;
+    return true;
+  }
+
   async readThemes(): Promise<void> {
     this.themesPaths.clear();
     this.themesNames.clear();
-    this.themesDirs.splice(0);
+    this.themesDirs.clear();
     Object.keys(this.themes).forEach(key => delete this.themes[key]);
 
-    const indexThemesPaths = uPath.glob(uPath.join(this.rootThemesDir, '*', 'index.ts'));
+    const indexThemesPaths = uPath.glob(this.themesResolver.resolve('*', 'index.ts'));
 
     for (const themePath of indexThemesPaths) {
-      await this._readThemeByPath(themePath);
+      await this.readThemeByPath(themePath);
     }
-
-    Object.assign(this.themesDirs, this.getThemesPaths().map(e => uPath.parse(e).dir));
   }
 
-  getRootDir(): string {
-    return this.rootDir;
+  getRootResolver(): Resolver {
+    return this.rootResolver;
+  }
+
+  getThemesResolver(): Resolver {
+    return this.themesResolver;
   }
 
   getThemesPaths(): string[] {
@@ -137,7 +141,7 @@ export class Server {
   }
 
   getThemesDirs(): string[] {
-    return this.themesDirs;
+    return Array.from(this.themesDirs);
   }
 
   getThemes(): ModuleServerThemes {
