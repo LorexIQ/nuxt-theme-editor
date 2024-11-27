@@ -2,7 +2,7 @@
 import type { Client } from '../../classes/Client';
 import type { ModuleThemeRootReturn } from '../../types';
 import ThemePreview from './ThemePreview.vue';
-import { computed } from '#imports';
+import ThemeBlockStatus from './ThemeBlockStatus.vue';
 
 type Props = {
   client: Client;
@@ -12,18 +12,11 @@ type Props = {
 const props = defineProps<Props>();
 const client = props.client;
 const theme = props.theme;
-
-const isLightTheme = computed(() => client.getSelectedLightThemeId() === theme.id);
-const isDarkTheme = computed(() => client.getSelectedDarkThemeId() === theme.id);
-const isLightDartTheme = computed(() => isLightTheme.value && isDarkTheme.value);
-const isActiveTheme = computed(() => client.getSelectedTheme()?.id === theme.id);
-const isBoxActive = computed(() => isLightTheme.value || isDarkTheme.value || isActiveTheme.value);
 </script>
 
 <template>
   <div
     class="TE-theme-block"
-    :class="{ 'TE-theme-block--active': isBoxActive }"
     @dblclick="client.setTheme(theme.id)"
     @contextmenu.prevent="client.getSandbox().openSystemThemeContextMenu($event, theme)"
   >
@@ -46,41 +39,17 @@ const isBoxActive = computed(() => isLightTheme.value || isDarkTheme.value || is
         <span>{{ theme.meta.description || 'Описание не задано' }}</span>
       </div>
     </div>
-    <div class="TE-theme-block__status">
-      <transition name="fade">
-        <div
-          v-if="isActiveTheme"
-          class="TE-theme-block__status__active"
-        >
-          Active
-        </div>
-        <div
-          v-else-if="isLightDartTheme"
-          class="TE-theme-block__status__light_dark"
-        >
-          Light/Dark
-        </div>
-        <div
-          v-else-if="isLightTheme"
-          class="TE-theme-block__status__light"
-        >
-          Light
-        </div>
-        <div
-          v-else-if="isDarkTheme"
-          class="TE-theme-block__status__dark"
-        >
-          Dark
-        </div>
-      </transition>
-    </div>
+    <ThemeBlockStatus
+      :client="client"
+      :theme="theme"
+    />
   </div>
 </template>
 
 <style scoped lang="scss">
 .TE-theme-block {
   display: grid;
-  grid-template-columns: 90px auto 0;
+  grid-template-columns: 90px 1fr auto;
   align-items: center;
   width: 100%;
   height: 62px;
@@ -182,10 +151,6 @@ const isBoxActive = computed(() => isLightTheme.value || isDarkTheme.value || is
       color: var(--statusDarkTitle);
       background-color: var(--statusDarkBg);
     }
-  }
-
-  &--active {
-    grid-template-columns: 90px auto 20px;
   }
 }
 

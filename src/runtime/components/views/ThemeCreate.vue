@@ -2,6 +2,7 @@
 import IsInput from '../shared/IsInput.vue';
 import type { Client } from '../../classes/Client';
 import IsButton from '../shared/IsButton.vue';
+import ThemeBlockStatus from '../features/ThemeBlockStatus.vue';
 import { reactive } from '#imports';
 
 type ThemeCreateData = {
@@ -57,11 +58,24 @@ const themeCreateData = reactive<ThemeCreateData>({
         />
       </div>
       <div class="TE-theme-create__row">
-        <div
-          v-for="theme of client.getThemes()"
-          :key="theme.id"
-        >
-          {{ theme.name }}
+        <div class="ttt">
+          <div
+            v-for="theme of client.getThemes()"
+            :key="theme.id"
+            class="ttt__row"
+          >
+            <div class="ttt__row__radio">
+              <input type="radio">
+            </div>
+            <div class="ttt__row__name">
+              {{ theme.name }}
+            </div>
+            <ThemeBlockStatus
+              view-mode="horizontal"
+              :client="client"
+              :theme="theme"
+            />
+          </div>
         </div>
       </div>
       <div class="TE-theme-create__row">
@@ -74,6 +88,19 @@ const themeCreateData = reactive<ThemeCreateData>({
 </template>
 
 <style scoped lang="scss">
+.ttt {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+
+  &__row {
+    display: grid;
+    grid-template-columns: 20px 1fr auto;
+    border: 1px solid var(--border);
+    border-radius: 5px;
+    overflow: hidden;
+  }
+}
 .TE-theme-create {
   display: flex;
   flex-direction: column;
