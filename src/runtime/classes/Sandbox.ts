@@ -1,5 +1,6 @@
 import { h, type Reactive, render } from 'vue';
 import type {
+  ModuleOptionsExtend,
   ModuleSandboxComponents,
   ModuleSandboxContextMenuItem,
   ModuleSandboxMousePosition,
@@ -14,12 +15,14 @@ import { markRaw, reactive } from '#imports';
 const CONTEXT_MENU_ID = 'context-menu';
 
 export class Sandbox {
+  private readonly config: ModuleOptionsExtend;
   private readonly id: string;
   private readonly components = reactive<ModuleSandboxComponents>([]);
   private readonly boxSize = reactive<ModuleSandboxSize>({ width: 0, height: 0 });
 
   constructor(private readonly ctx: Client) {
-    this.id = ctx.getConfig().keys.sandbox;
+    this.config = this.ctx.getConfig();
+    this.id = this.config.keys.sandbox;
     this._initSandbox();
   }
 
@@ -79,23 +82,28 @@ export class Sandbox {
           {
             title: isSelectedTheme ? 'Тема активна' : 'Выбрать тему',
             isDisabled: () => isSelectedTheme,
-            icon: isSelectedTheme ? 'Check' : undefined,
-            iconColor: 'var(--contextMenuStatusActive)',
+            icon: isSelectedTheme ? 'Check' : 'Palette',
+            iconColor: isSelectedTheme ? 'var(--contextMenuIconActive)' : undefined,
             action: () => this.ctx.selectTheme(theme.id)
           },
           {
             title: isSelectedLightTheme ? 'Назначена светлой темой' : 'Назначить светлой темой',
             isDisabled: () => isSelectedLightTheme,
-            icon: isSelectedLightTheme ? 'Check' : undefined,
-            iconColor: 'var(--contextMenuStatusActive)',
+            icon: isSelectedLightTheme ? 'Check' : 'Sun',
+            iconColor: isSelectedLightTheme ? 'var(--contextMenuIconActive)' : undefined,
             action: () => this.ctx.selectLightTheme(theme.id)
           },
           {
             title: isSelectedDarkTheme ? 'Назначена тёмной темой' : 'Назначить тёмной темой',
             isDisabled: () => isSelectedDarkTheme,
-            icon: isSelectedDarkTheme ? 'Check' : undefined,
-            iconColor: 'var(--contextMenuStatusActive)',
+            icon: isSelectedDarkTheme ? 'Check' : 'Moon',
+            iconColor: isSelectedDarkTheme ? 'var(--contextMenuIconActive)' : undefined,
             action: () => this.ctx.selectDarkTheme(theme.id)
+          },
+          {
+            title: 'Создать копию темы',
+            icon: 'Palette2',
+            action: () => this.ctx.setOpenedPage(`newTheme?parentThemeId=${theme.id}`, 'tab-fade-lr')
           }
         ]
       },

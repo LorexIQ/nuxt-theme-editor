@@ -1,3 +1,4 @@
+import type iconsConnector from '../helpers/iconsConnector';
 import type {
   ModuleDefineThemeBlockRootReturn,
   ModuleDefineThemeMeta
@@ -8,7 +9,9 @@ export type ModuleServerThemes = { [name: string]: ModuleDefineThemeBlockRootRet
 export type ModuleThemes = { [name: string]: ModuleThemeRootReturn };
 
 export type ModuleThemeType = 'system' | 'global' | 'local';
-export type ModuleIcons = 'Arrow' | 'Check' | 'Plus';
+export type ModulePages = 'index' | 'newTheme' | string;
+export type ModulePageAnimations = 'tab-fade-lr' | 'tab-fade-rl' | undefined;
+export type ModuleIcons = keyof typeof iconsConnector;
 
 export type ModuleThemeCleanedSetting = ModuleObject | ModuleThemeStyleBlockReturn;
 

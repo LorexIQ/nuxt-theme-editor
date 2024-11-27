@@ -2,30 +2,23 @@
 import useThemesEditor from '../composables/useThemesEditor';
 import ThemesList from './views/ThemesList.vue';
 import ThemeCreate from './views/ThemeCreate.vue';
-import { computed, ref } from '#imports';
+import { computed } from '#imports';
 
 const client = useThemesEditor();
+const router = client.getRouter();
+const openedPage = computed(() => router.getPath());
 
-const selectedPage = ref('index');
-const transitionAnimation = ref();
 const pageName = computed(() => {
-  switch (selectedPage.value) {
+  switch (openedPage.value) {
     case 'index':
       return '';
-    case 'new':
+    case 'newTheme':
       return 'New Theme';
     default:
       return '404';
   }
 });
-const isAnotherPage = computed(() => selectedPage.value !== 'index');
-
-function onNewTheme(parentTheme?: string) {
-  selectedPage.value = 'new';
-}
-function onGoIndex() {
-  selectedPage.value = 'new';
-}
+const isAnotherPage = computed(() => openedPage.value !== 'index');
 </script>
 
 <template>
@@ -62,18 +55,14 @@ function onGoIndex() {
       </transition-expand>
     </div>
     <div class="TE-root__content">
-      <transition name="tab-fade-rl">
-        <ThemesList
-          v-if="selectedPage === 'index'"
-          :client="client"
-          @on-new-theme="onNewTheme"
-        />
-        <ThemeCreate
-          v-else-if="selectedPage === 'new'"
-          :client="client"
-          @on-go-back="selectedPage = 'index'"
-        />
-      </transition>
+      <ThemesList
+        :client="client"
+        @on-new-theme="router.push(`newTheme`, 'tab-fade-lr')"
+      />
+      <ThemeCreate
+        :client="client"
+        @on-go-back="router.push('index', 'tab-fade-rl')"
+      />
     </div>
   </div>
 </template>

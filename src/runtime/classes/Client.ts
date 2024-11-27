@@ -8,7 +8,9 @@ import type {
   ModuleStorage,
   ModuleThemeRootReturn,
   ModuleThemes,
-  ModuleThemeType, ModuleDefineThemeMetaUI, ModuleDefineThemeMetaPreview
+  ModuleThemeType,
+  ModuleDefineThemeMetaUI,
+  ModuleDefineThemeMetaPreview
 } from '../types';
 // @ts-ignore
 import connectorMeta from '../meta/connector';
@@ -16,6 +18,7 @@ import unwrap from '../helpers/unwrap';
 import defineChecker from '../helpers/defineChecker';
 import getSystemTheme from '../helpers/getSystemTheme';
 import { Sandbox } from './Sandbox';
+import { Router } from './Router';
 import { useRuntimeConfig, reactive, ref, computed, watch } from '#imports';
 
 const DEFAULT_PREVIEW_STYLES: Required<ModuleDefineThemeMetaPreview> = {
@@ -35,6 +38,8 @@ const DEFAULT_UI_STYLES: Required<ModuleDefineThemeMetaUI> = {
   blurGlass: '3px',
   shadow: 'rgba(0, 0, 0, 0.1)',
   border: 'rgba(0, 0, 0, 0.1)',
+  title: '#333',
+  titleTransparent: '#999',
 
   inputFocus: '#333',
   inputBg: '#fff',
@@ -43,8 +48,6 @@ const DEFAULT_UI_STYLES: Required<ModuleDefineThemeMetaUI> = {
   inputText: '#333',
   inputPlaceholder: '#999',
 
-  title: '#333',
-  titleTransparent: '#999',
   statusActiveBg: '#85f585',
   statusActiveTitle: '#245024',
   statusLightDarkBg: '#dab6e2',
@@ -53,12 +56,16 @@ const DEFAULT_UI_STYLES: Required<ModuleDefineThemeMetaUI> = {
   statusLightTitle: '#5f3700',
   statusDarkBg: '#9e9eff',
   statusDarkTitle: '#fff',
-  contextMenuStatusActive: '#00ca00'
+
+  contextMenuIcon: '#444',
+  contextMenuIconActive: '#00ca00'
 };
 
 export class Client {
   private readonly config = useRuntimeConfig().public.themesEditor as ModuleOptionsExtend;
   private readonly sandbox = new Sandbox(this);
+  private readonly router = new Router(this);
+
   private readonly usesScopesProperties = reactive<ModuleObject<ModuleObject>>({});
 
   private readonly isUseSystemTheme = ref(false);
@@ -254,6 +261,10 @@ export class Client {
 
   getSandbox(): Sandbox {
     return this.sandbox;
+  }
+
+  getRouter(): Router {
+    return this.router;
   }
 
   getThemes(): ModuleThemes {

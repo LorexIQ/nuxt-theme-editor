@@ -21,6 +21,7 @@ const props = defineProps<Props>();
 const emit = defineEmits<Emits>();
 
 const client = props.client;
+const router = client.getRouter();
 const themeCreateData = reactive<ThemeCreateData>({
   id: '',
   name: '',
@@ -30,44 +31,49 @@ const themeCreateData = reactive<ThemeCreateData>({
 </script>
 
 <template>
-  <div class="TE-theme-create">
-    <div class="TE-theme-create__row">
-      <InputData
-        id="id"
-        v-model="themeCreateData.id"
-        title="ID"
-        is-required-icon
-      />
-    </div>
-    <div class="TE-theme-create__row">
-      <InputData
-        id="name"
-        v-model="themeCreateData.name"
-        title="Наименование"
-        :placeholder="themeCreateData.id"
-      />
-    </div>
-    <div class="TE-theme-create__row">
-      <InputData
-        id="description"
-        v-model="themeCreateData.description"
-        title="Описание"
-      />
-    </div>
-    <div class="TE-theme-create__row">
-      <div
-        v-for="theme of client.getThemes()"
-        :key="theme.id"
-      >
-        {{ theme.name }}
+  <transition :name="router.getTransitionName()">
+    <div
+      v-if="router.getPath() === 'newTheme'"
+      class="TE-theme-create"
+    >
+      <div class="TE-theme-create__row">
+        <InputData
+          id="id"
+          v-model="themeCreateData.id"
+          title="ID"
+          is-required-icon
+        />
+      </div>
+      <div class="TE-theme-create__row">
+        <InputData
+          id="name"
+          v-model="themeCreateData.name"
+          title="Наименование"
+          :placeholder="themeCreateData.id"
+        />
+      </div>
+      <div class="TE-theme-create__row">
+        <InputData
+          id="description"
+          v-model="themeCreateData.description"
+          title="Описание"
+        />
+      </div>
+      <div class="TE-theme-create__row">
+        <div
+          v-for="theme of client.getThemes()"
+          :key="theme.id"
+        >
+          {{ theme.name }}
+        </div>
+      </div>
+      <div class="TE-theme-create__row">
+        <button @click="emit('onGoBack')">
+          Назад
+        </button>
       </div>
     </div>
-    <div class="TE-theme-create__row">
-      <button @click="emit('onGoBack')">
-        Назад
-      </button>
-    </div>
-  </div>
+  </transition>
 </template>
 
 <style scoped lang="scss">

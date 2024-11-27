@@ -1,14 +1,10 @@
 <script lang="ts" setup>
-import { h } from 'vue';
 import type {
-  ModuleIcons,
   ModuleSandboxContextMenuItem,
   ModuleSandboxMousePosition,
   ModuleSandboxSize
 } from '../../types';
-import IconArrow from '../icons/IconArrow.vue';
-import IconCheck from '../icons/IconCheck.vue';
-import IconPlus from '../icons/IconPlus.vue';
+import IconsStore from '../shared/IconsStore.vue';
 import { computed, onMounted, ref } from '#imports';
 
 type Props = {
@@ -38,18 +34,6 @@ const menuPosition = computed(() => {
   };
 });
 
-function getIconByName(icon?: ModuleIcons) {
-  switch (icon) {
-    case 'Arrow':
-      return IconArrow;
-    case 'Check':
-      return IconCheck;
-    case 'Plus':
-      return IconPlus;
-    default:
-      return h('template');
-  }
-}
 function selectItem(item: ModuleSandboxContextMenuItem) {
   item.action();
   closeContextMenu();
@@ -99,7 +83,7 @@ onMounted(() => {
             class="TE-context-menu__menu__items__item__icon"
             :style="`color: ${item.iconColor};`"
           >
-            <component :is="getIconByName(item.icon)" />
+            <IconsStore :icon="item.icon" />
           </div>
           {{ item.title }}
         </div>
@@ -139,8 +123,8 @@ onMounted(() => {
         grid-template-columns: auto;
         align-items: center;
         font-size: 14px;
-        gap: 5px;
-        padding: 2px 5px;
+        gap: 6px;
+        padding: 3px 10px 3px 8px;
         color: var(--title);
         cursor: pointer;
 
@@ -151,6 +135,7 @@ onMounted(() => {
           display: flex;
           justify-content: center;
           align-items: center;
+          color: var(--contextMenuIcon);
 
           & svg {
             font-size: 16px;

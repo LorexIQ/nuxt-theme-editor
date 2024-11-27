@@ -17,14 +17,16 @@ export type ModuleDefineThemeMetaUI = Partial<{
   blurGlass: string;
   shadow: string;
   border: string;
+  title: string;
+  titleTransparent: string;
+
   inputFocus: string;
   inputBg: string;
   inputRequired: string;
   inputTitle: string;
   inputText: string;
   inputPlaceholder: string;
-  title: string;
-  titleTransparent: string;
+
   statusActiveBg: string;
   statusActiveTitle: string;
   statusLightDarkBg: string;
@@ -33,7 +35,9 @@ export type ModuleDefineThemeMetaUI = Partial<{
   statusLightTitle: string;
   statusDarkBg: string;
   statusDarkTitle: string;
-  contextMenuStatusActive: string;
+
+  contextMenuIcon: string;
+  contextMenuIconActive: string;
 }>;
 export type ModuleDefineThemeMeta = {
   name?: string;

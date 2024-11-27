@@ -9,27 +9,33 @@ type Emits = {
   (e: 'onNewTheme', parentTheme?: string): void;
 };
 
-defineProps<Props>();
+const props = defineProps<Props>();
 const emit = defineEmits<Emits>();
+const router = props.client.getRouter();
 </script>
 
 <template>
-  <div class="TE-themes-list">
-    <BlockThemes
-      type="system"
-      is-open
-      :client="client"
-      @on-new-theme="emit('onNewTheme', $event)"
-    />
-    <BlockThemes
-      type="global"
-      :client="client"
-      @on-new-theme="emit('onNewTheme', $event)"
-    />
-    <BlockThemes
-      type="local"
-      :client="client"
-      @on-new-theme="emit('onNewTheme', $event)"
-    />
-  </div>
+  <transition :name="router.getTransitionName()">
+    <div
+      v-if="router.getPath() === 'index'"
+      class="TE-themes-list"
+    >
+      <BlockThemes
+        type="system"
+        is-open
+        :client="client"
+        @on-new-theme="emit('onNewTheme', $event)"
+      />
+      <BlockThemes
+        type="global"
+        :client="client"
+        @on-new-theme="emit('onNewTheme', $event)"
+      />
+      <BlockThemes
+        type="local"
+        :client="client"
+        @on-new-theme="emit('onNewTheme', $event)"
+      />
+    </div>
+  </transition>
 </template>
