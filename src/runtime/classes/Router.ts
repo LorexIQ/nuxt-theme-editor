@@ -1,14 +1,17 @@
-import type { ModuleObject, ModuleOptionsExtend, ModulePageAnimations, ModulePages } from '../types';
+import type { ModuleObject, ModuleOptionsExtend, ModulePage, ModulePageAnimations, ModulePagesNames } from '../types';
 import unwrap from '../helpers/unwrap';
+import pagesMeta from '../assets/pagesMeta';
 import type { Client } from './Client';
 import { computed, ref } from '#imports';
 
 export class Router {
   private readonly config: ModuleOptionsExtend;
+  private readonly pages = pagesMeta;
 
-  private readonly fullPath = ref<ModulePages>('index');
+  private readonly fullPath = ref<ModulePagesNames>('index');
   private readonly transitionName = ref<ModulePageAnimations>();
-  private readonly path = computed(() => this.fullPath.value.split('?')[0]);
+  private readonly currentPage = computed(() => this.pages.find(page => page.name === unwrap.get(this.path)));
+  private readonly path = computed(() => this._validatePath(this.fullPath.value.split('?')[0]));
   private readonly query = computed(() => {
     const queries = this.fullPath.value.split('?').slice(1).join('?');
     if (queries.length) return queries.split('&').reduce((acc, query) => {
@@ -23,7 +26,11 @@ export class Router {
     this.config = this.ctx.getConfig();
   }
 
-  push(page: ModulePages, animation?: ModulePageAnimations): void {
+  private _validatePath(path: string): string {
+    return this.pages.find(page => page.name === path) ? path : '404';
+  }
+
+  push(page: ModulePagesNames, animation?: ModulePageAnimations): void {
     unwrap.set(this, 'transitionName', animation);
     unwrap.set(this, 'fullPath', page);
   }
@@ -34,6 +41,10 @@ export class Router {
 
   getTransitionName(): ModulePageAnimations {
     return unwrap.get(this.transitionName);
+  }
+
+  getCurrentPage(): ModulePage | undefined {
+    return unwrap.get(this.currentPage);
   }
 
   getPath(): string {

@@ -103,7 +103,7 @@ export class Sandbox {
           {
             title: 'Создать копию темы',
             icon: 'Palette2',
-            action: () => this.ctx.setOpenedPage(`newTheme?parentThemeId=${theme.id}`, 'tab-fade-lr')
+            action: () => this.ctx.getRouter().push(`newTheme?parentThemeId=${theme.id}`, 'tab-fade-lr')
           }
         ]
       },

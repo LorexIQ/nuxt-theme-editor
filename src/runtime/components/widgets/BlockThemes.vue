@@ -11,14 +11,10 @@ type Props = {
   client: Client;
   isOpen?: boolean;
 };
-type Emits = {
-  (e: 'onNewTheme', parentTheme?: string): void;
-};
 
 const props = withDefaults(defineProps<Props>(), {
   isOpen: false
 });
-const emit = defineEmits<Emits>();
 
 const isOpened = ref(props.isOpen);
 const isAddActive = computed(() => props.type === 'local');
@@ -59,7 +55,7 @@ const title = computed(() => {
         <div
           v-if="isAddActive"
           class="TE-block-themes__content__add"
-          @click="emit('onNewTheme')"
+          @click="client.getRouter().push('newTheme', 'tab-fade-lr')"
         >
           <IconPlus />
         </div>

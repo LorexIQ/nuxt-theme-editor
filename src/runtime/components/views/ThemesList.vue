@@ -5,12 +5,8 @@ import type { Client } from '../../classes/Client';
 type Props = {
   client: Client;
 };
-type Emits = {
-  (e: 'onNewTheme', parentTheme?: string): void;
-};
 
 const props = defineProps<Props>();
-const emit = defineEmits<Emits>();
 const router = props.client.getRouter();
 </script>
 
@@ -24,17 +20,14 @@ const router = props.client.getRouter();
         type="system"
         is-open
         :client="client"
-        @on-new-theme="emit('onNewTheme', $event)"
       />
       <BlockThemes
         type="global"
         :client="client"
-        @on-new-theme="emit('onNewTheme', $event)"
       />
       <BlockThemes
         type="local"
         :client="client"
-        @on-new-theme="emit('onNewTheme', $event)"
       />
     </div>
   </transition>

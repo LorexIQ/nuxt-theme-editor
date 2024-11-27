@@ -13,12 +13,8 @@ type ThemeCreateData = {
 type Props = {
   client: Client;
 };
-type Emits = {
-  (e: 'onGoBack'): void;
-};
 
 const props = defineProps<Props>();
-const emit = defineEmits<Emits>();
 
 const client = props.client;
 const router = client.getRouter();
@@ -68,7 +64,7 @@ const themeCreateData = reactive<ThemeCreateData>({
         </div>
       </div>
       <div class="TE-theme-create__row">
-        <button @click="emit('onGoBack')">
+        <button @click="router.push('index', 'tab-fade-rl')">
           Назад
         </button>
       </div>

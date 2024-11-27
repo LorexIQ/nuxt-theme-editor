@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type { ModuleIcons } from '../../types';
-import iconsConnector from '../../helpers/iconsConnector';
+import iconsConnector from '../../assets/iconsConnector';
 import { computed } from '#imports';
 
 type Props = {
