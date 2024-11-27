@@ -17,6 +17,12 @@ export type ModuleDefineThemeMetaUI = Partial<{
   blurGlass: string;
   shadow: string;
   border: string;
+  inputFocus: string;
+  inputBg: string;
+  inputRequired: string;
+  inputTitle: string;
+  inputText: string;
+  inputPlaceholder: string;
   title: string;
   titleTransparent: string;
   statusActiveBg: string;

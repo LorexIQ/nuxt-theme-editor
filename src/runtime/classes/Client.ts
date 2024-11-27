@@ -35,6 +35,14 @@ const DEFAULT_UI_STYLES: Required<ModuleDefineThemeMetaUI> = {
   blurGlass: '3px',
   shadow: 'rgba(0, 0, 0, 0.1)',
   border: 'rgba(0, 0, 0, 0.1)',
+
+  inputFocus: '#333',
+  inputBg: '#fff',
+  inputRequired: '#ef0000',
+  inputTitle: '#333',
+  inputText: '#333',
+  inputPlaceholder: '#999',
+
   title: '#333',
   titleTransparent: '#999',
   statusActiveBg: '#85f585',

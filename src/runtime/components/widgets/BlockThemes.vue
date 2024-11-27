@@ -3,7 +3,7 @@ import type { ModuleThemeType } from '../../types';
 import type { Client } from '../../classes/Client';
 import IconArrow from '../icons/IconArrow.vue';
 import IconPlus from '../icons/IconPlus.vue';
-import ThemeBlock from './ThemeBlock.vue';
+import ThemeBlock from '../features/ThemeBlock.vue';
 import { ref, computed } from '#imports';
 
 type Props = {
@@ -11,10 +11,14 @@ type Props = {
   client: Client;
   isOpen?: boolean;
 };
+type Emits = {
+  (e: 'onNewTheme', parentTheme?: string): void;
+};
 
 const props = withDefaults(defineProps<Props>(), {
   isOpen: false
 });
+const emit = defineEmits<Emits>();
 
 const isOpened = ref(props.isOpen);
 const isAddActive = computed(() => props.type === 'local');
@@ -55,6 +59,7 @@ const title = computed(() => {
         <div
           v-if="isAddActive"
           class="TE-block-themes__content__add"
+          @click="emit('onNewTheme')"
         >
           <IconPlus />
         </div>

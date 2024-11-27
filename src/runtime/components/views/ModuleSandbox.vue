@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type { Sandbox } from '../../classes/Sandbox';
-import ResizeObserver from '../helpers/ResizeObserver.vue';
+import ResizeObserver from '../shared/ResizeObserver.vue';
 import { ref } from '#imports';
 
 type Props = {

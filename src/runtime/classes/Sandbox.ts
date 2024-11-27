@@ -7,7 +7,7 @@ import type {
   ModuleThemeRootReturn
 } from '../types';
 import ContextMenu from '../components/features/ContextMenu.vue';
-import ModuleSandbox from '../components/features/ModuleSandbox.vue';
+import ModuleSandbox from '../components/views/ModuleSandbox.vue';
 import type { Client } from './Client';
 import { markRaw, reactive } from '#imports';
 
