@@ -24,7 +24,7 @@ const isBoxActive = computed(() => isLightTheme.value || isDarkTheme.value || is
   <div
     class="TE-theme-block"
     :class="{ 'TE-theme-block--active': isBoxActive }"
-    @dblclick="client.selectTheme(theme.id)"
+    @dblclick="client.setTheme(theme.id)"
     @contextmenu.prevent="client.getSandbox().openSystemThemeContextMenu($event, theme)"
   >
     <div

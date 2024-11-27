@@ -17,14 +17,14 @@ console.log('second.vue useThemeBlock =>', scopeStyles.value);
       <div class="test-blocks__left" />
       <div class="test-blocks__right" />
     </div>
-    <button @click="themesEditor.selectTheme('light')">
+    <button @click="themesEditor.setTheme('light')">
       LIGHT
     </button>
-    <button @click="themesEditor.selectTheme('dark')">
+    <button @click="themesEditor.setTheme('dark')">
       DARK
     </button>
-    <button @click="themesEditor.setAutoModeTheme(!themesEditor.getAutoModeStatus())">
-      AUTO [{{ themesEditor.getAutoModeStatus() ? 'ON' : 'OFF' }}]
+    <button @click="themesEditor.setAutoThemeModeStatus(!themesEditor.getAutoThemeModeStatus())">
+      AUTO [{{ themesEditor.getAutoThemeModeStatus() ? 'ON' : 'OFF' }}]
     </button>
     <log-object
       :value="themesEditor"

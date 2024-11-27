@@ -23,22 +23,22 @@ watch(innerValue, value => emit('update:modelValue', value));
 </script>
 
 <template>
-  <div class="TE-input-data">
-    <div class="TE-input-data__title">
+  <div class="TE-is-input">
+    <div class="TE-is-input__title">
       {{ title }}
       <IconAsterisk v-if="isRequiredIcon" />
     </div>
     <input
       :id="`TE-${id}`"
       v-model="innerValue"
-      class="TE-input-data__input"
+      class="TE-is-input__input"
       :placeholder="placeholder"
     >
   </div>
 </template>
 
 <style scoped lang="scss">
-.TE-input-data {
+.TE-is-input {
   &__title {
     position: relative;
     z-index: 1;

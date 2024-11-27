@@ -39,7 +39,7 @@ const isAnotherPage = computed(() => openedPage.value !== 'index');
         v-if="isAnotherPage"
         class="TE-editor-header__title"
       >
-        &nbsp;&nbsp;&nbsp; > {{ router.getCurrentPage()?.title }}
+        &nbsp;&nbsp;&nbsp; > {{ router.getCurrentPage()?.title ?? router.getPath() }}
       </div>
     </transition-expand>
   </div>

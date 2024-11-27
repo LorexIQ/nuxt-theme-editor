@@ -27,7 +27,7 @@ export class Client {
 
   private readonly usesScopesProperties = reactive<ModuleObject<ModuleObject>>({});
 
-  private readonly isUseSystemTheme = ref(false);
+  private readonly isAutoThemeMode = ref(false);
   private readonly selectedThemeId = ref<string>();
   private readonly selectedLightThemeId = ref<string>();
   private readonly selectedDarkThemeId = ref<string>();
@@ -35,12 +35,12 @@ export class Client {
   private readonly themes = reactive<ModuleThemes>({});
 
   private readonly selectedTheme = computed(() => {
-    const selectedTheme = unwrap.get(this.isUseSystemTheme) ? this._getSystemThemeAssociation() : unwrap.get(this.selectedThemeId);
+    const selectedTheme = unwrap.get(this.isAutoThemeMode) ? this._getSystemThemeAssociation() : unwrap.get(this.selectedThemeId);
     return selectedTheme ? this.themes[selectedTheme] : undefined;
   });
 
   private readonly savedStorage = computed<ModuleStorage>(() => ({
-    isUseSystemTheme: unwrap.get(this.isUseSystemTheme),
+    isAutoThemeMode: unwrap.get(this.isAutoThemeMode),
     selectedThemeId: unwrap.get(this.selectedThemeId),
     selectedLightThemeId: unwrap.get(this.selectedLightThemeId),
     selectedDarkThemeId: unwrap.get(this.selectedDarkThemeId)
@@ -77,8 +77,8 @@ export class Client {
     if (storage) {
       unwrap.set(this, 'selectedLightThemeId', this._checkThemeAvailableAndGetActual(storage.selectedLightThemeId, 'light'));
       unwrap.set(this, 'selectedDarkThemeId', this._checkThemeAvailableAndGetActual(storage.selectedDarkThemeId, 'dark'));
-      this.setAutoModeTheme(storage.isUseSystemTheme);
-      unwrap.set(this, 'selectedThemeId', this._checkThemeAvailableAndGetActual(storage.selectedThemeId, unwrap.get(this.isUseSystemTheme) ? 'system' : unwrap.get(this.selectedLightThemeId)));
+      this.setAutoThemeModeStatus(storage.isAutoThemeMode);
+      unwrap.set(this, 'selectedThemeId', this._checkThemeAvailableAndGetActual(storage.selectedThemeId, unwrap.get(this.isAutoThemeMode) ? 'system' : unwrap.get(this.selectedLightThemeId)));
     }
   }
 
@@ -226,16 +226,8 @@ export class Client {
     return this.router;
   }
 
-  getThemes(): ModuleThemes {
-    return this.themes;
-  }
-
-  getSelectedTheme(): ModuleThemeRootReturn | undefined {
-    return unwrap.get(this.selectedTheme);
-  }
-
-  getSelectedThemeId(): string | undefined {
-    return unwrap.get(this.selectedThemeId);
+  getAutoThemeModeStatus(): boolean {
+    return unwrap.get(this.isAutoThemeMode);
   }
 
   getSelectedLightThemeId(): string | undefined {
@@ -246,28 +238,36 @@ export class Client {
     return unwrap.get(this.selectedDarkThemeId);
   }
 
-  getAutoModeStatus(): boolean {
-    return unwrap.get(this.isUseSystemTheme);
+  getSelectedThemeId(): string | undefined {
+    return unwrap.get(this.selectedThemeId);
   }
 
-  setAutoModeTheme(mode: boolean): void {
+  getThemes(): ModuleThemes {
+    return this.themes;
+  }
+
+  getSelectedTheme(): ModuleThemeRootReturn | undefined {
+    return unwrap.get(this.selectedTheme);
+  }
+
+  setAutoThemeModeStatus(mode: boolean): void {
     if (!unwrap.get(this.selectedDarkThemeId)) return;
-    unwrap.set(this, 'isUseSystemTheme', mode);
+    unwrap.set(this, 'isAutoThemeMode', mode);
   }
 
-  selectTheme(themeName: string): void {
-    if (!(themeName in this.themes) || unwrap.get(this.selectedThemeId) === themeName) return;
-    unwrap.set(this, 'isUseSystemTheme', false);
-    unwrap.set(this, 'selectedThemeId', themeName);
+  setLightTheme(themeId: string): void {
+    if (!(themeId in this.themes) || unwrap.get(this.selectedLightThemeId) === themeId) return;
+    unwrap.set(this, 'selectedLightThemeId', themeId);
   }
 
-  selectLightTheme(themeName: string): void {
-    if (!(themeName in this.themes) || unwrap.get(this.selectedLightThemeId) === themeName) return;
-    unwrap.set(this, 'selectedLightThemeId', themeName);
+  setDarkTheme(themeId: string): void {
+    if (!(themeId in this.themes) || unwrap.get(this.selectedDarkThemeId) === themeId) return;
+    unwrap.set(this, 'selectedDarkThemeId', themeId);
   }
 
-  selectDarkTheme(themeName: string): void {
-    if (!(themeName in this.themes) || unwrap.get(this.selectedDarkThemeId) === themeName) return;
-    unwrap.set(this, 'selectedDarkThemeId', themeName);
+  setTheme(themeId: string): void {
+    if (!(themeId in this.themes) || unwrap.get(this.selectedTheme)?.id === themeId) return;
+    unwrap.set(this, 'isAutoThemeMode', false);
+    unwrap.set(this, 'selectedThemeId', themeId);
   }
 }

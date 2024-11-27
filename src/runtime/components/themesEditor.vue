@@ -3,6 +3,7 @@ import useThemesEditor from '../composables/useThemesEditor';
 import ThemesList from './views/ThemesList.vue';
 import ThemeCreate from './views/ThemeCreate.vue';
 import EditorHeader from './views/EditorHeader.vue';
+import Error404 from './views/Error404.vue';
 
 const client = useThemesEditor();
 </script>
@@ -13,9 +14,11 @@ const client = useThemesEditor();
     class="TE-root"
   >
     <EditorHeader :client="client" />
+
     <div class="TE-root__content">
       <ThemesList :client="client" />
       <ThemeCreate :client="client" />
+      <Error404 :client="client" />
     </div>
   </div>
 </template>

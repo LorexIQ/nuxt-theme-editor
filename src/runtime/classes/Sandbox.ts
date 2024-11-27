@@ -84,26 +84,31 @@ export class Sandbox {
             isDisabled: () => isSelectedTheme,
             icon: isSelectedTheme ? 'Check' : 'Palette',
             iconColor: isSelectedTheme ? 'var(--contextMenuIconActive)' : undefined,
-            action: () => this.ctx.selectTheme(theme.id)
+            action: () => this.ctx.setTheme(theme.id)
           },
           {
             title: isSelectedLightTheme ? 'Назначена светлой темой' : 'Назначить светлой темой',
             isDisabled: () => isSelectedLightTheme,
             icon: isSelectedLightTheme ? 'Check' : 'Sun',
             iconColor: isSelectedLightTheme ? 'var(--contextMenuIconActive)' : undefined,
-            action: () => this.ctx.selectLightTheme(theme.id)
+            action: () => this.ctx.setLightTheme(theme.id)
           },
           {
             title: isSelectedDarkTheme ? 'Назначена тёмной темой' : 'Назначить тёмной темой',
             isDisabled: () => isSelectedDarkTheme,
             icon: isSelectedDarkTheme ? 'Check' : 'Moon',
             iconColor: isSelectedDarkTheme ? 'var(--contextMenuIconActive)' : undefined,
-            action: () => this.ctx.selectDarkTheme(theme.id)
+            action: () => this.ctx.setDarkTheme(theme.id)
           },
           {
             title: 'Создать копию темы',
             icon: 'Palette2',
             action: () => this.ctx.getRouter().push(`newTheme?parentThemeId=${theme.id}`, 'tab-fade-lr')
+          },
+          {
+            title: '404',
+            icon: 'Palette2',
+            action: () => this.ctx.getRouter().push('newT123heme', 'tab-fade-lr')
           }
         ]
       },

@@ -17,6 +17,7 @@ export default createConfigForNuxt({
       rules: {
         'no-new-func': 'off',
         'no-eval': 'off',
+        'vue/multi-word-component-names': 'off',
         'antfu/no-import-node-modules-by-path': 'off',
         '@typescript-eslint/no-explicit-any': 'off',
         '@typescript-eslint/no-require-imports': 'off',

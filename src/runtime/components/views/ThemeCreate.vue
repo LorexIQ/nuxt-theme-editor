@@ -1,6 +1,7 @@
 <script setup lang="ts">
-import InputData from '../features/InputData.vue';
+import IsInput from '../shared/IsInput.vue';
 import type { Client } from '../../classes/Client';
+import IsButton from '../shared/IsButton.vue';
 import { reactive } from '#imports';
 
 type ThemeCreateData = {
@@ -33,7 +34,7 @@ const themeCreateData = reactive<ThemeCreateData>({
       class="TE-theme-create"
     >
       <div class="TE-theme-create__row">
-        <InputData
+        <IsInput
           id="id"
           v-model="themeCreateData.id"
           title="ID"
@@ -41,7 +42,7 @@ const themeCreateData = reactive<ThemeCreateData>({
         />
       </div>
       <div class="TE-theme-create__row">
-        <InputData
+        <IsInput
           id="name"
           v-model="themeCreateData.name"
           title="Наименование"
@@ -49,7 +50,7 @@ const themeCreateData = reactive<ThemeCreateData>({
         />
       </div>
       <div class="TE-theme-create__row">
-        <InputData
+        <IsInput
           id="description"
           v-model="themeCreateData.description"
           title="Описание"
@@ -64,9 +65,9 @@ const themeCreateData = reactive<ThemeCreateData>({
         </div>
       </div>
       <div class="TE-theme-create__row">
-        <button @click="router.push('index', 'tab-fade-rl')">
+        <IsButton @click="router.push('index', 'tab-fade-rl')">
           Назад
-        </button>
+        </IsButton>
       </div>
     </div>
   </transition>

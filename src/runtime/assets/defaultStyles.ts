@@ -14,10 +14,10 @@ export const DEFAULT_UI_STYLES: Required<ModuleDefineThemeMetaUI> = {
   bgHover: '#f6f6f6',
   bgHeader: '#f6f6f6',
   bgBlockHeader: '#f6f6f6',
-  bgGlass: 'rgba(0, 0, 0, 0.1)',
+  bgGlass: '#00000019',
   blurGlass: '3px',
-  shadow: 'rgba(0, 0, 0, 0.1)',
-  border: 'rgba(0, 0, 0, 0.1)',
+  shadow: '#00000033',
+  border: '#00000019',
   title: '#333',
   titleTransparent: '#999',
 
@@ -27,6 +27,12 @@ export const DEFAULT_UI_STYLES: Required<ModuleDefineThemeMetaUI> = {
   inputTitle: '#333',
   inputText: '#333',
   inputPlaceholder: '#999',
+
+  buttonBg: '#fafafa',
+  buttonBgHover: '#fff',
+  buttonBorder: '#00000019',
+  buttonText: '#555',
+  buttonTextHover: '#333',
 
   statusActiveBg: '#85f585',
   statusActiveTitle: '#245024',

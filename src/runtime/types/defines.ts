@@ -27,6 +27,12 @@ export type ModuleDefineThemeMetaUI = Partial<{
   inputText: string;
   inputPlaceholder: string;
 
+  buttonBg: string;
+  buttonBgHover: string;
+  buttonBorder: string;
+  buttonText: string;
+  buttonTextHover: string;
+
   statusActiveBg: string;
   statusActiveTitle: string;
   statusLightDarkBg: string;
