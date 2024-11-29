@@ -1,4 +1,3 @@
-import type { ComputedRef } from 'vue';
 import type {
   ModuleDefineThemeBlockRootReturn,
   ModuleDefineThemeMeta
@@ -24,7 +23,10 @@ export type ModuleThemeRootReturn<T = string> = {
   styles: ModuleThemeCleanedSetting<T>[];
 };
 
-type ThemeStyleValueType = ComputedRef<string> | string;
+type ThemeStyleValueType = string;
 export type ModuleThemeStyleObject = ModuleObject<ThemeStyleValueType>;
-export type ModuleThemeSelectedStyles = ModuleThemeStyleObject | ModuleThemeStyleBlockReturn<ThemeStyleValueType>;
-export type ModuleThemeSelected = ModuleThemeRootReturn<ThemeStyleValueType>;
+export type ModuleThemeStyleBlock = ModuleThemeStyleBlockReturn<ThemeStyleValueType>;
+export type ModuleThemeSelectedStyles = ModuleThemeStyleObject | ModuleThemeStyleBlock;
+export type ModuleThemeSelected = ModuleThemeRootReturn<ThemeStyleValueType> & {
+  target: ModuleThemeRootReturn;
+};

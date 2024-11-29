@@ -8,11 +8,15 @@ console.log('second.vue useThemeBlock =>', scopeStyles.value);
 <template>
   <div class="page-second">
     <h4>PAGE: SECOND</h4>
-    {{ themesEditor.getStylesKeyValueByPath('global.dssssss3') }}
+    {{ themesEditor.getStylesKeyValueByPath('sidebar.test.testtesttest') }}
 
-    <input v-model="themesEditor.getThemes()[themesEditor.getSelectedThemeId()].styles.at(-1)!.styles.at(-1)!.styles[0].testtesttest">
+    <input v-model="themesEditor.getSelectedTheme()!.target.styles.at(-1)!.styles.at(-1)!.styles[0].testtesttest">
     <input
-      v-model="themesEditor.getThemes()[themesEditor.getSelectedThemeId()].styles[0].styles[0].dssssss3"
+      v-model="themesEditor.getSelectedTheme()!.target.styles[0].styles[0].dssssss3"
+      type="color"
+    >
+    <input
+      v-model="themesEditor.getSelectedTheme()!.target.styles[0].styles[0].test"
       type="color"
     >
     <button @click="router.push({ path: '/' })">
