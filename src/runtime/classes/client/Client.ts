@@ -8,7 +8,11 @@ import type {
   ModuleStorage,
   ModuleThemeRootReturn,
   ModuleThemes,
-  ModuleThemeType, ModuleThemeSelected, ModuleThemeSelectedStyles
+  ModuleThemeType,
+  ModuleThemeSelected,
+  ModuleThemeSelectedStyles,
+  ModuleDefaultStyleKeys,
+  ModuleDefaultBlockKeys
 } from '../../types';
 import connectorMeta from '../../meta/connector';
 import unwrap from '../../helpers/unwrap';
@@ -163,7 +167,7 @@ export class Client {
           return 'CIRCULAR';
         } else {
           relationsPaths[selfPath] = relationPath;
-          return getStyleByPath(relationPath, this.getStylesKeyValueByPath(relationPath, selectedTheme).value);
+          return getStyleByPath(relationPath, this.getStylesKeyValueByPath(relationPath as any, selectedTheme).value);
         }
       }
       return styleValue;
@@ -277,7 +281,7 @@ export class Client {
     return !!this.usesScopesProperties[scopeId];
   }
 
-  getStylesKeyValueByPath(stylePath: string, theme?: ModuleThemeRootReturn): ComputedRef<string> {
+  getStylesKeyValueByPath(stylePath: ModuleDefaultStyleKeys, theme?: ModuleThemeRootReturn): ComputedRef<string> {
     const stylePathParts = stylePath.split('.');
     const blockPath = stylePathParts.length > 1 ? stylePathParts.slice(0, -1).join('.') : '';
     const styleName = stylePathParts[stylePathParts.length - 1] as any;
@@ -285,7 +289,7 @@ export class Client {
     return computed(() => unwrap.get(this._searchBlockStylesByPath(blockPath, (theme ?? unwrap.get(this.selectedTheme))?.styles)[styleName]) ?? 'UNKNOWN STYLE');
   }
 
-  getStylesByPath(blockPath: string, theme?: ModuleThemeRootReturn): ComputedRef<ModuleObject> {
+  getStylesByPath(blockPath: ModuleDefaultBlockKeys, theme?: ModuleThemeRootReturn): ComputedRef<ModuleObject> {
     return computed(() => this._searchBlockStylesByPath(blockPath, (theme ?? unwrap.get(this.selectedTheme))?.styles));
   }
 

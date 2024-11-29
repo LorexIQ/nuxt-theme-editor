@@ -1,8 +1,6 @@
 import type { ComponentInternalInstance } from '@vue/runtime-core';
 import clientGetter from '../helpers/clientGetter';
-import type { ModuleNestedKeys } from '../types';
-// @ts-ignore
-import type { ModuleMetaBlocks } from '../meta/themesStructure';
+import type { ModuleDefaultBlockKeys } from '../types';
 import { getCurrentInstance, onMounted, onUnmounted } from '#imports';
 
 function getComponentId(instance: ComponentInternalInstance) {
@@ -23,7 +21,7 @@ function getComponentId(instance: ComponentInternalInstance) {
   return scopeId;
 }
 
-export default function useBlock(block: ModuleNestedKeys<ModuleMetaBlocks>) {
+export default function useBlock(block: ModuleDefaultBlockKeys) {
   const client = clientGetter().value;
   const blockStyles = client.getStylesByPath(block);
   const currentInstance = getCurrentInstance()!;

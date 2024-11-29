@@ -64,7 +64,14 @@ export class MetaFiles {
           writer.write(`'${block.id}': `);
 
           if (block.styles.length > 1) writer.inlineBlock(() => generateBlockCode(writer, block.styles as ModuleDefineThemeBlockSetting[]));
-          else writer.write('{}');
+          else writer.inlineBlock(() => {
+            const selfStyles = block.styles[0] as ModuleObject;
+            const selfStylesKeys = Object.keys(selfStyles);
+            for (let selfStyleI = 0; selfStyleI < selfStylesKeys.length; selfStyleI++) {
+              const selfStylesKey = selfStylesKeys[selfStyleI];
+              writer.write(`'${selfStylesKey}': string;\n`);
+            }
+          });
 
           writer.write(';\n');
         }
