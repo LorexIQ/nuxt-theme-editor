@@ -1,5 +1,6 @@
 export default defineThemeBlock('test', [
   {
-    testtesttest: '#ff0000'
+    testtesttest: '$navbar.test1',
+    testtesttest2: '#ff0000'
   }
 ]);

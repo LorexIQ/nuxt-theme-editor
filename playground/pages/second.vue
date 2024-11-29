@@ -8,7 +8,8 @@ console.log('second.vue useThemeBlock =>', scopeStyles.value);
 <template>
   <div class="page-second">
     <h4>PAGE: SECOND</h4>
-    {{ themesEditor.getSelectedThemeId() }}
+    {{ themesEditor.getStylesKeyValueByPath('sidebar.test.testtesttest') }}
+    <input v-model="themesEditor.getThemes().light.styles.at(-1)!.styles.at(-1)!.styles[0].testtesttest">
     <button @click="router.push({ path: '/' })">
       Go Index Page
     </button>
@@ -28,7 +29,7 @@ console.log('second.vue useThemeBlock =>', scopeStyles.value);
     </button>
     <log-object
       :value="themesEditor"
-      :replaces="{ ctx: '[CTX]', styles: '[STYLES]' }"
+      :replaces="{ ctx: '[CTX]' }"
     />
   </div>
 </template>

@@ -70,11 +70,11 @@ const client = useThemesEditor();
   }
   &-leave-to {
     opacity: 0;
-    transform: scale(.9) translateX(-100%);
+    transform: scaleX(.9) translateX(-100%);
   }
   &-enter-from {
     opacity: 0;
-    transform: scale(.9) translateX(100%);
+    transform: scaleX(.9) translateX(100%);
   }
 }
 .tab-fade-rl {
@@ -86,11 +86,11 @@ const client = useThemesEditor();
   }
   &-leave-to {
     opacity: 0;
-    transform: scale(.9) translateX(100%);
+    transform: scaleX(.9) translateX(100%);
   }
   &-enter-from {
     opacity: 0;
-    transform: scale(.9) translateX(-100%);
+    transform: scaleX(.9) translateX(-100%);
   }
 }
 </style>

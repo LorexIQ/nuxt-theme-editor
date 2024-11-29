@@ -1,4 +1,4 @@
-import type { ComputedRef } from 'vue';
+import type { ComputedRef, Reactive } from 'vue';
 import type {
   ModuleDefineThemeBlockRootReturn,
   ModuleDefineThemeBlockSetting,
@@ -25,7 +25,7 @@ export class Client {
   private readonly sandbox = new Sandbox(this);
   private readonly router = new Router(this);
 
-  private readonly usesScopesProperties = reactive<ModuleObject<ModuleObject>>({});
+  private readonly usesScopesProperties = reactive<ModuleObject<ModuleObject<string | ComputedRef<string>>>>({});
 
   private readonly isAutoThemeMode = ref(false);
   private readonly selectedThemeId = ref<string>();
@@ -36,7 +36,7 @@ export class Client {
 
   private readonly selectedTheme = computed(() => {
     const selectedTheme = unwrap.get(this.isAutoThemeMode) ? this._getSystemThemeAssociation() : unwrap.get(this.selectedThemeId);
-    return selectedTheme ? this.themes[selectedTheme] : undefined;
+    return selectedTheme ? this._prepareSelectedTheme(this.themes[selectedTheme]) : undefined;
   });
 
   private readonly savedStorage = computed<ModuleStorage>(() => ({
@@ -60,7 +60,7 @@ export class Client {
 
       return {
         ...accum,
-        [themeName]: this._prepareTheme(theme, themeName, 'system')
+        [themeName]: this._buildSystemTheme(theme, themeName, 'system')
       };
     }, {}));
   }
@@ -110,7 +110,7 @@ export class Client {
     watch(this.savedStorage, () => this._saveStorage());
   }
 
-  private _prepareTheme(themeFile: ModuleDefineThemeBlockRootReturn, themeName: string, themeType: ModuleThemeType): ModuleThemeRootReturn {
+  private _buildSystemTheme(themeFile: ModuleDefineThemeBlockRootReturn, themeName: string, themeType: ModuleThemeType): ModuleThemeRootReturn {
     const cleanThemeStyles = (themeStyle: ModuleDefineThemeBlockSetting, selfId?: string): ModuleThemeCleanedSetting => {
       if (defineChecker(themeStyle, 'block')) return {
         id: themeStyle.id,
@@ -141,6 +141,56 @@ export class Client {
     };
   }
 
+  private _prepareSelectedTheme(selectedTheme: Reactive<ModuleThemeRootReturn>): ModuleThemeRootReturn {
+    const relationsPaths: ModuleObject = {};
+
+    const isCircularRelation = (path1: string, path2: string): boolean => {
+      let currentPath = relationsPaths[path2];
+
+      while (currentPath) {
+        if (currentPath === path1) return true;
+        currentPath = relationsPaths[currentPath];
+      }
+
+      return false;
+    };
+    const getStyleByPath = (selfPath: string, styleValue: string) => {
+      if (styleValue.startsWith('$') && styleValue.length > 1) {
+        const relationPath = styleValue.slice(1);
+
+        if (isCircularRelation(selfPath, relationPath)) {
+          return 'CIRCULAR';
+        } else {
+          relationsPaths[selfPath] = relationPath;
+          return getStyleByPath(relationPath, this.getStylesKeyValueByPath(relationPath, selectedTheme).value);
+        }
+      }
+      return styleValue;
+    };
+    const prepareStyle = (stylesBlock: ModuleThemeCleanedSetting, parentPath: string[] = []): ModuleThemeCleanedSetting => {
+      if (stylesBlock.id) return {
+        id: stylesBlock.id,
+        styles: (stylesBlock.styles as ModuleDefineThemeBlockSetting[]).map(style => prepareStyle(style, [...parentPath, stylesBlock.id]))
+      };
+
+      const stylesBlockAny = stylesBlock as any;
+      for (const styleKey of Object.keys(stylesBlockAny)) {
+        const styleValue = stylesBlockAny[styleKey] as string;
+        const selfPath = [...parentPath, styleKey].join('.');
+        stylesBlockAny[styleKey] = getStyleByPath(selfPath, styleValue);
+      }
+
+      return stylesBlockAny;
+    };
+
+    const themeCopy = JSON.parse(JSON.stringify(selectedTheme)) as ModuleThemeRootReturn;
+
+    return {
+      ...themeCopy,
+      styles: themeCopy.styles.map(style => prepareStyle(style))
+    };
+  }
+
   private _checkThemeAvailableAndGetActual(themeName?: string, def?: 'light' | 'dark' | 'system' | string): string | undefined {
     const isInThemes = themeName && themeName in this.themes;
 
@@ -152,12 +202,12 @@ export class Client {
     else return undefined;
   }
 
-  private _appendStyleToHead(id: string, scopes: ModuleObject<ModuleObject>, shielding = false) {
+  private _appendStyleToHead(id: string, scopes: ModuleObject<ModuleObject<string | ComputedRef<string>>>, shielding = false) {
     const styleContent = Object.keys(scopes).map((scopeId) => {
       const scopeStyles = scopes[scopeId];
       return [
         shielding ? `[${scopeId}] {` : `${scopeId} {`,
-        ...Object.keys(scopeStyles).map(key => `  --${key}: ${scopeStyles[key]};`),
+        ...Object.keys(scopeStyles).map(key => `  --${key}: ${unwrap.get(scopeStyles[key])};`),
         '}'
       ].join('\n');
     }).join('\n\n');
@@ -194,7 +244,15 @@ export class Client {
     return !!this.usesScopesProperties[scopeId];
   }
 
-  getStylesByPath(blockPath: string): ComputedRef<ModuleObject> {
+  getStylesKeyValueByPath(stylePath: string, theme?: ModuleThemeRootReturn): ComputedRef<string> {
+    const stylePathParts = stylePath.split('.');
+    const blockPath = stylePathParts.length > 1 ? stylePathParts.slice(0, -1).join('.') : '';
+    const styleName = stylePathParts[stylePathParts.length - 1] as any;
+
+    return computed(() => unwrap.get(this.getStylesByPath(blockPath, theme).value[styleName]) ?? 'UNKNOWN STYLE');
+  }
+
+  getStylesByPath(blockPath: string, theme?: ModuleThemeRootReturn): ComputedRef<ModuleObject> {
     const searchDefineStylesByPath = (blockName: string[], styles?: ModuleThemeCleanedSetting[]): ModuleObject => {
       if (styles) {
         for (const style of styles) {
@@ -211,7 +269,7 @@ export class Client {
       return {};
     };
 
-    return computed(() => searchDefineStylesByPath(blockPath.split('.'), unwrap.get(this.selectedTheme)?.styles));
+    return computed(() => searchDefineStylesByPath(blockPath.split('.'), unwrap.get(theme ?? this.selectedTheme)?.styles));
   }
 
   getConfig(): ModuleOptionsExtend {

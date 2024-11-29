@@ -6,7 +6,8 @@ export default defineThemeBlockRoot({
   }
 }, [
   {
-    test: '#676764'
+    test: '#676764',
+    dssssss3: '#830101'
   },
   sidebar,
   defineThemeBlock('navbar', [
@@ -17,7 +18,7 @@ export default defineThemeBlockRoot({
       }
     ]),
     {
-      test1: '#f50000',
+      test1: '#207909',
       a: '#f1f1f1'
     },
     {

@@ -2,7 +2,7 @@ import sidebar from './sidebar';
 
 export default defineThemeBlockRoot({
   name: 'Light',
-  description: 'Стандартная светлая тема фырв шщрфшщырв шщрфышвр щшфырщв рфырв шщфршырв щшфырщшв рфыр фылдв фыв рфырвд фыдвр дфыырлвр фыдрдвр',
+  description: 'Стандартная светлая тема',
   previewStyles: {
   },
   uiStyles: {
@@ -10,8 +10,8 @@ export default defineThemeBlockRoot({
 }, [
   {
     test: '#cccccc',
-    dsd: '#002',
-    dssssss3: '#001'
+    dsd: '$global.test',
+    dssssss3: '#5da239'
   },
   sidebar,
   defineThemeBlock('navbar', [
@@ -22,11 +22,11 @@ export default defineThemeBlockRoot({
       }
     ]),
     {
-      test1: '#f50000',
+      test1: '$sidebar.test.testtesttest2',
       a: '#f1f1f1'
     },
     {
-      test2: '#f50000',
+      test2: '#e5b7b7',
       a: '#f1f1f1'
     }
   ]),

@@ -52,7 +52,7 @@ watch(innerValue, value => emit('update:modelValue', value));
     background-color: var(--inputBg);
 
     & > svg {
-      font-size: 10px;
+      font-size: 12px;
       color: var(--inputRequired);
     }
   }

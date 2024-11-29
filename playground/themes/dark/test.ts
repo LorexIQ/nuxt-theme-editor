@@ -1,5 +1,5 @@
 export default defineThemeBlock('test', [
   {
-    testtesttest: '#830101'
+    testtesttest: '$global.dssssss3'
   }
 ]);
