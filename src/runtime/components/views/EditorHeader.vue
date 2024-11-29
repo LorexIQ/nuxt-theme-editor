@@ -1,9 +1,9 @@
 <script setup lang="ts">
-import type { Client } from '../../classes/Client';
+import type { ModuleClient } from '../../types';
 import { computed } from '#imports';
 
 type Props = {
-  client: Client;
+  client: ModuleClient;
 };
 
 const props = defineProps<Props>();

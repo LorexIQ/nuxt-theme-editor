@@ -1,6 +1,6 @@
 export type ModuleStorage = {
   isAutoThemeMode: boolean;
-  selectedThemeId?: string;
+  selectedSelfThemeId?: string;
   selectedLightThemeId?: string;
   selectedDarkThemeId?: string;
 };

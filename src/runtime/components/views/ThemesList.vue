@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import BlockThemes from '../widgets/BlockThemes.vue';
-import type { Client } from '../../classes/Client';
+import type { ModuleClient } from '../../types';
 
 type Props = {
-  client: Client;
+  client: ModuleClient;
 };
 
 const props = defineProps<Props>();

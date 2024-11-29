@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import IsInput from '../shared/IsInput.vue';
-import type { Client } from '../../classes/Client';
 import IsButton from '../shared/IsButton.vue';
 import ThemeBlockStatus from '../features/ThemeBlockStatus.vue';
+import type { ModuleClient } from '../../types';
 import { reactive } from '#imports';
 
 type ThemeCreateData = {
@@ -13,7 +13,7 @@ type ThemeCreateData = {
 };
 
 type Props = {
-  client: Client;
+  client: ModuleClient;
 };
 
 const props = defineProps<Props>();

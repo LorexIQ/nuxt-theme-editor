@@ -2,7 +2,7 @@ import { defineNuxtModule, addPlugin, createResolver, addImportsDir, addComponen
 import defu from 'defu';
 import { name, version } from '../package.json';
 import type { ModuleOptions } from './runtime/types';
-import { Server } from './runtime/classes/Server';
+import { Server } from './runtime/classes/server/Server';
 
 const MODULE_CONFIG_KEY = 'themesEditor';
 const meta = {

@@ -2,16 +2,16 @@ import fs from 'node:fs';
 import type { CodeBlockWriter } from 'ts-morph';
 import type { Resolver } from '@nuxt/kit';
 import { createResolver } from '@nuxt/kit';
-import uPath from '../helpers/uPath';
+import uPath from '../../helpers/uPath';
 import type {
   ModuleDefineThemeBlockSetting,
   ModuleMetaFilesWatcherHash,
   ModuleObject,
-  ModuleOptionsExtend
-} from '../types';
-import defineChecker from '../helpers/defineChecker';
-import tsMorphProject from '../helpers/tsMorphProject';
-import type { Server } from './Server';
+  ModuleOptionsExtend,
+  ModuleServer
+} from '../../types';
+import defineChecker from '../../helpers/defineChecker';
+import tsMorphProject from '../../helpers/tsMorphProject';
 
 export class MetaFiles {
   private readonly metaResolver: Resolver;
@@ -20,7 +20,7 @@ export class MetaFiles {
   private readonly watcherHash: ModuleMetaFilesWatcherHash = {};
   private watcherLastUpdate = Date.now();
 
-  constructor(private readonly ctx: Server) {
+  constructor(private readonly ctx: ModuleServer) {
     this.metaResolver = createResolver(this.ctx.getResolver().resolve('runtime', 'meta'));
     this.config = this.ctx.getConfig();
   }

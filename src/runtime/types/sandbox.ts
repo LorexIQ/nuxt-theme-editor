@@ -1,5 +1,5 @@
 import type { Component } from 'vue';
-import type { ModuleIcons } from './themes';
+import type { ModuleIcons } from './share';
 
 export type ModuleSandboxComponent = {
   id: string;

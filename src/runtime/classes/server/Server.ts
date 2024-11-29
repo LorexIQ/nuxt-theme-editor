@@ -1,17 +1,17 @@
 import fs from 'node:fs';
 import type { Nuxt } from '@nuxt/schema';
 import { createResolver, type Resolver } from '@nuxt/kit';
-import defineThemeBlock from '../composables/defineThemeBlock';
-import defineThemeBlockRoot from '../composables/defineThemeBlockRoot';
+import defineThemeBlock from '../../composables/defineThemeBlock';
+import defineThemeBlockRoot from '../../composables/defineThemeBlockRoot';
 import type {
   ModuleDefineThemeBlockRootReturn,
   ModuleOptions,
   ModuleOptionsExtend, ModuleOptionsExtendMeta, ModuleServerThemes
-} from '../types';
-import uPath from '../helpers/uPath';
-import logger from '../helpers/logger';
-import tsMorphProject from '../helpers/tsMorphProject';
-import { loadTsModule } from '../helpers/loadTsModule';
+} from '../../types';
+import uPath from '../../helpers/uPath';
+import logger from '../../helpers/logger';
+import tsMorphProject from '../../helpers/tsMorphProject';
+import { loadTsModule } from '../../helpers/loadTsModule';
 import { MetaFiles } from './MetaFiles';
 
 (global as any).defineThemeBlock = defineThemeBlock;

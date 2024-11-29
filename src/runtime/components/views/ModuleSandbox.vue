@@ -1,10 +1,10 @@
 <script setup lang="ts">
-import type { Sandbox } from '../../classes/Sandbox';
 import ResizeObserver from '../shared/ResizeObserver.vue';
+import type { ModuleClientSandbox } from '../../types';
 import { ref } from '#imports';
 
 type Props = {
-  sandbox: Sandbox;
+  sandbox: ModuleClientSandbox;
 };
 
 const props = defineProps<Props>();

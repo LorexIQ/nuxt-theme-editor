@@ -1,7 +1,13 @@
-import type { ModuleObject, ModuleOptionsExtend, ModulePage, ModulePageAnimations, ModulePagesNames } from '../types';
-import unwrap from '../helpers/unwrap';
-import pagesMeta from '../assets/pagesMeta';
-import type { Client } from './Client';
+import type {
+  ModuleClient,
+  ModuleObject,
+  ModuleOptionsExtend,
+  ModulePage,
+  ModulePageAnimations,
+  ModulePagesNames
+} from '../../types';
+import unwrap from '../../helpers/unwrap';
+import pagesMeta from '../../assets/pagesMeta';
 import { computed, ref } from '#imports';
 
 export class Router {
@@ -22,7 +28,7 @@ export class Router {
     else return {};
   });
 
-  constructor(private readonly ctx: Client) {
+  constructor(private readonly ctx: ModuleClient) {
     this.config = this.ctx.getConfig();
   }
 

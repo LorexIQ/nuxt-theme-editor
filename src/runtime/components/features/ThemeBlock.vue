@@ -1,11 +1,10 @@
 <script setup lang="ts">
-import type { Client } from '../../classes/Client';
-import type { ModuleThemeRootReturn } from '../../types';
+import type { ModuleClient, ModuleThemeRootReturn } from '../../types';
 import ThemePreview from './ThemePreview.vue';
 import ThemeBlockStatus from './ThemeBlockStatus.vue';
 
 type Props = {
-  client: Client;
+  client: ModuleClient;
   theme: ModuleThemeRootReturn;
 };
 

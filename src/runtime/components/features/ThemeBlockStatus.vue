@@ -1,10 +1,9 @@
 <script setup lang="ts">
-import type { Client } from '../../classes/Client';
-import type { ModuleThemeRootReturn } from '../../types';
+import type { ModuleClient, ModuleThemeRootReturn } from '../../types';
 import { computed } from '#imports';
 
 type Props = {
-  client: Client;
+  client: ModuleClient;
   theme: ModuleThemeRootReturn;
   viewMode?: 'vertical' | 'horizontal';
 };
@@ -18,7 +17,7 @@ const theme = props.theme;
 const isLightTheme = computed(() => client.getSelectedLightThemeId() === theme.id);
 const isDarkTheme = computed(() => client.getSelectedDarkThemeId() === theme.id);
 const isLightDartTheme = computed(() => isLightTheme.value && isDarkTheme.value);
-const isActiveTheme = computed(() => client.getSelectedTheme()?.id === theme.id);
+const isActiveTheme = computed(() => client.getSelectedThemeId() === theme.id);
 const isBoxActive = computed(() => isLightTheme.value || isDarkTheme.value || isActiveTheme.value);
 </script>
 

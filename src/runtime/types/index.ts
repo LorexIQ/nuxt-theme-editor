@@ -2,6 +2,7 @@ export * from './defines';
 export * from './helpers';
 export * from './metaFiles';
 export * from './sandbox';
+export * from './share';
 export * from './storage';
 export * from './themes';
 

@@ -1,9 +1,9 @@
 <script setup lang="ts">
-import type { Client } from '../../classes/Client';
 import IsButton from '../shared/IsButton.vue';
+import type { ModuleClient } from '../../types';
 
 type Props = {
-  client: Client;
+  client: ModuleClient;
 };
 
 const props = defineProps<Props>();

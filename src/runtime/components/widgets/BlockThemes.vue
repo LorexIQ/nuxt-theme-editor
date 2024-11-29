@@ -1,6 +1,5 @@
 <script setup lang="ts">
-import type { ModuleThemeType } from '../../types';
-import type { Client } from '../../classes/Client';
+import type { ModuleClient, ModuleThemeType } from '../../types';
 import IconArrow from '../icons/IconArrow.vue';
 import IconPlus from '../icons/IconPlus.vue';
 import ThemeBlock from '../features/ThemeBlock.vue';
@@ -8,7 +7,7 @@ import { ref, computed } from '#imports';
 
 type Props = {
   type: ModuleThemeType;
-  client: Client;
+  client: ModuleClient;
   isOpen?: boolean;
 };
 

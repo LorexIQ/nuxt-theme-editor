@@ -1,15 +1,15 @@
 import { h, type Reactive, render } from 'vue';
 import type {
+  ModuleClient,
   ModuleOptionsExtend,
   ModuleSandboxComponents,
   ModuleSandboxContextMenuItem,
   ModuleSandboxMousePosition,
   ModuleSandboxSize,
   ModuleThemeRootReturn
-} from '../types';
-import ContextMenu from '../components/features/ContextMenu.vue';
-import ModuleSandbox from '../components/views/ModuleSandbox.vue';
-import type { Client } from './Client';
+} from '../../types';
+import ContextMenu from '../../components/features/ContextMenu.vue';
+import ModuleSandbox from '../../components/views/ModuleSandbox.vue';
 import { markRaw, reactive } from '#imports';
 
 const CONTEXT_MENU_ID = 'context-menu';
@@ -20,7 +20,7 @@ export class Sandbox {
   private readonly components = reactive<ModuleSandboxComponents>([]);
   private readonly boxSize = reactive<ModuleSandboxSize>({ width: 0, height: 0 });
 
-  constructor(private readonly ctx: Client) {
+  constructor(private readonly ctx: ModuleClient) {
     this.config = this.ctx.getConfig();
     this.id = this.config.keys.sandbox;
     this._initSandbox();

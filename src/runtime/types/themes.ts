@@ -1,5 +1,4 @@
-import type iconsConnector from '../assets/iconsConnector';
-import type pagesMeta from '../assets/pagesMeta';
+import type { ComputedRef } from 'vue';
 import type {
   ModuleDefineThemeBlockRootReturn,
   ModuleDefineThemeMeta
@@ -9,22 +8,23 @@ import type { ModuleObject } from './index';
 export type ModuleServerThemes = { [name: string]: ModuleDefineThemeBlockRootReturn };
 export type ModuleThemes = { [name: string]: ModuleThemeRootReturn };
 
-export type ModulePage = { name: string; title: string };
 export type ModuleThemeType = 'system' | 'global' | 'local';
-export type ModulePageAnimations = 'tab-fade-lr' | 'tab-fade-rl' | undefined;
-export type ModulePagesNames = (typeof pagesMeta extends { name: infer U }[] ? U : never) | string;
-export type ModuleIcons = keyof typeof iconsConnector;
 
-export type ModuleThemeCleanedSetting = ModuleObject | ModuleThemeStyleBlockReturn;
+export type ModuleThemeCleanedSetting<T = string> = ModuleObject<T> | ModuleThemeStyleBlockReturn<T>;
 
-export type ModuleThemeStyleBlockReturn = {
+export type ModuleThemeStyleBlockReturn<T = string> = {
   id: string;
-  styles: ModuleThemeCleanedSetting[];
+  styles: ModuleThemeCleanedSetting<T>[];
 };
-export type ModuleThemeRootReturn = {
+export type ModuleThemeRootReturn<T = string> = {
   id: string;
   name: string;
   type: ModuleThemeType;
   meta: Required<ModuleDefineThemeMeta>;
-  styles: ModuleThemeCleanedSetting[];
+  styles: ModuleThemeCleanedSetting<T>[];
 };
+
+type ThemeStyleValueType = ComputedRef<string> | string;
+export type ModuleThemeStyleObject = ModuleObject<ThemeStyleValueType>;
+export type ModuleThemeSelectedStyles = ModuleThemeStyleObject | ModuleThemeStyleBlockReturn<ThemeStyleValueType>;
+export type ModuleThemeSelected = ModuleThemeRootReturn<ThemeStyleValueType>;
