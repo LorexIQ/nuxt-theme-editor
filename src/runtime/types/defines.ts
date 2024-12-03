@@ -12,6 +12,7 @@ export type ModuleDefineThemeMetaUI = Partial<{
   bg: string;
   bgHover: string;
   bgHeader: string;
+  bgFooter: string;
   bgBlockHeader: string;
   bgGlass: string;
   blurGlass: string;
@@ -27,6 +28,9 @@ export type ModuleDefineThemeMetaUI = Partial<{
   inputText: string;
   inputPlaceholder: string;
 
+  radioStatic: string;
+  radioActive: string;
+
   buttonBg: string;
   buttonBgHover: string;
   buttonBorder: string;
@@ -41,6 +45,19 @@ export type ModuleDefineThemeMetaUI = Partial<{
   statusLightTitle: string;
   statusDarkBg: string;
   statusDarkTitle: string;
+
+  messageInfoBg: string;
+  messageInfoTitle: string;
+  messageInfoContent: string;
+  messageTipBg: string;
+  messageTipTitle: string;
+  messageTipContent: string;
+  messageWarnBg: string;
+  messageWarnTitle: string;
+  messageWarnContent: string;
+  messageErrorBg: string;
+  messageErrorTitle: string;
+  messageErrorContent: string;
 
   contextMenuIcon: string;
   contextMenuIconActive: string;

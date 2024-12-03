@@ -1,47 +1,39 @@
 <script setup lang="ts">
-import type { ModuleClient, ModuleThemeRootReturn } from '../../types';
+import type { ModuleThemeRootReturn } from '../../types';
 import ThemePreview from './ThemePreview.vue';
-import ThemeBlockStatus from './ThemeBlockStatus.vue';
 
 type Props = {
-  client: ModuleClient;
   theme: ModuleThemeRootReturn;
 };
 
-const props = defineProps<Props>();
-const client = props.client;
-const theme = props.theme;
+defineProps<Props>();
 </script>
 
 <template>
-  <div
-    class="TE-theme-block"
-    @dblclick="client.setTheme(theme.id)"
-    @contextmenu.prevent="client.getSandbox().openSystemThemeContextMenu($event, theme)"
-  >
+  <div class="TE-theme-block">
     <div
       class="TE-theme-block__preview"
       v-bind="{ [`theme-${theme.id}-preview`]: '' }"
     >
-      <slot>
+      <slot name="preview">
         <ThemePreview />
       </slot>
     </div>
     <div class="TE-theme-block__info">
-      <div class="TE-theme-block__info__name">
-        {{ theme.name }}
+      <div
+        class="TE-theme-block__info__name"
+        :class="{ 'TE-theme-block__info__name--transparent': !theme.name }"
+      >
+        {{ theme.name || 'Empty' }}
       </div>
       <div
         class="TE-theme-block__info__description"
         :class="{ 'TE-theme-block__info__description--transparent': !theme.meta.description }"
       >
-        <span>{{ theme.meta.description || 'Описание не задано' }}</span>
+        <span>{{ theme.meta.description || 'Description isn\'t set' }}</span>
       </div>
     </div>
-    <ThemeBlockStatus
-      :client="client"
-      :theme="theme"
-    />
+    <slot name="status" />
   </div>
 </template>
 
@@ -94,6 +86,10 @@ const theme = props.theme;
         width: 50px;
         height: 26px;
         background: linear-gradient(90deg, transparent 0%, var(--bg) 100%);
+      }
+
+      &--transparent {
+        color: var(--titleTransparent)
       }
     }
     &__description {

@@ -4,6 +4,9 @@ export default defineThemeBlockRoot({
   name: 'Light',
   description: 'Стандартная светлая тема',
   previewStyles: {
+    defaultPreviewCardBG1: 'red',
+    defaultPreviewCardBG2: 'green',
+    defaultPreviewCardBG3: 'blue'
   },
   uiStyles: {
   }

@@ -101,15 +101,12 @@ export class Client {
     watch(this.themes, (themes) => {
       this._appendStyleToHead(
         `${this.config.keys.style}:preview`,
-        Object
-          .values(themes)
-          .reduce((accum, theme) => ({
-            ...accum,
-            [`theme-${theme.id}-preview`]: {
-              ...DEFAULT_PREVIEW_STYLES,
-              ...theme.meta.previewStyles
-            }
-          }), {}), true);
+        {
+          'theme-default-preview': DEFAULT_PREVIEW_STYLES,
+          ...Object.values(themes).reduce((accum, theme) => ({ ...accum, [`theme-${theme.id}-preview`]: { ...DEFAULT_PREVIEW_STYLES, ...theme.meta.previewStyles } }), {})
+        },
+        true
+      );
     }, { immediate: true });
 
     watch(this.savedStorage, () => this._saveStorage());

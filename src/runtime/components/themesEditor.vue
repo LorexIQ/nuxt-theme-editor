@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import useThemesEditor from '../composables/useThemesEditor';
+import EditorHeader from './widgets/EditorHeader.vue';
 import ThemesList from './views/ThemesList.vue';
 import ThemeCreate from './views/ThemeCreate.vue';
-import EditorHeader from './views/EditorHeader.vue';
 import Error404 from './views/Error404.vue';
 
 const client = useThemesEditor();
@@ -57,40 +57,7 @@ const client = useThemesEditor();
 
   &__content {
     position: relative;
-    overflow-x: hidden;
-    overflow-y: auto;
-  }
-}
-
-.tab-fade-lr {
-  &-enter-active, &-leave-active {
-    position: absolute;
-    width: 100%;
-    transition: .3s;
-  }
-  &-leave-to {
-    opacity: 0;
-    transform: scaleX(.9) translateX(-100%);
-  }
-  &-enter-from {
-    opacity: 0;
-    transform: scaleX(.9) translateX(100%);
-  }
-}
-.tab-fade-rl {
-  &-enter-active, &-leave-active {
-    position: absolute;
-    width: 100%;
-    height: 100%;
-    transition: .3s;
-  }
-  &-leave-to {
-    opacity: 0;
-    transform: scaleX(.9) translateX(100%);
-  }
-  &-enter-from {
-    opacity: 0;
-    transform: scaleX(.9) translateX(-100%);
+    overflow: hidden;
   }
 }
 </style>

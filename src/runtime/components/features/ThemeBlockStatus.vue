@@ -104,7 +104,7 @@ const isBoxActive = computed(() => isLightTheme.value || isDarkTheme.value || is
     writing-mode: horizontal-tb;
 
     &-active {
-      width: 50px;
+      width: 55px;
     }
   }
 }

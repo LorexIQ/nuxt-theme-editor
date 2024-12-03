@@ -13,6 +13,7 @@ export const DEFAULT_UI_STYLES: Required<ModuleDefineThemeMetaUI> = {
   bg: '#fff',
   bgHover: '#f6f6f6',
   bgHeader: '#f6f6f6',
+  bgFooter: '#fff',
   bgBlockHeader: '#f6f6f6',
   bgGlass: '#00000019',
   blurGlass: '3px',
@@ -28,14 +29,17 @@ export const DEFAULT_UI_STYLES: Required<ModuleDefineThemeMetaUI> = {
   inputText: '#333',
   inputPlaceholder: '#999',
 
+  radioStatic: '#000',
+  radioActive: '#2ecc71',
+
   buttonBg: '#fafafa',
   buttonBgHover: '#fff',
   buttonBorder: '#00000019',
   buttonText: '#555',
   buttonTextHover: '#333',
 
-  statusActiveBg: '#85f585',
-  statusActiveTitle: '#245024',
+  statusActiveBg: '#2ecc71',
+  statusActiveTitle: '#2c3e50',
   statusLightDarkBg: '#dab6e2',
   statusLightDarkTitle: '#3b003d',
   statusLightBg: '#ffd9a6',
@@ -43,6 +47,19 @@ export const DEFAULT_UI_STYLES: Required<ModuleDefineThemeMetaUI> = {
   statusDarkBg: '#9e9eff',
   statusDarkTitle: '#fff',
 
+  messageInfoBg: '#65758528',
+  messageInfoTitle: '#333',
+  messageInfoContent: '#333',
+  messageTipBg: '#646CFF28',
+  messageTipTitle: '#333',
+  messageTipContent: '#333',
+  messageWarnBg: '#EAB30828',
+  messageWarnTitle: '#333',
+  messageWarnContent: '#333',
+  messageErrorBg: '#F43F5E28',
+  messageErrorTitle: '#333',
+  messageErrorContent: '#333',
+
   contextMenuIcon: '#444',
-  contextMenuIconActive: '#00ca00'
+  contextMenuIconActive: '#2ecc71'
 };

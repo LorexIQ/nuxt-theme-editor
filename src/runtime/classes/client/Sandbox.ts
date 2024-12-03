@@ -8,7 +8,7 @@ import type {
   ModuleSandboxSize,
   ModuleThemeRootReturn
 } from '../../types';
-import ContextMenu from '../../components/features/ContextMenu.vue';
+import ContextMenu from '../../components/shared/ContextMenu.vue';
 import ModuleSandbox from '../../components/views/ModuleSandbox.vue';
 import { markRaw, reactive } from '#imports';
 
@@ -77,38 +77,33 @@ export class Sandbox {
       props: {
         clickPosition,
         sandboxSize: this.boxSize,
-        tipText: 'Выберите действие',
+        tipText: 'Select an action',
         items: <ModuleSandboxContextMenuItem[]>[
           {
-            title: isSelectedTheme ? 'Тема активна' : 'Выбрать тему',
+            title: isSelectedTheme ? 'Theme is active' : 'Select a theme',
             isDisabled: () => isSelectedTheme,
             icon: isSelectedTheme ? 'Check' : 'Palette',
             iconColor: isSelectedTheme ? 'var(--contextMenuIconActive)' : undefined,
             action: () => this.ctx.setTheme(theme.id)
           },
           {
-            title: isSelectedLightTheme ? 'Назначена светлой темой' : 'Назначить светлой темой',
+            title: isSelectedLightTheme ? 'Light theme is set' : 'Set as light theme',
             isDisabled: () => isSelectedLightTheme,
             icon: isSelectedLightTheme ? 'Check' : 'Sun',
             iconColor: isSelectedLightTheme ? 'var(--contextMenuIconActive)' : undefined,
             action: () => this.ctx.setLightTheme(theme.id)
           },
           {
-            title: isSelectedDarkTheme ? 'Назначена тёмной темой' : 'Назначить тёмной темой',
+            title: isSelectedDarkTheme ? 'Dark theme is set' : 'Set as dark theme',
             isDisabled: () => isSelectedDarkTheme,
             icon: isSelectedDarkTheme ? 'Check' : 'Moon',
             iconColor: isSelectedDarkTheme ? 'var(--contextMenuIconActive)' : undefined,
             action: () => this.ctx.setDarkTheme(theme.id)
           },
           {
-            title: 'Создать копию темы',
+            title: 'Create theme copy',
             icon: 'Palette2',
             action: () => this.ctx.getRouter().push(`newTheme?parentThemeId=${theme.id}`, 'tab-fade-lr')
-          },
-          {
-            title: '404',
-            icon: 'Palette2',
-            action: () => this.ctx.getRouter().push('newT123heme', 'tab-fade-lr')
           }
         ]
       },

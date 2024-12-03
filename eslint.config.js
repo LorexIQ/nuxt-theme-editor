@@ -19,6 +19,7 @@ export default createConfigForNuxt({
         'no-eval': 'off',
         'vue/multi-word-component-names': 'off',
         'antfu/no-import-node-modules-by-path': 'off',
+        '@typescript-eslint/unified-signatures': 'off',
         '@typescript-eslint/no-explicit-any': 'off',
         '@typescript-eslint/no-require-imports': 'off',
         '@typescript-eslint/no-use-before-define': 'off',

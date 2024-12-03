@@ -1,6 +1,7 @@
 <script setup lang="ts">
-import IsButton from '../shared/IsButton.vue';
 import type { ModuleClient } from '../../types';
+import IsButton from '../shared/IsButton.vue';
+import ViewPage from '../widgets/ViewPage.vue';
 
 type Props = {
   client: ModuleClient;
@@ -11,27 +12,23 @@ const router = props.client.getRouter();
 </script>
 
 <template>
-  <transition :name="router.getTransitionName()">
-    <div
-      v-if="router.getPath() === '404'"
-      class="TE-error-404"
-    >
-      <h1>404</h1>
-      <span>Страница не найдена</span>
-      <IsButton @click="router.push('index', 'tab-fade-rl')">
-        Назад
-      </IsButton>
-    </div>
-  </transition>
+  <ViewPage
+    class="TE-error-404"
+    page-id="404"
+    :client="client"
+  >
+    <h1>404</h1>
+    <span>Страница не найдена</span>
+    <IsButton @click="router.push('index', 'tab-fade-rl')">
+      Назад
+    </IsButton>
+  </ViewPage>
 </template>
 
 <style lang="scss" scoped>
 .TE-error-404 {
-  display: flex;
-  flex-direction: column;
   justify-content: center;
   align-items: center;
-  height: 100%;
 
   & h1 {
     font-family: 'Segoe Print', sans-serif;

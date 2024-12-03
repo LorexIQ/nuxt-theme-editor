@@ -17,7 +17,8 @@ const icon = computed(() => iconsConnector[props.icon]);
     :is="icon"
     v-if="icon"
     :style="{
-      fontSize: size,
+      width: size,
+      height: size,
     }"
   />
   <div v-else>

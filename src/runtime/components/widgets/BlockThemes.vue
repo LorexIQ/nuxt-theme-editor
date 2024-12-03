@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import type { ModuleClient, ModuleThemeType } from '../../types';
-import IconArrow from '../icons/IconArrow.vue';
-import IconPlus from '../icons/IconPlus.vue';
 import ThemeBlock from '../features/ThemeBlock.vue';
+import ThemeBlockStatus from '../features/ThemeBlockStatus.vue';
+import IconsStore from '../shared/IconsStore.vue';
 import { ref, computed } from '#imports';
 
 type Props = {
@@ -21,11 +21,11 @@ const themes = computed(() => Object.values(props.client.getThemes()).filter(the
 const title = computed(() => {
   switch (props.type) {
     case 'system':
-      return 'Системные';
+      return 'System';
     case 'global':
-      return 'Глобальные';
+      return 'Global';
     case 'local':
-      return 'Локальные';
+      return 'Local';
     default:
       return 'Unsupported';
   }
@@ -43,7 +43,7 @@ const title = computed(() => {
         class="TE-block-themes__title__icon"
         :class="{ 'TE-block-themes__title__icon--open': isOpened }"
       >
-        <IconArrow />
+        <IconsStore icon="Arrow" />
       </div>
     </div>
     <transition-expand>
@@ -56,7 +56,7 @@ const title = computed(() => {
           class="TE-block-themes__content__add"
           @click="client.getRouter().push('newTheme', 'tab-fade-lr')"
         >
-          <IconPlus />
+          <IconsStore icon="Plus" />
         </div>
         <div
           v-if="themes.length"
@@ -67,14 +67,23 @@ const title = computed(() => {
             :key="theme.id"
             :client="client"
             :theme="theme"
-          />
+            @dblclick="client.setTheme(theme.id)"
+            @contextmenu.prevent="client.getSandbox().openSystemThemeContextMenu($event, theme)"
+          >
+            <template #status>
+              <ThemeBlockStatus
+                :client="client"
+                :theme="theme"
+              />
+            </template>
+          </ThemeBlock>
         </div>
         <div
           v-else
           class="TE-block-themes__content__null"
           :class="{ 'TE-block-themes__content__null--simplify': !isAddActive }"
         >
-          Список тем пуст
+          No themes available
         </div>
       </div>
     </transition-expand>

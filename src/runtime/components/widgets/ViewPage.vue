@@ -1,0 +1,94 @@
+<script setup lang="ts">
+import type { ModuleClient } from '../../types';
+import { computed, watch } from '#imports';
+
+type Props = {
+  pageId: string;
+  client: ModuleClient;
+};
+type Emits = {
+  (e: 'onActive:on'): void;
+  (e: 'onActive:off'): void;
+};
+
+const props = defineProps<Props>();
+const emit = defineEmits<Emits>();
+const client = props.client;
+const router = client.getRouter();
+
+const isActive = computed(() => router.getPath() === props.pageId);
+
+watch(isActive, (status) => {
+  if (status) emit('onActive:on');
+  else emit('onActive:off');
+}, { immediate: true });
+</script>
+
+<template>
+  <transition :name="router.getTransitionName()">
+    <div
+      v-if="isActive"
+      class="TE-view-page"
+    >
+      <div class="TE-view-page__template">
+        <slot />
+      </div>
+      <div class="TE-view-page__footer">
+        <slot name="footer" />
+      </div>
+    </div>
+  </transition>
+</template>
+
+<style scoped lang="scss">
+.TE-view-page {
+  display: grid;
+  grid-template-rows: 1fr auto;
+  height: 100%;
+  margin-left: -1px;
+  border-left: 1px solid var(--border);
+
+  &__template {
+    display: flex;
+    flex-direction: column;
+    overflow-x: hidden;
+    overflow-y: auto;
+  }
+  &__footer {
+    background-color: var(--bgFooter);
+    box-shadow: 0 0 10px var(--shadow);
+  }
+}
+
+.tab-fade-lr {
+  &-enter-active, &-leave-active {
+    position: absolute;
+    width: 100%;
+    transition: .3s;
+  }
+  &-leave-to {
+    opacity: 0;
+    transform: scaleX(.9) translateX(-100%);
+  }
+  &-enter-from {
+    opacity: 0;
+    transform: scaleX(.9) translateX(100%);
+  }
+}
+.tab-fade-rl {
+  &-enter-active, &-leave-active {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    transition: .3s;
+  }
+  &-leave-to {
+    opacity: 0;
+    transform: scaleX(.9) translateX(100%);
+  }
+  &-enter-from {
+    opacity: 0;
+    transform: scaleX(.9) translateX(-100%);
+  }
+}
+</style>

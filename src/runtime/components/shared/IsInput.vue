@@ -1,53 +1,87 @@
-<script setup lang="ts" generic="T extends any">
-import IconAsterisk from '../icons/IconAsterisk.vue';
-import { ref, watch } from '#imports';
+<script setup lang="ts">
+import IconsStore from './IconsStore.vue';
+import { ref, watch, computed } from '#imports';
 
 type Props = {
   id: string;
   title: string;
-  modelValue: T;
+  modelValue: string;
   placeholder?: string;
   isRequiredIcon?: boolean;
+  maxLength?: number;
 };
 type Emits = {
-  (e: 'update:modelValue', value: T): void;
+  (e: 'update:modelValue', value: string): void;
 };
 
 const props = defineProps<Props>();
 const emit = defineEmits<Emits>();
+const maxLength = props.maxLength;
 
 const innerValue = ref(props.modelValue);
+const maxLengthRemained = computed(() => {
+  const remained = (props.maxLength ?? 0) - innerValue.value.length;
+  return remained < 0 ? 0 : remained;
+});
 
 watch(() => props.modelValue, value => innerValue.value = value);
-watch(innerValue, value => emit('update:modelValue', value));
+watch(innerValue, value => emit('update:modelValue', value.slice(0, maxLength)));
+
+function onInput(event: Event) {
+  const target = event.target as HTMLInputElement;
+
+  if (maxLength) {
+    if (maxLengthRemained.value === 0) {
+      target.value = target.value.slice(0, maxLength);
+    }
+  }
+}
 </script>
 
 <template>
-  <div class="TE-is-input">
+  <div
+    class="TE-is-input"
+    :class="{ 'TE-is-input--with-max-length': maxLength }"
+  >
     <div class="TE-is-input__title">
       {{ title }}
-      <IconAsterisk v-if="isRequiredIcon" />
+      <IconsStore
+        v-if="isRequiredIcon"
+        icon="Asterisk"
+      />
     </div>
     <input
-      :id="`TE-${id}`"
+      :id="`TE-input-${id}`"
       v-model="innerValue"
       class="TE-is-input__input"
       :placeholder="placeholder"
+      autocomplete="off"
+      @input="onInput"
     >
+    <div
+      ref="maxLengthRef"
+      class="TE-is-input__length"
+      :class="{ 'TE-is-input__length--null': !maxLengthRemained }"
+    >
+      {{ maxLengthRemained }}
+    </div>
   </div>
 </template>
 
 <style scoped lang="scss">
 .TE-is-input {
+  position: relative;
+
   &__title {
-    position: relative;
-    z-index: 1;
+    position: absolute;
+    top: -7px;
+    left: 5px;
     font-size: 12px;
     display: flex;
     align-items: flex-start;
     width: max-content;
-    margin: 0 0 -7px 5px;
     padding: 0 5px;
+    border-radius: 3px;
     color: var(--inputTitle);
     background-color: var(--inputBg);
 
@@ -70,6 +104,34 @@ watch(innerValue, value => emit('update:modelValue', value));
     }
     &:focus {
       outline: 1px solid var(--inputFocus);
+    }
+  }
+  &__length {
+    font-size: 14px;
+    position: absolute;
+    top: 6px;
+    right: 0;
+    bottom: 6px;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    padding: 0 8px;
+    border-left: 1px solid var(--inputTitle);
+
+    &--null {
+      color: var(--inputRequired);
+    }
+  }
+
+  &--with-max-length {
+    .TE-is-input {
+      &__input {
+        padding: 8px 50px 8px 10px;
+      }
+      &__length {
+        display: flex;
+      }
     }
   }
 }

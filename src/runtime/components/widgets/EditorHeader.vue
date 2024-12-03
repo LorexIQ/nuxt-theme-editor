@@ -10,6 +10,13 @@ const props = defineProps<Props>();
 const client = props.client;
 const router = client.getRouter();
 
+const logoParts: string[] = [
+  'T',
+  'hemes',
+  'E',
+  'ditor'
+];
+
 const openedPage = computed(() => router.getPath());
 const isAnotherPage = computed(() => openedPage.value !== 'index');
 </script>
@@ -19,17 +26,13 @@ const isAnotherPage = computed(() => openedPage.value !== 'index');
     class="TE-editor-header"
     :class="{ 'TE-editor-header--another-page': isAnotherPage }"
   >
-    <div class="TE-editor-header__title">
-      T
-    </div>
-    <div class="TE-editor-header__title">
-      hemes
-    </div>
-    <div class="TE-editor-header__title">
-      E
-    </div>
-    <div class="TE-editor-header__title">
-      ditor
+    <div
+      v-for="part of logoParts"
+      :key="part"
+      class="TE-editor-header__title TE-editor-header__title--logo"
+      @click="router.push('index', 'tab-fade-rl')"
+    >
+      {{ part }}
     </div>
     <div class="TE-editor-header__version">
       {{ client.getConfig().meta.version }}
@@ -48,7 +51,7 @@ const isAnotherPage = computed(() => openedPage.value !== 'index');
 <style scoped lang="scss">
 .TE-editor-header {
   position: relative;
-  z-index: 2;
+  z-index: 3;
   display: grid;
   grid-template-columns: auto 74px auto 60px 0 auto;
   align-items: center;
@@ -79,6 +82,10 @@ const isAnotherPage = computed(() => openedPage.value !== 'index');
   }
   &--another-page {
     grid-template-columns: auto 0 auto 0 0 auto;
+
+    .TE-editor-header__title--logo {
+      cursor: pointer;
+    }
   }
 }
 </style>
