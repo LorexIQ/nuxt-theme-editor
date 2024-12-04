@@ -33,6 +33,9 @@ watch(isActive, (status) => {
       <div class="TE-view-page__template">
         <slot />
       </div>
+      <div class="TE-view-page__messages">
+        <slot name="messages" />
+      </div>
       <div class="TE-view-page__footer">
         <slot name="footer" />
       </div>
@@ -43,7 +46,7 @@ watch(isActive, (status) => {
 <style scoped lang="scss">
 .TE-view-page {
   display: grid;
-  grid-template-rows: 1fr auto;
+  grid-template-rows: 1fr auto auto;
   height: 100%;
   margin-left: -1px;
   border-left: 1px solid var(--border);

@@ -1,12 +1,11 @@
 <script setup lang="ts">
 import type { ModuleClient } from '../../types';
-import ThemeBlockStatus from '../features/ThemeBlockStatus.vue';
 import IsInput from '../shared/IsInput.vue';
 import IsButton from '../shared/IsButton.vue';
-import ViewPage from '../widgets/ViewPage.vue';
-import IsRadio from '../shared/IsRadio.vue';
-import ThemeBlock from '../features/ThemeBlock.vue';
 import NotifyBlock from '../shared/NotifyBlock.vue';
+import ThemeBlock from '../features/ThemeBlock.vue';
+import ViewPage from '../widgets/ViewPage.vue';
+import BlockRadioThemes from '../widgets/BlockRadioThemes.vue';
 import { computed, reactive } from '#imports';
 
 type ThemeCreateData = {
@@ -38,6 +37,9 @@ function onActivate() {
     description: '',
     parentThemeId: router.getQuery()['parentThemeId']
   });
+}
+function createTheme() {
+
 }
 </script>
 
@@ -84,49 +86,30 @@ function onActivate() {
       <div class="TE-theme-create__delimiter">
         Parent Theme
       </div>
-      <div class="TE-theme-create__row">
-        <div class="ttt">
-          <div
-            v-for="theme of client.getThemes()"
-            :key="theme.id"
-            class="ttt__row"
-            @click="themeCreateData.parentThemeId = theme.id"
-          >
-            <IsRadio
-              v-model="themeCreateData.parentThemeId"
-              :value="theme.id"
-            />
-            <div class="ttt__row__name">
-              {{ theme.name }}
-            </div>
-            <ThemeBlockStatus
-              view-mode="horizontal"
-              :client="client"
-              :theme="theme"
-            />
-          </div>
-        </div>
-      </div>
-      <div
-        class="TE-theme-create__row"
-        style="display: flex; flex-direction: column; gap: 5px"
-      >
-        <NotifyBlock type="info">
-          Lorem ipsum dolor sit amet, consectetur adipisicing elit. Ab, accusamus aperiam architecto asperiores, aut autem, enim eos facere mollitia nostrum odit perferendis porro praesentium qui recusandae ullam voluptatum. Hic, quis?
-        </NotifyBlock>
-        <NotifyBlock type="tip" />
-        <NotifyBlock type="warn">
-          123
-        </NotifyBlock>
-        <NotifyBlock type="error">
-          123
-        </NotifyBlock>
+      <div class="TE-theme-create__row TE-theme-create__row--parent-theme">
+        <BlockRadioThemes
+          v-model="themeCreateData.parentThemeId"
+          :client="client"
+        />
       </div>
     </div>
+    <template #messages>
+      <div class="TE-theme-create-messages">
+        <NotifyBlock type="info">
+          <template #title>
+            Information
+          </template>
+          You can customize all styles, including preview card and theme editor, after creating the theme.
+        </NotifyBlock>
+      </div>
+    </template>
     <template #footer>
       <div class="TE-theme-create-footer">
         <IsButton @click="router.push('index', 'tab-fade-rl')">
-          Назад
+          Go back
+        </IsButton>
+        <IsButton @click="createTheme">
+          Create
         </IsButton>
       </div>
     </template>
@@ -134,30 +117,6 @@ function onActivate() {
 </template>
 
 <style scoped lang="scss">
-.ttt {
-  display: flex;
-  flex-direction: column;
-  gap: 5px;
-
-  &__row {
-    display: grid;
-    grid-template-columns: 30px 1fr auto;
-    align-items: center;
-    height: 30px;
-    border: 1px solid var(--border);
-    border-radius: 5px;
-    overflow: hidden;
-    cursor: pointer;
-    transition: .3s;
-
-    &:hover {
-      background-color: var(--bgHover);
-    }
-    &:active {
-      transform: scale(0.99);
-    }
-  }
-}
 .TE-theme-create {
   display: flex;
   flex-direction: column;
@@ -180,11 +139,19 @@ function onActivate() {
     & > .TE-theme-block {
       cursor: default;
     }
+    &--parent-theme {
+      height: 100%;
+    }
   }
 
+  &-messages {
+    padding: 10px;
+    box-shadow: 0 0 10px var(--bg);
+  }
   &-footer {
     display: flex;
     justify-content: flex-end;
+    gap: 5px;
     padding: 10px;
   }
 }
