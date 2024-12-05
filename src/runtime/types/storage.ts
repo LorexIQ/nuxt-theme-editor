@@ -1,6 +1,8 @@
+import type { ModuleThemes } from './themes';
+
 export type ModuleStorage = {
   isAutoThemeMode: boolean;
-  localThemes: string;
+  localThemes: ModuleThemes;
   selectedSelfThemeId?: string;
   selectedLightThemeId?: string;
   selectedDarkThemeId?: string;

@@ -14,9 +14,10 @@ export type ModuleSandboxComponents = ModuleSandboxComponent[];
 export type ModuleSandboxMousePosition = { x: number; y: number };
 export type ModuleSandboxContextMenuItem = {
   title: string;
+  titleColor?: string;
   icon: ModuleIcons;
-  action: () => void;
   iconColor?: string;
+  action: () => void;
   isDisabled?: () => boolean;
   isVisible?: () => boolean;
 };

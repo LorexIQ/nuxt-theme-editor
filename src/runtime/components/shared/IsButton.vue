@@ -1,6 +1,6 @@
 <script setup lang="ts">
 type Props = {
-  decor?: 'default' | 'green';
+  decor?: 'default' | 'success' | 'error';
 };
 
 withDefaults(defineProps<Props>(), {
@@ -38,14 +38,24 @@ withDefaults(defineProps<Props>(), {
       background-color: var(--buttonDefaultBgHover);
     }
   }
-  &--green {
-    border-color: var(--buttonGreenBorder);
-    color: var(--buttonGreenText);
-    background-color: var(--buttonGreenBg);
+  &--success {
+    border-color: var(--buttonSuccessBorder);
+    color: var(--buttonSuccessText);
+    background-color: var(--buttonSuccessBg);
 
     &:hover {
-      color: var(--buttonGreenTextHover);
-      background-color: var(--buttonGreenBgHover);
+      color: var(--buttonSuccessTextHover);
+      background-color: var(--buttonSuccessBgHover);
+    }
+  }
+  &--error {
+    border-color: var(--buttonErrorBorder);
+    color: var(--buttonErrorText);
+    background-color: var(--buttonErrorBg);
+
+    &:hover {
+      color: var(--buttonErrorTextHover);
+      background-color: var(--buttonErrorBgHover);
     }
   }
 }

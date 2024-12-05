@@ -38,11 +38,17 @@ export const DEFAULT_UI_STYLES: Required<ModuleDefineThemeMetaUI> = {
   buttonDefaultText: '#555',
   buttonDefaultTextHover: '#333',
 
-  buttonGreenBg: '#2ECC71CB',
-  buttonGreenBgHover: '#2ecc71',
-  buttonGreenBorder: '#00000019',
-  buttonGreenText: '#2C3E50CC',
-  buttonGreenTextHover: '#2c3e50',
+  buttonSuccessBg: '#2ECC71CB',
+  buttonSuccessBgHover: '#2ecc71',
+  buttonSuccessBorder: '#00000019',
+  buttonSuccessText: '#2C3E50CC',
+  buttonSuccessTextHover: '#2c3e50',
+
+  buttonErrorBg: '#FF5151E6',
+  buttonErrorBgHover: '#ff5151',
+  buttonErrorBorder: '#00000019',
+  buttonErrorText: '#f5f5f5',
+  buttonErrorTextHover: '#f5f5f5',
 
   statusActiveBg: '#2ecc71',
   statusActiveTitle: '#2c3e50',
@@ -67,5 +73,6 @@ export const DEFAULT_UI_STYLES: Required<ModuleDefineThemeMetaUI> = {
   messageErrorContent: '#333',
 
   contextMenuIcon: '#444',
-  contextMenuIconActive: '#2ecc71'
+  contextMenuIconSuccess: '#2ecc71',
+  contextMenuIconError: '#ff5151'
 };

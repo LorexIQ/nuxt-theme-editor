@@ -1,11 +1,10 @@
 <script setup lang="ts">
-import type { ModuleClient, ModuleThemeCreateData } from '../../types';
+import type { ModuleClient, ModuleThemeEditData } from '../../types';
 import IsInput from '../shared/IsInput.vue';
 import IsButton from '../shared/IsButton.vue';
 import NotifyBlock from '../shared/NotifyBlock.vue';
 import ThemeBlock from '../features/ThemeBlock.vue';
 import ViewPage from '../widgets/ViewPage.vue';
-import BlockRadioThemes from '../widgets/BlockRadioThemes.vue';
 import useErrorMessages from '../../helpers/client/useErrorMessages';
 import { computed, reactive } from '#imports';
 
@@ -19,101 +18,91 @@ const router = client.getRouter();
 const themes = client.getThemes();
 
 const activeErrors = useErrorMessages();
-const themeCreateData = reactive({} as ModuleThemeCreateData);
+const themeEditData = reactive({} as ModuleThemeEditData);
+const themeId = computed(() => router.getQuery().themeId);
 const previewTheme = computed(() => ({
-  id: themeCreateData.parentThemeId ?? 'default',
-  name: themeCreateData.name || themeCreateData.id,
-  meta: { description: themeCreateData.description }
+  id: themeId.value ?? 'default',
+  name: themeEditData.name || themeEditData.id,
+  meta: { description: themeEditData.description }
 }) as any);
 
-function createTheme() {
-  const id = themeCreateData.id;
+function editTheme() {
+  const id = themeEditData.id;
   activeErrors.clear();
 
   if (!id.length) activeErrors.add(0);
   if (!/^[\w-]+$/.test(id)) activeErrors.add(1);
-  if (id in themes) activeErrors.add(2, { id });
-  if (!themeCreateData.parentThemeId) activeErrors.add(3);
+  if (themeId.value !== id && id in themes) activeErrors.add(2, { id });
 
   if (!activeErrors.isError.value) {
-    client.createTheme(themeCreateData);
+    client.editThemeInfo(themeEditData);
     router.push('index', 'tab-fade-rl');
   }
 }
 
 function onActivate() {
+  if (!themeId.value || !client.getThemes()[themeId.value]) {
+    router.push('index', 'tab-fade-lr');
+    return;
+  }
+
+  const theme = client.getThemes()[themeId.value];
   activeErrors.clear();
-  Object.assign(themeCreateData, {
-    id: '',
-    name: '',
-    description: '',
-    parentThemeId: router.getQuery()['parentThemeId']
+  Object.assign(themeEditData, {
+    id: theme.id,
+    name: theme.name,
+    description: theme.meta.description,
+    oldThemeId: themeId.value
   });
 }
 </script>
 
 <template>
   <ViewPage
-    page-id="newTheme"
+    page-id="editThemeInfo"
     :client="client"
     @on-active:on="onActivate"
   >
-    <div class="TE-theme-create">
-      <div class="TE-theme-create__delimiter">
+    <div class="TE-theme-edit-info">
+      <div class="TE-theme-edit-info__delimiter">
         Theme Info
       </div>
-      <div class="TE-theme-create__row">
+      <div class="TE-theme-edit-info__row">
         <IsInput
           id="id"
-          v-model="themeCreateData.id"
+          v-model="themeEditData.id"
           title="ID"
           is-required-icon
           :max-length="30"
           @input="activeErrors.remove(0, 1, 2)"
         />
       </div>
-      <div class="TE-theme-create__row">
+      <div class="TE-theme-edit-info__row">
         <IsInput
           id="name"
-          v-model="themeCreateData.name"
+          v-model="themeEditData.name"
           title="Name"
-          :placeholder="themeCreateData.id"
+          :placeholder="themeEditData.id"
           :max-length="30"
         />
       </div>
-      <div class="TE-theme-create__row">
+      <div class="TE-theme-edit-info__row">
         <IsInput
           id="description"
-          v-model="themeCreateData.description"
+          v-model="themeEditData.description"
           title="Description"
           :max-length="200"
         />
       </div>
-      <div class="TE-theme-create__delimiter">
+      <div class="TE-theme-edit-info__delimiter">
         Preview Card
       </div>
-      <div class="TE-theme-create__row">
+      <div class="TE-theme-edit-info__row">
         <ThemeBlock :theme="previewTheme" />
-      </div>
-      <div class="TE-theme-create__delimiter">
-        Parent Theme
-      </div>
-      <div class="TE-theme-create__row TE-theme-create__row--parent-theme">
-        <BlockRadioThemes
-          v-model="themeCreateData.parentThemeId"
-          :client="client"
-          @update:model-value="activeErrors.remove(3)"
-        />
       </div>
     </div>
     <template #messages>
-      <div class="TE-theme-create-messages">
-        <NotifyBlock type="info">
-          <template #title>
-            Information
-          </template>
-          You can customize all styles, including preview card and theme editor, after creating the theme.
-        </NotifyBlock>
+      <div class="TE-theme-edit-info-messages">
         <transition-expand>
           <NotifyBlock
             v-if="activeErrors.isError.value"
@@ -135,15 +124,15 @@ function onActivate() {
       </div>
     </template>
     <template #footer>
-      <div class="TE-theme-create-footer">
+      <div class="TE-theme-edit-info-footer">
         <IsButton @click="router.push('index', 'tab-fade-rl')">
           Go back
         </IsButton>
         <IsButton
           decor="success"
-          @click="createTheme"
+          @click="editTheme"
         >
-          Create
+          Save
         </IsButton>
       </div>
     </template>
@@ -151,7 +140,7 @@ function onActivate() {
 </template>
 
 <style scoped lang="scss">
-.TE-theme-create {
+.TE-theme-edit-info {
   display: flex;
   flex-direction: column;
   gap: 10px;

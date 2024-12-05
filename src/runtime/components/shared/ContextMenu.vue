@@ -88,7 +88,12 @@ onMounted(() => {
             >
               <IconsStore :icon="item.icon" />
             </div>
-            {{ item.title }}
+            <div
+              class="TE-context-menu__menu__items__item__title"
+              :style="`color: ${item.titleColor};`"
+            >
+              {{ item.title }}
+            </div>
           </div>
         </template>
       </div>

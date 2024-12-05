@@ -37,11 +37,17 @@ export type ModuleDefineThemeMetaUI = Partial<{
   buttonDefaultText: string;
   buttonDefaultTextHover: string;
 
-  buttonGreenBg: string;
-  buttonGreenBgHover: string;
-  buttonGreenBorder: string;
-  buttonGreenText: string;
-  buttonGreenTextHover: string;
+  buttonSuccessBg: string;
+  buttonSuccessBgHover: string;
+  buttonSuccessBorder: string;
+  buttonSuccessText: string;
+  buttonSuccessTextHover: string;
+
+  buttonErrorBg: string;
+  buttonErrorBgHover: string;
+  buttonErrorBorder: string;
+  buttonErrorText: string;
+  buttonErrorTextHover: string;
 
   statusActiveBg: string;
   statusActiveTitle: string;
@@ -66,7 +72,8 @@ export type ModuleDefineThemeMetaUI = Partial<{
   messageErrorContent: string;
 
   contextMenuIcon: string;
-  contextMenuIconActive: string;
+  contextMenuIconSuccess: string;
+  contextMenuIconError: string;
 }>;
 export type ModuleDefineThemeMeta = {
   name?: string;

@@ -65,7 +65,9 @@ export class Sandbox {
   }
 
   openThemeContextMenu(event: MouseEvent, theme: ModuleThemeRootReturn, handlers?: ModuleSandboxHandlers): void {
+    handlers;
     this.closeContextMenu();
+    const router = this.ctx.getRouter();
     const clickPosition: ModuleSandboxMousePosition = { x: event.pageX, y: event.pageY };
     const isSelectedTheme = this.ctx.getSelectedTheme()?.id === theme.id;
     const isSelectedLightTheme = this.ctx.getSelectedLightThemeId() === theme.id;
@@ -84,44 +86,46 @@ export class Sandbox {
             title: isSelectedTheme ? 'Theme is active' : 'Select a theme',
             isDisabled: () => isSelectedTheme,
             icon: isSelectedTheme ? 'Check' : 'Palette',
-            iconColor: isSelectedTheme ? 'var(--contextMenuIconActive)' : undefined,
+            iconColor: isSelectedTheme ? 'var(--contextMenuIconSuccess)' : undefined,
             action: () => this.ctx.setTheme(theme.id)
           },
           {
             title: isSelectedLightTheme ? 'Light theme is set' : 'Set as light theme',
             isDisabled: () => isSelectedLightTheme,
             icon: isSelectedLightTheme ? 'Check' : 'Sun',
-            iconColor: isSelectedLightTheme ? 'var(--contextMenuIconActive)' : undefined,
+            iconColor: isSelectedLightTheme ? 'var(--contextMenuIconSuccess)' : undefined,
             action: () => this.ctx.setLightTheme(theme.id)
           },
           {
             title: isSelectedDarkTheme ? 'Dark theme is set' : 'Set as dark theme',
             isDisabled: () => isSelectedDarkTheme,
             icon: isSelectedDarkTheme ? 'Check' : 'Moon',
-            iconColor: isSelectedDarkTheme ? 'var(--contextMenuIconActive)' : undefined,
+            iconColor: isSelectedDarkTheme ? 'var(--contextMenuIconSuccess)' : undefined,
             action: () => this.ctx.setDarkTheme(theme.id)
           },
           {
             title: 'Create theme copy',
             icon: 'Palette2',
-            action: () => this.ctx.getRouter().push(`newTheme?parentThemeId=${theme.id}`, 'tab-fade-lr')
+            action: () => router.push(`newTheme?parentThemeId=${theme.id}`, 'tab-fade-lr')
           },
           {
             title: 'Edit info',
             icon: 'PaperPen',
-            action: () => this.ctx.getRouter().push(`editTheme?themeId=${theme.id}`, 'tab-fade-lr'),
+            action: () => router.push(`editThemeInfo?themeId=${theme.id}`, 'tab-fade-lr'),
             isVisible: () => theme.type === 'local'
           },
           {
             title: 'Edit styles',
             icon: 'WordsPen',
-            action: () => this.ctx.getRouter().push(`editTheme?themeId=${theme.id}`, 'tab-fade-lr'),
+            action: () => router.push(`editThemeStyles?themeId=${theme.id}`, 'tab-fade-lr'),
             isVisible: () => theme.type === 'local'
           },
           {
             title: 'Delete theme',
+            titleColor: 'var(--contextMenuIconError)',
             icon: 'Bin',
-            action: () => handlers?.['deleteTheme']?.(theme),
+            iconColor: 'var(--contextMenuIconError)',
+            action: () => router.push(`deleteTheme?themeId=${theme.id}`, 'tab-fade-lr'),
             isVisible: () => theme.type === 'local'
           }
         ]

@@ -12,7 +12,7 @@ import type {
   ModuleThemeSelected,
   ModuleThemeSelectedStyles,
   ModuleDefaultStyleKeys,
-  ModuleDefaultBlockKeys, ModuleThemeCreateData
+  ModuleDefaultBlockKeys, ModuleThemeCreateData, ModuleThemeEditData
 } from '../../types';
 // @ts-ignore
 import connectorMeta from '../../meta/connector';
@@ -51,7 +51,7 @@ export class Client {
     console.log('save');
     return {
       isAutoThemeMode: unwrap.get(this.isAutoThemeMode),
-      localThemes: btoa(JSON.stringify(localThemes)),
+      localThemes: localThemes,
       selectedSelfThemeId: unwrap.get(this.selectedSelfThemeId),
       selectedLightThemeId: unwrap.get(this.selectedLightThemeId),
       selectedDarkThemeId: unwrap.get(this.selectedDarkThemeId)
@@ -87,15 +87,17 @@ export class Client {
     const storage = JSON.parse(localStorage.getItem(this.config.keys.storage) as string) as ModuleStorage | null;
 
     if (storage) {
-      try {
-        Object.assign(this.themes, JSON.parse(atob(storage.localThemes)));
-      } catch { /* empty */ }
-
+      Object.assign(this.themes, Object.values(storage.localThemes).map(this._themeValidate.bind(this)).reduce((acc, theme) => ({ ...acc, [theme.id]: theme }), {}));
       unwrap.set(this, 'selectedLightThemeId', this._checkThemeAvailableAndGetActual(storage.selectedLightThemeId, 'light'));
       unwrap.set(this, 'selectedDarkThemeId', this._checkThemeAvailableAndGetActual(storage.selectedDarkThemeId, 'dark'));
       this.setAutoThemeModeStatus(storage.isAutoThemeMode);
       unwrap.set(this, 'selectedSelfThemeId', this._checkThemeAvailableAndGetActual(storage.selectedSelfThemeId, unwrap.get(this.isAutoThemeMode) ? 'system' : unwrap.get(this.selectedLightThemeId)));
     }
+  }
+
+  private _themeValidate(theme: ModuleThemeRootReturn): ModuleThemeRootReturn {
+    if (theme.id in this.themes) theme.id = `${theme.id}-${Date.now()}`;
+    return theme;
   }
 
   private _initWatchers(): void {
@@ -380,5 +382,35 @@ export class Client {
         description: description
       }
     };
+  }
+
+  editThemeInfo(themeData: ModuleThemeEditData): void {
+    const { id, name, description, oldThemeId } = themeData;
+    if (!(oldThemeId in this.themes)) return;
+
+    const theme = this.themes[oldThemeId];
+    delete this.themes[oldThemeId];
+    this.themes[id] = {
+      ...theme,
+
+      id,
+      name: name || id,
+      meta: {
+        ...theme.meta,
+
+        name: name || id,
+        description: description
+      }
+    };
+  }
+
+  deleteTheme(themeId: string): void {
+    const theme = this.themes[themeId];
+    if (!theme || theme.type !== 'local') return;
+    delete this.themes[themeId];
+
+    unwrap.set(this, 'selectedLightThemeId', this._checkThemeAvailableAndGetActual(unwrap.get(this.selectedLightThemeId), 'light'));
+    unwrap.set(this, 'selectedDarkThemeId', this._checkThemeAvailableAndGetActual(unwrap.get(this.selectedDarkThemeId), 'dark'));
+    unwrap.set(this, 'selectedSelfThemeId', this._checkThemeAvailableAndGetActual(unwrap.get(this.selectedSelfThemeId), unwrap.get(this.isAutoThemeMode) ? 'system' : unwrap.get(this.selectedLightThemeId)));
   }
 }

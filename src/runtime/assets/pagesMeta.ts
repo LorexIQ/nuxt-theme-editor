@@ -8,7 +8,15 @@ export default [
     title: 'New'
   },
   {
-    name: 'editTheme',
-    title: 'Edit'
+    name: 'editThemeInfo',
+    title: 'Edit Info'
+  },
+  {
+    name: 'editThemeStyles',
+    title: 'Edit Styles'
+  },
+  {
+    name: 'deleteTheme',
+    title: 'Delete'
   }
 ] as const;

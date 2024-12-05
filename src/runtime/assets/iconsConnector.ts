@@ -10,6 +10,7 @@ import Palette2 from '../components/icons/Palette2.vue';
 import PaperPen from '../components/icons/PaperPen.vue';
 import WordsPen from '../components/icons/WordsPen.vue';
 import Plus from '../components/icons/Plus.vue';
+import Question from '../components/icons/Question.vue';
 import Sun from '../components/icons/Sun.vue';
 import Tip from '../components/icons/Tip.vue';
 import Warn from '../components/icons/Warn.vue';
@@ -27,6 +28,7 @@ export default {
   PaperPen,
   WordsPen,
   Plus,
+  Question,
   Sun,
   Tip,
   Warn

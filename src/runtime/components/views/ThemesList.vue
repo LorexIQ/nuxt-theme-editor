@@ -39,7 +39,7 @@ function onDeleteTheme(theme: ModuleThemeRootReturn) {
       type="local"
       :is-open="selectedTheme?.type === 'local'"
       :client="client"
-      @context-menu-open="sandbox.openThemeContextMenu(...$event, { deleteTheme: onDeleteTheme })"
+      @context-menu-open="sandbox.openThemeContextMenu(...$event)"
     />
   </ViewPage>
 </template>
