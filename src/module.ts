@@ -1,4 +1,11 @@
-import { defineNuxtModule, addPlugin, createResolver, addImportsDir, addComponent, installModule } from '@nuxt/kit';
+import {
+  defineNuxtModule,
+  addPlugin,
+  createResolver,
+  addImportsDir,
+  addComponent,
+  installModule
+} from '@nuxt/kit';
 import defu from 'defu';
 import { name, version } from '../package.json';
 import type { ModuleOptions } from './runtime/types';

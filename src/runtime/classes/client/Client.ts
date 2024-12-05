@@ -14,6 +14,7 @@ import type {
   ModuleDefaultStyleKeys,
   ModuleDefaultBlockKeys
 } from '../../types';
+// @ts-ignore
 import connectorMeta from '../../meta/connector';
 import unwrap from '../../helpers/unwrap';
 import defineChecker from '../../helpers/defineChecker';
@@ -164,7 +165,7 @@ export class Client {
           return 'CIRCULAR';
         } else {
           relationsPaths[selfPath] = relationPath;
-          return getStyleByPath(relationPath, this.getStylesKeyValueByPath(relationPath as any, selectedTheme).value);
+          return getStyleByPath(relationPath, this.getStylesKeyValueByPath(relationPath as never, selectedTheme).value);
         }
       }
       return styleValue;
@@ -279,7 +280,7 @@ export class Client {
   }
 
   getStylesKeyValueByPath(stylePath: ModuleDefaultStyleKeys, theme?: ModuleThemeRootReturn): ComputedRef<string> {
-    const stylePathParts = stylePath.split('.');
+    const stylePathParts = (stylePath as string).split('.');
     const blockPath = stylePathParts.length > 1 ? stylePathParts.slice(0, -1).join('.') : '';
     const styleName = stylePathParts[stylePathParts.length - 1] as any;
 
