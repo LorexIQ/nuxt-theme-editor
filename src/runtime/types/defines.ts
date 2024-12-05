@@ -31,11 +31,17 @@ export type ModuleDefineThemeMetaUI = Partial<{
   radioStatic: string;
   radioActive: string;
 
-  buttonBg: string;
-  buttonBgHover: string;
-  buttonBorder: string;
-  buttonText: string;
-  buttonTextHover: string;
+  buttonDefaultBg: string;
+  buttonDefaultBgHover: string;
+  buttonDefaultBorder: string;
+  buttonDefaultText: string;
+  buttonDefaultTextHover: string;
+
+  buttonGreenBg: string;
+  buttonGreenBgHover: string;
+  buttonGreenBorder: string;
+  buttonGreenText: string;
+  buttonGreenTextHover: string;
 
   statusActiveBg: string;
   statusActiveTitle: string;

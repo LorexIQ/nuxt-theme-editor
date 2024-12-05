@@ -32,11 +32,17 @@ export const DEFAULT_UI_STYLES: Required<ModuleDefineThemeMetaUI> = {
   radioStatic: '#000',
   radioActive: '#2ecc71',
 
-  buttonBg: '#fafafa',
-  buttonBgHover: '#fff',
-  buttonBorder: '#00000019',
-  buttonText: '#555',
-  buttonTextHover: '#333',
+  buttonDefaultBg: '#fafafa',
+  buttonDefaultBgHover: '#fff',
+  buttonDefaultBorder: '#00000019',
+  buttonDefaultText: '#555',
+  buttonDefaultTextHover: '#333',
+
+  buttonGreenBg: '#2ECC71CB',
+  buttonGreenBgHover: '#2ecc71',
+  buttonGreenBorder: '#00000019',
+  buttonGreenText: '#2C3E50CC',
+  buttonGreenTextHover: '#2c3e50',
 
   statusActiveBg: '#2ecc71',
   statusActiveTitle: '#2c3e50',

@@ -12,7 +12,7 @@ import type {
   ModuleThemeSelected,
   ModuleThemeSelectedStyles,
   ModuleDefaultStyleKeys,
-  ModuleDefaultBlockKeys
+  ModuleDefaultBlockKeys, ModuleThemeCreateData
 } from '../../types';
 // @ts-ignore
 import connectorMeta from '../../meta/connector';
@@ -45,12 +45,18 @@ export class Client {
     return themeId ? this._prepareSelectedTheme(this.themes[themeId]) : undefined;
   });
 
-  private readonly savedStorage = computed<ModuleStorage>(() => ({
-    isAutoThemeMode: unwrap.get(this.isAutoThemeMode),
-    selectedSelfThemeId: unwrap.get(this.selectedSelfThemeId),
-    selectedLightThemeId: unwrap.get(this.selectedLightThemeId),
-    selectedDarkThemeId: unwrap.get(this.selectedDarkThemeId)
-  }));
+  private readonly savedStorage = computed<ModuleStorage>(() => {
+    const localThemes = Object.values(this.themes).filter(theme => theme.type === 'local').reduce((acc, theme) => ({ ...acc, [theme.id]: theme }), {});
+
+    console.log('save');
+    return {
+      isAutoThemeMode: unwrap.get(this.isAutoThemeMode),
+      localThemes: btoa(JSON.stringify(localThemes)),
+      selectedSelfThemeId: unwrap.get(this.selectedSelfThemeId),
+      selectedLightThemeId: unwrap.get(this.selectedLightThemeId),
+      selectedDarkThemeId: unwrap.get(this.selectedDarkThemeId)
+    };
+  });
 
   constructor() {
     this._readSystemThemes();
@@ -81,6 +87,10 @@ export class Client {
     const storage = JSON.parse(localStorage.getItem(this.config.keys.storage) as string) as ModuleStorage | null;
 
     if (storage) {
+      try {
+        Object.assign(this.themes, JSON.parse(atob(storage.localThemes)));
+      } catch { /* empty */ }
+
       unwrap.set(this, 'selectedLightThemeId', this._checkThemeAvailableAndGetActual(storage.selectedLightThemeId, 'light'));
       unwrap.set(this, 'selectedDarkThemeId', this._checkThemeAvailableAndGetActual(storage.selectedDarkThemeId, 'dark'));
       this.setAutoThemeModeStatus(storage.isAutoThemeMode);
@@ -350,5 +360,25 @@ export class Client {
     if (!(themeId in this.themes) || unwrap.get(this.selectedThemeId) === themeId) return;
     unwrap.set(this, 'isAutoThemeMode', false);
     unwrap.set(this, 'selectedSelfThemeId', themeId);
+  }
+
+  createTheme(themeData: ModuleThemeCreateData): void {
+    const { id, name, description, parentThemeId: parentId } = themeData;
+    if (id in this.themes || !parentId || !(parentId in this.themes)) return;
+
+    const newTheme = JSON.parse(JSON.stringify(this.themes[parentId])) as ModuleThemeRootReturn;
+    this.themes[id] = {
+      ...newTheme,
+
+      id,
+      name: name || id,
+      type: 'local',
+      meta: {
+        ...newTheme.meta,
+
+        name: name || id,
+        description: description
+      }
+    };
   }
 }

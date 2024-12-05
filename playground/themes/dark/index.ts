@@ -1,7 +1,6 @@
 import sidebar from './sidebar';
 
 export default defineThemeBlockRoot({
-  name: 'Dark',
   previewStyles: {
     defaultPreviewCardBG1: 'purple',
     defaultPreviewCardBG2: 'pink',

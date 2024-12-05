@@ -86,6 +86,5 @@ const isContent = computed(() => currentInstance?.slots.default);
     &__title {
       padding-top: 4px;
     }
-  }
-}
+  }}
 </style>

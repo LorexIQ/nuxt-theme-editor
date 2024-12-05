@@ -30,3 +30,10 @@ export type ModuleThemeSelectedStyles = ModuleThemeStyleObject | ModuleThemeStyl
 export type ModuleThemeSelected = ModuleThemeRootReturn<ThemeStyleValueType> & {
   target: ModuleThemeRootReturn;
 };
+
+export type ModuleThemeCreateData = {
+  id: string;
+  name: string;
+  description: string;
+  parentThemeId?: string;
+};

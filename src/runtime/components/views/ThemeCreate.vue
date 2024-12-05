@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { ModuleClient } from '../../types';
+import type { ModuleClient, ModuleThemeCreateData } from '../../types';
 import IsInput from '../shared/IsInput.vue';
 import IsButton from '../shared/IsButton.vue';
 import NotifyBlock from '../shared/NotifyBlock.vue';
@@ -8,11 +8,13 @@ import ViewPage from '../widgets/ViewPage.vue';
 import BlockRadioThemes from '../widgets/BlockRadioThemes.vue';
 import { computed, reactive } from '#imports';
 
-type ThemeCreateData = {
-  id: string;
-  name: string;
-  description: string;
-  parentThemeId?: string;
+type ValidationError = {
+  id: number;
+  message: (meta: any) => string;
+};
+type ValidationErrorPrepared = {
+  id: number;
+  message: string;
 };
 
 type Props = {
@@ -22,24 +24,57 @@ type Props = {
 const props = defineProps<Props>();
 const client = props.client;
 const router = client.getRouter();
+const themes = client.getThemes();
 
-const themeCreateData = reactive({} as ThemeCreateData);
+const validationErrors: ValidationError[] = [
+  { id: 0, message: () => 'The ID value is required.' },
+  { id: 1, message: () => 'The ID may only contain digits and letters (a-z, A-Z).' },
+  { id: 2, message: ({ id }) => `The theme with the ID "${id}" already exists.` },
+  { id: 3, message: () => 'The parent theme is not set.' }
+];
+
+const activeValidationErrors = reactive<ValidationErrorPrepared[]>([]);
+const themeCreateData = reactive({} as ModuleThemeCreateData);
 const previewTheme = computed(() => ({
   id: themeCreateData.parentThemeId ?? 'default',
   name: themeCreateData.name || themeCreateData.id,
   meta: { description: themeCreateData.description }
 }) as any);
 
+function createTheme() {
+  const id = themeCreateData.id;
+  activeValidationErrors.splice(0);
+
+  if (!id.length) addError(0);
+  if (!/^[a-z0-9]+$/i.test(id)) addError(1);
+  if (id in themes) addError(2, id);
+  if (!themeCreateData.parentThemeId) addError(3);
+
+  if (!activeValidationErrors.length) {
+    client.createTheme(themeCreateData);
+    router.push('index', 'tab-fade-rl');
+  }
+}
+function addError(id: number, meta?: any) {
+  const error = validationErrors.find(err => err.id === id);
+  if (error) activeValidationErrors.push({
+    id: error.id,
+    message: error.message(meta)
+  });
+}
+function removeError(id: number) {
+  const errorIndex = activeValidationErrors.findIndex(err => err.id === id);
+  if (errorIndex !== -1) activeValidationErrors.splice(errorIndex, 1);
+}
+
 function onActivate() {
+  activeValidationErrors.splice(0);
   Object.assign(themeCreateData, {
     id: '',
     name: '',
     description: '',
     parentThemeId: router.getQuery()['parentThemeId']
   });
-}
-function createTheme() {
-
 }
 </script>
 
@@ -60,6 +95,7 @@ function createTheme() {
           title="ID"
           is-required-icon
           :max-length="30"
+          @input="removeError(0); removeError(1); removeError(2)"
         />
       </div>
       <div class="TE-theme-create__row">
@@ -92,6 +128,7 @@ function createTheme() {
         <BlockRadioThemes
           v-model="themeCreateData.parentThemeId"
           :client="client"
+          @update:model-value="removeError(3)"
         />
       </div>
     </div>
@@ -103,6 +140,24 @@ function createTheme() {
           </template>
           You can customize all styles, including preview card and theme editor, after creating the theme.
         </NotifyBlock>
+        <transition-expand>
+          <NotifyBlock
+            v-if="activeValidationErrors.length"
+            type="error"
+          >
+            <template #title>
+              Validation error
+            </template>
+            <transition-expand tag="div">
+              <p
+                v-for="error of activeValidationErrors"
+                :key="error.id"
+              >
+                {{ error.message }}
+              </p>
+            </transition-expand>
+          </NotifyBlock>
+        </transition-expand>
       </div>
     </template>
     <template #footer>
@@ -110,7 +165,10 @@ function createTheme() {
         <IsButton @click="router.push('index', 'tab-fade-rl')">
           Go back
         </IsButton>
-        <IsButton @click="createTheme">
+        <IsButton
+          decor="green"
+          @click="createTheme"
+        >
           Create
         </IsButton>
       </div>
@@ -147,6 +205,9 @@ function createTheme() {
   }
 
   &-messages {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
     padding: 10px;
     box-shadow: 0 0 10px var(--bg);
   }

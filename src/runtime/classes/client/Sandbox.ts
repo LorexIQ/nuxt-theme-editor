@@ -4,6 +4,7 @@ import type {
   ModuleOptionsExtend,
   ModuleSandboxComponents,
   ModuleSandboxContextMenuItem,
+  ModuleSandboxHandlers,
   ModuleSandboxMousePosition,
   ModuleSandboxSize,
   ModuleThemeRootReturn
@@ -63,7 +64,7 @@ export class Sandbox {
     if (contextMenuComponentIndex !== -1) this.components.splice(contextMenuComponentIndex, 1);
   }
 
-  openSystemThemeContextMenu(event: MouseEvent, theme: ModuleThemeRootReturn): void {
+  openThemeContextMenu(event: MouseEvent, theme: ModuleThemeRootReturn, handlers?: ModuleSandboxHandlers): void {
     this.closeContextMenu();
     const clickPosition: ModuleSandboxMousePosition = { x: event.pageX, y: event.pageY };
     const isSelectedTheme = this.ctx.getSelectedTheme()?.id === theme.id;
@@ -104,6 +105,24 @@ export class Sandbox {
             title: 'Create theme copy',
             icon: 'Palette2',
             action: () => this.ctx.getRouter().push(`newTheme?parentThemeId=${theme.id}`, 'tab-fade-lr')
+          },
+          {
+            title: 'Edit info',
+            icon: 'PaperPen',
+            action: () => this.ctx.getRouter().push(`editTheme?themeId=${theme.id}`, 'tab-fade-lr'),
+            isVisible: () => theme.type === 'local'
+          },
+          {
+            title: 'Edit styles',
+            icon: 'WordsPen',
+            action: () => this.ctx.getRouter().push(`editTheme?themeId=${theme.id}`, 'tab-fade-lr'),
+            isVisible: () => theme.type === 'local'
+          },
+          {
+            title: 'Delete theme',
+            icon: 'Bin',
+            action: () => handlers?.['deleteTheme']?.(theme),
+            isVisible: () => theme.type === 'local'
           }
         ]
       },

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { ModuleClient, ModuleThemeType } from '../../types';
+import type { ModuleClient, ModuleThemeRootReturn, ModuleThemeType } from '../../types';
 import ThemeBlock from '../features/ThemeBlock.vue';
 import ThemeBlockStatus from '../features/ThemeBlockStatus.vue';
 import IconsStore from '../shared/IconsStore.vue';
@@ -10,10 +10,14 @@ type Props = {
   client: ModuleClient;
   isOpen?: boolean;
 };
+type Emits = {
+  (e: 'contextMenuOpen', v: [MouseEvent, ModuleThemeRootReturn]): void;
+};
 
 const props = withDefaults(defineProps<Props>(), {
   isOpen: false
 });
+const emit = defineEmits<Emits>();
 
 const isOpened = ref(props.isOpen);
 const isAddActive = computed(() => props.type === 'local');
@@ -68,7 +72,7 @@ const title = computed(() => {
             :client="client"
             :theme="theme"
             @dblclick="client.setTheme(theme.id)"
-            @contextmenu.prevent="client.getSandbox().openSystemThemeContextMenu($event, theme)"
+            @contextmenu.prevent="emit('contextMenuOpen', [$event, theme])"
           >
             <template #status>
               <ThemeBlockStatus
@@ -81,7 +85,6 @@ const title = computed(() => {
         <div
           v-else
           class="TE-block-themes__content__null"
-          :class="{ 'TE-block-themes__content__null--simplify': !isAddActive }"
         >
           No themes available
         </div>
@@ -119,6 +122,9 @@ const title = computed(() => {
     }
   }
   &__content {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
     padding: 10px;
     border-bottom: 1px solid var(--border);
 
@@ -147,13 +153,8 @@ const title = computed(() => {
     }
     &__null {
       font-size: 12px;
-      padding-top: 10px;
       color: var(--titleTransparent);
       text-align: center;
-
-      &--simplify {
-        padding-top: 0;
-      }
     }
   }
 }

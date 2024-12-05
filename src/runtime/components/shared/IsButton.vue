@@ -1,13 +1,18 @@
 <script setup lang="ts">
 type Props = {
-  decor?: string;
+  decor?: 'default' | 'green';
 };
 
-defineProps<Props>();
+withDefaults(defineProps<Props>(), {
+  decor: 'default'
+});
 </script>
 
 <template>
-  <button class="TE-is-button">
+  <button
+    class="TE-is-button"
+    :class="`TE-is-button--${decor}`"
+  >
     <slot />
   </button>
 </template>
@@ -19,15 +24,29 @@ defineProps<Props>();
   letter-spacing: 1px;
   padding: 6px 15px;
   border-radius: 5px;
-  border: 1px solid var(--buttonBorder);
-  color: var(--buttonText);
-  background-color: var(--buttonBg);
+  border: 1px solid;
   cursor: pointer;
   transition: .3s;
 
-  &:hover {
-    color: var(--buttonTextHover);
-    background-color: var(--buttonBgHover);
+  &--default {
+    border-color: var(--buttonDefaultBorder);
+    color: var(--buttonDefaultText);
+    background-color: var(--buttonDefaultBg);
+
+    &:hover {
+      color: var(--buttonDefaultTextHover);
+      background-color: var(--buttonDefaultBgHover);
+    }
+  }
+  &--green {
+    border-color: var(--buttonGreenBorder);
+    color: var(--buttonGreenText);
+    background-color: var(--buttonGreenBg);
+
+    &:hover {
+      color: var(--buttonGreenTextHover);
+      background-color: var(--buttonGreenBgHover);
+    }
   }
 }
 </style>

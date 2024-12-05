@@ -68,25 +68,29 @@ onMounted(() => {
         {{ tipText }}
       </div>
       <div class="TE-context-menu__menu__items">
-        <div
+        <template
           v-for="item of items"
           :key="item.title"
-          class="TE-context-menu__menu__items__item"
-          :class="{
-            'TE-context-menu__menu__items__item--disabled': item.isDisabled?.(),
-            'TE-context-menu__menu__items__item--with-icon': item.icon,
-          }"
-          @click="selectItem(item)"
         >
           <div
-            v-if="item.icon"
-            class="TE-context-menu__menu__items__item__icon"
-            :style="`color: ${item.iconColor};`"
+            v-if="item.isVisible?.() ?? true"
+            class="TE-context-menu__menu__items__item"
+            :class="{
+              'TE-context-menu__menu__items__item--disabled': item.isDisabled?.(),
+              'TE-context-menu__menu__items__item--with-icon': item.icon,
+            }"
+            @click="selectItem(item)"
           >
-            <IconsStore :icon="item.icon" />
+            <div
+              v-if="item.icon"
+              class="TE-context-menu__menu__items__item__icon"
+              :style="`color: ${item.iconColor};`"
+            >
+              <IconsStore :icon="item.icon" />
+            </div>
+            {{ item.title }}
           </div>
-          {{ item.title }}
-        </div>
+        </template>
       </div>
     </div>
   </div>
@@ -135,10 +139,13 @@ onMounted(() => {
           display: flex;
           justify-content: center;
           align-items: center;
+          width: 16px;
+          height: 16px;
           color: var(--contextMenuIcon);
 
           & svg {
-            font-size: 16px;
+            width: 100%;
+            height: 100%;
           }
         }
 
