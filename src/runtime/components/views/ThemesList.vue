@@ -1,7 +1,8 @@
 <script setup lang="ts">
-import type { ModuleClient, ModuleThemeRootReturn } from '../../types';
+import type { ModuleClient } from '../../types';
 import BlockThemes from '../widgets/BlockThemes.vue';
 import ViewPage from '../widgets/ViewPage.vue';
+import IsSwitch from '../shared/IsSwitch.vue';
 import { computed } from '#imports';
 
 type Props = {
@@ -12,10 +13,6 @@ const props = defineProps<Props>();
 const sandbox = props.client.getSandbox();
 
 const selectedTheme = computed(() => props.client.getSelectedTheme());
-
-function onDeleteTheme(theme: ModuleThemeRootReturn) {
-  console.log(theme);
-}
 </script>
 
 <template>
@@ -41,5 +38,14 @@ function onDeleteTheme(theme: ModuleThemeRootReturn) {
       :client="client"
       @context-menu-open="sandbox.openThemeContextMenu(...$event)"
     />
+    <template #footer>
+      <div class="TE-themes-list-footer">
+        <IsSwitch
+          :model-value="client.getAutoThemeModeStatus()"
+          @check="client.setAutoThemeModeStatus(true)"
+          @uncheck="client.setAutoThemeModeStatus(false)"
+        />
+      </div>
+    </template>
   </ViewPage>
 </template>

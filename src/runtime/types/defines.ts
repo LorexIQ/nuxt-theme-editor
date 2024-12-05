@@ -31,6 +31,13 @@ export type ModuleDefineThemeMetaUI = Partial<{
   radioStatic: string;
   radioActive: string;
 
+  switchSlider: string;
+  switchSliderChecked: string;
+  switchSliderBorder: string;
+  switchCircle: string;
+  switchCircleChecked: string;
+  switchCircleBorder: string;
+
   buttonDefaultBg: string;
   buttonDefaultBgHover: string;
   buttonDefaultBorder: string;
