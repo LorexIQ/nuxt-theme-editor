@@ -18,6 +18,7 @@ const props = defineProps<Props>();
 const emit = defineEmits<Emits>();
 const maxLength = props.maxLength;
 
+const isAnimation = ref(false);
 const innerValue = ref(props.modelValue);
 const maxLengthRemained = computed(() => {
   const remained = (props.maxLength ?? 0) - innerValue.value.length;
@@ -25,23 +26,23 @@ const maxLengthRemained = computed(() => {
 });
 
 watch(() => props.modelValue, value => innerValue.value = value);
-watch(innerValue, value => emit('update:modelValue', value.slice(0, maxLength)));
-
-function onInput(event: Event) {
-  const target = event.target as HTMLInputElement;
-
-  if (maxLength) {
-    if (maxLengthRemained.value === 0) {
-      target.value = target.value.slice(0, maxLength);
-    }
+watch(innerValue, (value) => {
+  if (maxLength && value.length > maxLength) {
+    innerValue.value = value.slice(0, maxLength);
+    isAnimation.value = false;
+    setTimeout(() => isAnimation.value = true, 50);
   }
-}
+  emit('update:modelValue', innerValue.value);
+});
 </script>
 
 <template>
   <div
     class="TE-is-input"
-    :class="{ 'TE-is-input--with-max-length': maxLength }"
+    :class="{
+      'TE-is-input--with-max-length': maxLength,
+      'x-shake': isAnimation,
+    }"
   >
     <div class="TE-is-input__title">
       {{ title }}
@@ -56,7 +57,6 @@ function onInput(event: Event) {
       class="TE-is-input__input"
       :placeholder="placeholder"
       autocomplete="off"
-      @input="onInput"
     >
     <div
       ref="maxLengthRef"
@@ -134,5 +134,16 @@ function onInput(event: Event) {
       }
     }
   }
+}
+
+@keyframes x-shake {
+  0% { transform: translateX(-2px); }
+  50% { transform: translateX(2px); }
+  100% { transform: translateX(-2px); }
+}
+.x-shake {
+  animation-name: x-shake;
+  animation-duration: .15s;
+  animation-iteration-count: 2;
 }
 </style>

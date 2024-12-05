@@ -59,7 +59,7 @@ function createTheme() {
           v-model="themeCreateData.id"
           title="ID"
           is-required-icon
-          :max-length="20"
+          :max-length="30"
         />
       </div>
       <div class="TE-theme-create__row">
@@ -68,6 +68,7 @@ function createTheme() {
           v-model="themeCreateData.name"
           title="Name"
           :placeholder="themeCreateData.id"
+          :max-length="30"
         />
       </div>
       <div class="TE-theme-create__row">
@@ -75,6 +76,7 @@ function createTheme() {
           id="description"
           v-model="themeCreateData.description"
           title="Description"
+          :max-length="200"
         />
       </div>
       <div class="TE-theme-create__delimiter">

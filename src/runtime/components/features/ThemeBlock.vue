@@ -95,6 +95,8 @@ defineProps<Props>();
     &__description {
       font-size: 12px;
       padding-bottom: 5px;
+      hyphens: auto;
+      overflow-wrap: break-word;
       overflow-x: hidden;
       overflow-y: auto;
 
