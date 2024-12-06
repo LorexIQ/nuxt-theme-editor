@@ -5,14 +5,17 @@ import defineThemeBlock from '../../composables/defineThemeBlock';
 import defineThemeBlockRoot from '../../composables/defineThemeBlockRoot';
 import type {
   ModuleDefineThemeBlockRootReturn,
+  ModuleMetaFilesWatcherHash,
   ModuleOptions,
-  ModuleOptionsExtend, ModuleOptionsExtendMeta, ModuleServerThemes
+  ModuleOptionsExtend,
+  ModuleOptionsExtendMeta,
+  ModuleServerThemes
 } from '../../types';
 import uPath from '../../helpers/uPath';
 import logger from '../../helpers/logger';
-import tsMorphProject from '../../helpers/tsMorphProject';
 import { loadTsModule } from '../../helpers/loadTsModule';
 import { MetaFiles } from './MetaFiles';
+import { ThemesFiles } from './ThemesFiles';
 
 (global as any).defineThemeBlock = defineThemeBlock;
 (global as any).defineThemeBlockRoot = defineThemeBlockRoot;
@@ -28,6 +31,10 @@ export class Server {
   private readonly themesNames: Set<string> = new Set();
 
   private readonly metaFiles: MetaFiles;
+  private readonly themesFiles: ThemesFiles;
+
+  private readonly watcherHash: ModuleMetaFilesWatcherHash = {};
+  private watcherLastUpdate = Date.now();
 
   constructor(
     private readonly nuxt: Nuxt,
@@ -37,9 +44,11 @@ export class Server {
     this.config = this._initConfig(this.nuxt.options.runtimeConfig.public.themesEditor as any);
     this.rootResolver = createResolver(this.nuxt.options.rootDir);
     this.themesResolver = createResolver(this.rootResolver.resolve(this.config.themesDir));
-    this.metaFiles = new MetaFiles(this);
 
-    this._initThemesDir();
+    this.metaFiles = new MetaFiles(this);
+    this.themesFiles = new ThemesFiles(this);
+
+    this.themesFiles.init();
   }
 
   private _initConfig(options: ModuleOptions): ModuleOptionsExtend {
@@ -55,34 +64,6 @@ export class Server {
       },
       meta: this.meta
     };
-  }
-
-  private _initThemesDir(): void {
-    const themesDir = this.themesResolver.resolve();
-    if (!fs.existsSync(themesDir)) {
-      fs.mkdirSync(themesDir, { recursive: true });
-    }
-  }
-
-  async checkAndGenerateDefaultTheme(): Promise<void> {
-    const defaultThemeDir = this.themesResolver.resolve(this.config.defaultTheme);
-    const defaultThemePath = this.themesResolver.resolve(this.config.defaultTheme, 'index.ts');
-
-    if (this.config.enableDefaultThemeGenerator && !fs.existsSync(defaultThemePath)) {
-      logger.info('Default theme generation...');
-
-      if (!fs.existsSync(defaultThemeDir)) {
-        fs.mkdirSync(defaultThemeDir);
-      }
-      const themeIndexFile = tsMorphProject.createSourceFile(defaultThemePath, '', { overwrite: true });
-
-      themeIndexFile.removeDefaultExport();
-      themeIndexFile.addExportAssignment({
-        isExportEquals: false,
-        expression: 'defineThemeBlockRoot({}, [])'
-      });
-      themeIndexFile.saveSync();
-    }
   }
 
   async readThemeByPath(indexPath: string): Promise<boolean> {
@@ -128,6 +109,19 @@ export class Server {
     }
   }
 
+  async checkThemeChangesWithAction(path: string): Promise<void> {
+    const pathFull = this.rootResolver.resolve(path);
+
+    if (this.watcherHash[path] === undefined) this.watcherHash[path] = pathFull.endsWith(`/${this.config.defaultTheme}/index.ts`);
+    if (!this.watcherHash[path]) return;
+    if (Date.now() - this.watcherLastUpdate < 2000) return;
+
+    await this.readThemeByPath(pathFull);
+    this.themesFiles.update();
+    this.metaFiles.update();
+    this.watcherLastUpdate = Date.now();
+  }
+
   getRootResolver(): Resolver {
     return this.rootResolver;
   }
@@ -159,7 +153,11 @@ export class Server {
     };
   }
 
-  getMetaFiles() {
+  getMetaFiles(): MetaFiles {
     return this.metaFiles;
+  }
+
+  getThemesFiles(): ThemesFiles {
+    return this.themesFiles;
   }
 }

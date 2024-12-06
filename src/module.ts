@@ -22,8 +22,7 @@ export default defineNuxtModule<ModuleOptions>({
   meta,
   defaults: {
     defaultTheme: 'light',
-    themesDir: './themes',
-    enableDefaultThemeGenerator: true
+    themesDir: './themes'
   },
   async setup(options, nuxt) {
     // @ts-ignore
@@ -31,13 +30,13 @@ export default defineNuxtModule<ModuleOptions>({
 
     const resolver = createResolver(import.meta.url);
     const serverObject = new Server(nuxt, meta, resolver);
-    await serverObject.checkAndGenerateDefaultTheme();
     await serverObject.readThemes();
+    serverObject.getThemesFiles().create();
 
     // @ts-ignore
     nuxt.options.runtimeConfig.public[MODULE_CONFIG_KEY] = serverObject.getConfig();
 
-    nuxt.hook('builder:watch', (_, path) => serverObject.getMetaFiles().checkPathAndUpdate(path));
+    nuxt.hook('builder:watch', (_, path) => serverObject.checkThemeChangesWithAction(path));
     nuxt.hook('build:before', () => serverObject.getMetaFiles().create());
 
     addImportsDir(resolver.resolve('./runtime/composables'));

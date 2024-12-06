@@ -1,24 +1,20 @@
 import fs from 'node:fs';
-import type { CodeBlockWriter } from 'ts-morph';
 import type { Resolver } from '@nuxt/kit';
 import { createResolver } from '@nuxt/kit';
 import uPath from '../../helpers/uPath';
 import type {
   ModuleDefineThemeBlockSetting,
-  ModuleMetaFilesWatcherHash,
   ModuleObject,
   ModuleOptionsExtend,
   ModuleServer
 } from '../../types';
 import defineChecker from '../../helpers/defineChecker';
 import tsMorphProject from '../../helpers/tsMorphProject';
+import writeThemeStructure from '../../helpers/server/writeThemeStructure';
 
 export class MetaFiles {
   private readonly metaResolver: Resolver;
   private readonly config: ModuleOptionsExtend;
-
-  private readonly watcherHash: ModuleMetaFilesWatcherHash = {};
-  private watcherLastUpdate = Date.now();
 
   constructor(private readonly ctx: ModuleServer) {
     this.metaResolver = createResolver(this.ctx.getResolver().resolve('runtime', 'meta'));
@@ -58,26 +54,6 @@ export class MetaFiles {
   }
 
   private _createThemesStructure(): void {
-    const generateBlockCode = (writer: CodeBlockWriter, styles: ModuleDefineThemeBlockSetting[]) => {
-      styles.forEach((block) => {
-        if (defineChecker(block)) {
-          writer.write(`'${block.id}': `);
-
-          if (block.styles.length > 1) writer.inlineBlock(() => generateBlockCode(writer, block.styles as ModuleDefineThemeBlockSetting[]));
-          else writer.inlineBlock(() => {
-            const selfStyles = block.styles[0] as ModuleObject;
-            const selfStylesKeys = Object.keys(selfStyles);
-            for (let selfStyleI = 0; selfStyleI < selfStylesKeys.length; selfStyleI++) {
-              const selfStylesKey = selfStylesKeys[selfStyleI];
-              writer.write(`'${selfStylesKey}': string;\n`);
-            }
-          });
-
-          writer.write(';\n');
-        }
-      });
-    };
-
     const filePath = this.metaResolver.resolve('themesStructure.ts');
     const metaFile = tsMorphProject.createSourceFile(filePath, '', { overwrite: true });
     const defaultTheme = this.ctx.getThemes()[this.config.defaultTheme];
@@ -86,7 +62,7 @@ export class MetaFiles {
       metaFile.addTypeAlias({
         name: 'ModuleMetaBlocks',
         isExported: true,
-        type: writer => writer.block(() => generateBlockCode(writer, defaultTheme.styles))
+        type: writer => writeThemeStructure(writer, defaultTheme, 'type')
       });
     } else {
       metaFile.addTypeAlias({
@@ -134,17 +110,9 @@ export class MetaFiles {
     metaFile.saveSync();
   }
 
-  async checkPathAndUpdate(path: string): Promise<void> {
-    const pathFull = this.ctx.getRootResolver().resolve(path);
-
-    if (this.watcherHash[path] === undefined) this.watcherHash[path] = pathFull.endsWith(`/${this.ctx.getConfig().defaultTheme}/index.ts`);
-    if (!this.watcherHash[path]) return;
-    if (Date.now() - this.watcherLastUpdate < 2000) return;
-
-    await this.ctx.readThemeByPath(pathFull);
+  update(): void {
     this._createThemesStructure();
     this._createThemesStyles();
-    this.watcherLastUpdate = Date.now();
   }
 
   create(): void {

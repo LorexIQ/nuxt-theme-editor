@@ -27,6 +27,7 @@ import defineChecker from '../../helpers/defineChecker';
 import getSystemTheme from '../../helpers/getSystemTheme';
 import { DEFAULT_PREVIEW_STYLES, DEFAULT_UI_STYLES } from '../../assets/defaultStyles';
 import useReloadMiddleware from '../../helpers/client/useReloadMiddleware';
+import mergeObjects from '../../helpers/mergeObjects';
 import { Sandbox } from './Sandbox';
 import { Router } from './Router';
 import { useRuntimeConfig, reactive, ref, computed, watch } from '#imports';
@@ -147,31 +148,8 @@ export class Client {
     localStorage.setItem(this.config.keys.storage, JSON.stringify(unwrap.get(this.savedStorage)));
   }
 
-  private _syncTheme<T>(target: Record<any, any>, template: T): T {
-    if (Array.isArray(template)) {
-      if (!Array.isArray(target)) target = [];
-
-      return template.map((templateItem, index) => {
-        if (typeof templateItem === 'object' && templateItem !== null) return this._syncTheme(target[index] || {}, templateItem);
-        else return target[index] !== undefined ? target[index] : templateItem;
-      }) as T;
-    }
-
-    if (typeof template === 'object' && template !== null) {
-      if (typeof target !== 'object' || target === null) target = {};
-
-      const result: Record<string, any> = {};
-
-      for (const key in template) result[key] = this._syncTheme(target[key], template[key]);
-
-      return result as T;
-    }
-
-    return target !== undefined ? target : template as T;
-  }
-
   private _buildCustomTheme(theme: ModuleThemeRootReturn, index: number): ModuleThemeRootReturn {
-    theme = this._syncTheme(theme, JSON.parse(JSON.stringify(this.themes[this.config.defaultTheme])));
+    theme = mergeObjects(theme, JSON.parse(JSON.stringify(this.themes[this.config.defaultTheme])));
     let themeId = theme.id;
 
     if (themeId in this.themes) {

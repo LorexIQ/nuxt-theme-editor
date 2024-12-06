@@ -12,7 +12,7 @@ export default defineThemeBlockRoot({
   }
 }, [
   {
-    test: '#cccccc',
+    test: '#cccccc', // Это описание глобального стиля
     dsd: '$global.test',
     dssssss3: '#5da239'
   },
@@ -20,7 +20,7 @@ export default defineThemeBlockRoot({
   defineThemeBlock('navbar', [
     defineThemeBlock('road', [
       {
-        test1: '#fff',
+        test1: '#fff', // Это navbar road test 1 описание
         a: '#f1f1f1'
       }
     ]),
