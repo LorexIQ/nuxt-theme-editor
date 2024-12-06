@@ -42,7 +42,7 @@ function getTempName(path: string, timestamp: number, scope: 'ts' | 'js'): strin
   return path.replace(/\.ts$/, `.${timestamp}.temp.${scope}`);
 }
 
-export async function loadTsModuleBase(modulePath: string): Promise<ModuleLoadTsModuleBaseReturn> {
+async function loadTsModuleBase(modulePath: string): Promise<ModuleLoadTsModuleBaseReturn> {
   const tempCleaners: (() => void)[] = [];
   const fullPath = uPath.resolve(modulePath);
   const parsedPath = uPath.parse(fullPath);
@@ -51,12 +51,18 @@ export async function loadTsModuleBase(modulePath: string): Promise<ModuleLoadTs
   const tempJsFilePath = getTempName(fullPath, fileReadTimestamp, 'js');
   let sourceFile: SourceFile | undefined = undefined;
 
+  const clearAllTemps = () => {
+    clearTemp(tempJsFilePath, sourceFile);
+    tempCleaners.forEach(tempCleaner => tempCleaner());
+  };
+
   try {
     const tsCode = fs.readFileSync(fullPath, 'utf8');
     sourceFile = tsMorphProject.createSourceFile(tempTsFilePath, tsCode, { overwrite: true });
 
     for (const imp of sourceFile.getImportDeclarations()) {
       const importPath = getImportPath(parsedPath.dir, imp.getStructure().moduleSpecifier);
+
       if (importPath) {
         const dir = uPath.parse(modulePath).dir;
         const relativePath = './' + uPath.relative(uPath.parse(modulePath).dir, importPath);
@@ -72,17 +78,16 @@ export async function loadTsModuleBase(modulePath: string): Promise<ModuleLoadTs
     const { code } = await esbuild.transform(sourceFile.getFullText(), { loader: 'ts' });
     fs.writeFileSync(tempJsFilePath, code, 'utf8');
     const module = await import(pathToFileURL(tempJsFilePath).href);
-    tempCleaners.forEach(tempCleaner => tempCleaner());
 
     return {
-      clearTemp: clearTemp.bind(null, tempJsFilePath, sourceFile),
+      clearTemp: clearAllTemps,
       timestamp: fileReadTimestamp,
       module
     };
   } catch (e) {
     console.error(e);
     return {
-      clearTemp: clearTemp.bind(null, tempJsFilePath, sourceFile),
+      clearTemp: clearAllTemps,
       timestamp: fileReadTimestamp,
       module: undefined
     };
