@@ -60,9 +60,34 @@ export class Client {
 
   constructor() {
     this._readSystemThemes();
-    this._initDefaultThemes();
+    this._selectDefaultThemes();
     this._readStorage();
     this._initWatchers();
+  }
+
+  private _initWatchers(): void {
+    const rootStylesKey = ':root';
+    const uiStylesKey = `#${this.config.keys.sandbox.replaceAll(':', '\\:')}, #${this.config.keys.editor.replaceAll(':', '\\:')}`;
+
+    watch(this.selectedTheme, (theme) => {
+      this._appendStyleToHead(`${this.config.keys.style}:root`, theme ? { [rootStylesKey]: (theme as any).styles[0].styles[0] } : {});
+      this._appendStyleToHead(`${this.config.keys.style}:ui`, { [uiStylesKey]: { ...theme?.meta.uiStyles } });
+    }, { immediate: true });
+
+    watch(this.usesScopesProperties, scopes => this._appendStyleToHead(`${this.config.keys.style}:scope`, scopes, true), { immediate: true });
+
+    watch(this.themes, (themes) => {
+      this._appendStyleToHead(
+        `${this.config.keys.style}:preview`,
+        {
+          'theme-default-preview': DEFAULT_PREVIEW_STYLES,
+          ...Object.values(themes).reduce((accum, theme) => ({ ...accum, [`theme-${theme.id}-preview`]: theme.meta.previewStyles }), {})
+        },
+        true
+      );
+    }, { immediate: true });
+
+    watch(this.savedStorage, () => this._saveStorage());
   }
 
   private _readSystemThemes(): void {
@@ -77,7 +102,7 @@ export class Client {
     }, {}));
   }
 
-  private _initDefaultThemes(): void {
+  private _selectDefaultThemes(): void {
     unwrap.set(this, 'selectedLightThemeId', this._checkThemeAvailableAndGetActual(this.config.defaultTheme));
     unwrap.set(this, 'selectedDarkThemeId', this._checkThemeAvailableAndGetActual(this.config.defaultDarkTheme));
     unwrap.set(this, 'selectedSelfThemeId', unwrap.get(this.selectedLightThemeId));
@@ -87,7 +112,7 @@ export class Client {
     const storage = JSON.parse(localStorage.getItem(this.config.keys.storage) as string) as ModuleStorage | null;
 
     if (storage) {
-      Object.assign(this.themes, Object.values(storage.localThemes).map(this._themeValidate.bind(this)).reduce((acc, theme) => ({ ...acc, [theme.id]: theme }), {}));
+      Object.assign(this.themes, Object.values(storage.localThemes).map(this._buildCustomTheme.bind(this)).reduce((acc, theme) => ({ ...acc, [theme.id]: theme }), {}));
       unwrap.set(this, 'selectedLightThemeId', this._checkThemeAvailableAndGetActual(storage.selectedLightThemeId, 'light'));
       unwrap.set(this, 'selectedDarkThemeId', this._checkThemeAvailableAndGetActual(storage.selectedDarkThemeId, 'dark'));
       this.setAutoThemeModeStatus(storage.isAutoThemeMode);
@@ -95,34 +120,37 @@ export class Client {
     }
   }
 
-  private _themeValidate(theme: ModuleThemeRootReturn): ModuleThemeRootReturn {
-    if (theme.id in this.themes) theme.id = `${theme.id}-${Date.now()}`;
-    return theme;
+  private _saveStorage(): void {
+    localStorage.setItem(this.config.keys.storage, JSON.stringify(unwrap.get(this.savedStorage)));
   }
 
-  private _initWatchers(): void {
-    const rootStylesKey = ':root';
-    const uiStylesKey = `#${this.config.keys.sandbox.replaceAll(':', '\\:')}, #${this.config.keys.editor.replaceAll(':', '\\:')}`;
+  private _syncTheme<T>(target: Record<any, any>, template: T): T {
+    if (Array.isArray(template)) {
+      if (!Array.isArray(target)) target = [];
 
-    watch(this.selectedTheme, (theme) => {
-      this._appendStyleToHead(`${this.config.keys.style}:root`, theme ? { [rootStylesKey]: (theme as any).styles[0].styles[0] } : {});
-      this._appendStyleToHead(`${this.config.keys.style}:ui`, { [uiStylesKey]: { ...DEFAULT_UI_STYLES, ...theme?.meta.uiStyles } });
-    }, { immediate: true });
+      return template.map((templateItem, index) => {
+        if (typeof templateItem === 'object' && templateItem !== null) return this._syncTheme(target[index] || {}, templateItem);
+        else return target[index] !== undefined ? target[index] : templateItem;
+      }) as T;
+    }
 
-    watch(this.usesScopesProperties, scopes => this._appendStyleToHead(`${this.config.keys.style}:scope`, scopes, true), { immediate: true });
+    if (typeof template === 'object' && template !== null) {
+      if (typeof target !== 'object' || target === null) target = {};
 
-    watch(this.themes, (themes) => {
-      this._appendStyleToHead(
-        `${this.config.keys.style}:preview`,
-        {
-          'theme-default-preview': DEFAULT_PREVIEW_STYLES,
-          ...Object.values(themes).reduce((accum, theme) => ({ ...accum, [`theme-${theme.id}-preview`]: { ...DEFAULT_PREVIEW_STYLES, ...theme.meta.previewStyles } }), {})
-        },
-        true
-      );
-    }, { immediate: true });
+      const result: Record<string, any> = {};
 
-    watch(this.savedStorage, () => this._saveStorage());
+      for (const key in template) result[key] = this._syncTheme(target[key], template[key]);
+
+      return result as T;
+    }
+
+    return target !== undefined ? target : template as T;
+  }
+
+  private _buildCustomTheme(theme: ModuleThemeRootReturn): ModuleThemeRootReturn {
+    theme = this._syncTheme(theme, JSON.parse(JSON.stringify(this.themes[this.config.defaultTheme])));
+    if (theme.id in this.themes) theme.id = `${theme.id}-${Date.now()}`;
+    return theme;
   }
 
   private _buildSystemTheme(themeFile: ModuleDefineThemeBlockRootReturn, themeName: string, themeType: ModuleThemeType): ModuleThemeRootReturn {
@@ -149,8 +177,14 @@ export class Client {
 
         ...themeFile.meta,
 
-        previewStyles: themeFile.meta.previewStyles!,
-        uiStyles: themeFile.meta.uiStyles!
+        previewStyles: {
+          ...DEFAULT_PREVIEW_STYLES,
+          ...themeFile.meta.previewStyles
+        },
+        uiStyles: {
+          ...DEFAULT_UI_STYLES,
+          ...themeFile.meta.uiStyles
+        }
       },
       styles: themeFile.styles.map(style => cleanThemeStyles(style, 'global'))
     };
@@ -235,10 +269,6 @@ export class Client {
     if (!_styleElement) document.head.appendChild(styleElement);
   }
 
-  private _saveStorage(): void {
-    localStorage.setItem(this.config.keys.storage, JSON.stringify(unwrap.get(this.savedStorage)));
-  }
-
   private _getSystemThemeAssociation(): string {
     switch (unwrap.get(this.selectedSystemThemeId)) {
       case 'light':
@@ -279,16 +309,8 @@ export class Client {
     }
   }
 
-  registerScopeStyles(scopeId: string, styles: ComputedRef<ModuleObject>): void {
-    (this.usesScopesProperties as ModuleObject<any>)[scopeId] = styles;
-  }
-
-  unregisterScopeStyles(scopeId: string): void {
-    delete this.usesScopesProperties[scopeId];
-  }
-
-  checkScopeRegistration(scopeId: string): boolean {
-    return !!this.usesScopesProperties[scopeId];
+  getStylesByPath(blockPath: ModuleDefaultBlockKeys, theme?: ModuleThemeRootReturn): ComputedRef<ModuleObject> {
+    return computed(() => this._searchBlockStylesByPath(blockPath, (theme ?? unwrap.get(this.selectedTheme))?.styles));
   }
 
   getStylesKeyValueByPath(stylePath: ModuleDefaultStyleKeys, theme?: ModuleThemeRootReturn): ComputedRef<string> {
@@ -299,8 +321,16 @@ export class Client {
     return computed(() => unwrap.get(this._searchBlockStylesByPath(blockPath, (theme ?? unwrap.get(this.selectedTheme))?.styles)[styleName]) ?? 'UNKNOWN STYLE');
   }
 
-  getStylesByPath(blockPath: ModuleDefaultBlockKeys, theme?: ModuleThemeRootReturn): ComputedRef<ModuleObject> {
-    return computed(() => this._searchBlockStylesByPath(blockPath, (theme ?? unwrap.get(this.selectedTheme))?.styles));
+  registerScopeStyles(scopeId: string, styles: ComputedRef<ModuleObject>): void {
+    (this.usesScopesProperties as ModuleObject<any>)[scopeId] = styles;
+  }
+
+  unregisterScopeStyles(scopeId: string): void {
+    delete this.usesScopesProperties[scopeId];
+  }
+
+  checkScopeRegistration(scopeId: string): boolean {
+    return !!this.usesScopesProperties[scopeId];
   }
 
   getConfig(): ModuleOptionsExtend {

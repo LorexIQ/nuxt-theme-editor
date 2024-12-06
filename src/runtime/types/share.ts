@@ -21,3 +21,4 @@ export type ModuleServerMetaFiles = MetaFiles;
 
 export type ModuleDefaultBlockKeys = ModuleHelpersNestedKeys<ModuleMetaBlocks>;
 export type ModuleDefaultStyleKeys = ModuleHelpersStringKeys<ModuleMetaBlocks>;
+export type ModuleDefaultKeys = ModuleDefaultBlockKeys | ModuleDefaultStyleKeys;
