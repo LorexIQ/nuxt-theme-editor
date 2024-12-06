@@ -106,7 +106,7 @@ function onActivate() {
         <transition-expand>
           <NotifyBlock
             v-if="activeErrors.isError.value"
-            type="error"
+            type="ERROR"
           >
             <template #title>
               Validation error

@@ -33,10 +33,10 @@ export const DEFAULT_UI_STYLES: Required<ModuleDefineThemeMetaUI> = {
   radioActive: '#2ecc71',
 
   switchSlider: '#999',
-  switchSliderChecked: '#999',
+  switchSliderChecked: '#1e752a',
   switchSliderBorder: '#00000019',
   switchCircle: '#333',
-  switchCircleChecked: '#333',
+  switchCircleChecked: '#2ecc71',
   switchCircleBorder: '#00000019',
 
   buttonDefaultBg: '#fafafa',

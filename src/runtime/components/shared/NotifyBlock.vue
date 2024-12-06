@@ -3,28 +3,35 @@ import type { ModuleIcons } from '../../types';
 import IconsStore from './IconsStore.vue';
 import { computed, getCurrentInstance } from '#imports';
 
-type TypeGeneratorBase = { [name: string]: {
-  defTitle: string;
-  titleColor: string;
-  contentColor: string;
-  bgColor: string;
-  icon: ModuleIcons;
-}; };
+type TypeGeneratorBase = {
+  [name: string]: {
+    defTitle: string;
+    titleColor: string;
+    contentColor: string;
+    bgColor: string;
+    icon: ModuleIcons;
+  };
+};
 type BlockTypesIds = keyof typeof blockTypes;
 
 type Props = {
   type: BlockTypesIds;
+  withClose?: boolean;
+};
+type Emits = {
+  (e: 'onClose'): void;
 };
 
 const props = defineProps<Props>();
+const emit = defineEmits<Emits>();
 const currentInstance = getCurrentInstance();
 
 const typesGenerator = <T extends TypeGeneratorBase>(types: T) => types;
 const blockTypes = typesGenerator({
-  info: { defTitle: 'INFO', titleColor: 'var(--messageInfoTitle)', contentColor: 'var(--messageInfoContent)', bgColor: 'var(--messageInfoBg)', icon: 'Info' },
-  tip: { defTitle: 'TIP', titleColor: 'var(--messageTipTitle)', contentColor: 'var(--messageTipContent)', bgColor: 'var(--messageTipBg)', icon: 'Tip' },
-  warn: { defTitle: 'WARN', titleColor: 'var(--messageWarnTitle)', contentColor: 'var(--messageWarnContent)', bgColor: 'var(--messageWarnBg)', icon: 'Warn' },
-  error: { defTitle: 'ERROR', titleColor: 'var(--messageErrorTitle)', contentColor: 'var(--messageErrorContent)', bgColor: 'var(--messageErrorBg)', icon: 'Error' }
+  INFO: { defTitle: 'INFO', titleColor: 'var(--messageInfoTitle)', contentColor: 'var(--messageInfoContent)', bgColor: 'var(--messageInfoBg)', icon: 'Info' },
+  TIP: { defTitle: 'TIP', titleColor: 'var(--messageTipTitle)', contentColor: 'var(--messageTipContent)', bgColor: 'var(--messageTipBg)', icon: 'Tip' },
+  WARN: { defTitle: 'WARN', titleColor: 'var(--messageWarnTitle)', contentColor: 'var(--messageWarnContent)', bgColor: 'var(--messageWarnBg)', icon: 'Warn' },
+  ERROR: { defTitle: 'ERROR', titleColor: 'var(--messageErrorTitle)', contentColor: 'var(--messageErrorContent)', bgColor: 'var(--messageErrorBg)', icon: 'Error' }
 });
 
 const selectedType = computed(() => blockTypes[props.type]);
@@ -45,6 +52,13 @@ const isContent = computed(() => currentInstance?.slots.default);
           :icon="selectedType.icon"
           size="100%"
         />
+      </div>
+      <div
+        v-if="withClose"
+        class="TE-notify-block__header__close"
+        @click="emit('onClose')"
+      >
+        <IconsStore icon="Times" />
       </div>
       <div class="TE-notify-block__header__title">
         <slot name="title">
@@ -83,8 +97,23 @@ const isContent = computed(() => currentInstance?.slots.default);
       height: 22px;
       margin-right: 5px;
     }
+    &__close {
+      float: right;
+      width: 22px;
+      height: 22px;
+      margin-left: 5px;
+      cursor: pointer;
+      transition: .3s;
+
+      &:hover {
+        opacity: .7;
+      }
+    }
     &__title {
       padding-top: 4px;
+    }
+    &__content {
+      white-space: pre-line;
     }
   }}
 </style>

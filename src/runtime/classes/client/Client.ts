@@ -12,7 +12,12 @@ import type {
   ModuleThemeSelected,
   ModuleThemeSelectedStyles,
   ModuleDefaultStyleKeys,
-  ModuleDefaultBlockKeys, ModuleThemeCreateData, ModuleThemeEditData
+  ModuleDefaultBlockKeys,
+  ModuleThemeCreateData,
+  ModuleThemeEditData,
+  ModuleErrorMessage,
+  ModuleErrorType,
+  ModulePagesNames
 } from '../../types';
 // @ts-ignore
 import connectorMeta from '../../meta/connector';
@@ -30,6 +35,7 @@ export class Client {
   private readonly router = new Router(this);
 
   private readonly themesPathsCache: ModuleObject<number[]> = {};
+  private readonly errorsMessages = reactive<ModuleErrorMessage[]>([]);
   private readonly usesScopesProperties = reactive<ModuleObject<ModuleObject>>({});
 
   private readonly isAutoThemeMode = ref(false);
@@ -147,9 +153,16 @@ export class Client {
     return target !== undefined ? target : template as T;
   }
 
-  private _buildCustomTheme(theme: ModuleThemeRootReturn): ModuleThemeRootReturn {
+  private _buildCustomTheme(theme: ModuleThemeRootReturn, index: number): ModuleThemeRootReturn {
     theme = this._syncTheme(theme, JSON.parse(JSON.stringify(this.themes[this.config.defaultTheme])));
-    if (theme.id in this.themes) theme.id = `${theme.id}-${Date.now()}`;
+    let themeId = theme.id;
+
+    if (themeId in this.themes) {
+      themeId = `${theme.id}-${(Date.now() + index).toFixed().slice(-4)}`;
+      this.addError('WARN', 'index', `Used plug: ${theme.id} (${theme.name}) > ${themeId}`, 'ID duplicate detected!');
+      theme.id = themeId;
+    }
+
     return theme;
   }
 
@@ -373,29 +386,50 @@ export class Client {
     return unwrap.get(this.selectedThemeId);
   }
 
+  getErrors(type?: ModuleErrorType, page?: ModulePagesNames): ModuleErrorMessage[] {
+    return this.errorsMessages.filter(error => (type ? error.type === type : true) && (page ? error.page === page : true));
+  }
+
+  addError(type: ModuleErrorType, page: ModulePagesNames, message: string, title?: string): number {
+    const id = Math.max(...this.errorsMessages.map(error => error.id), 0) + 1;
+    this.errorsMessages.push({
+      id,
+      type,
+      page,
+      message,
+      title
+    });
+    return id;
+  }
+
+  deleteError(id: number): void {
+    const errorIndex = this.errorsMessages.findIndex(error => error.id === id);
+    if (errorIndex !== -1) this.errorsMessages.splice(errorIndex, 1);
+  }
+
   setAutoThemeModeStatus(mode: boolean): void {
     if (!unwrap.get(this.selectedDarkThemeId)) return;
     unwrap.set(this, 'isAutoThemeMode', mode);
   }
 
-  setLightTheme(themeId: string): void {
-    if (!(themeId in this.themes) || unwrap.get(this.selectedLightThemeId) === themeId) return;
-    unwrap.set(this, 'selectedLightThemeId', themeId);
+  setLightTheme(id: string): void {
+    if (!(id in this.themes) || unwrap.get(this.selectedLightThemeId) === id) return;
+    unwrap.set(this, 'selectedLightThemeId', id);
   }
 
-  setDarkTheme(themeId: string): void {
-    if (!(themeId in this.themes) || unwrap.get(this.selectedDarkThemeId) === themeId) return;
-    unwrap.set(this, 'selectedDarkThemeId', themeId);
+  setDarkTheme(id: string): void {
+    if (!(id in this.themes) || unwrap.get(this.selectedDarkThemeId) === id) return;
+    unwrap.set(this, 'selectedDarkThemeId', id);
   }
 
-  setTheme(themeId: string): void {
-    if (!(themeId in this.themes) || unwrap.get(this.selectedThemeId) === themeId) return;
+  setTheme(id: string): void {
+    if (!(id in this.themes) || unwrap.get(this.selectedThemeId) === id) return;
     unwrap.set(this, 'isAutoThemeMode', false);
-    unwrap.set(this, 'selectedSelfThemeId', themeId);
+    unwrap.set(this, 'selectedSelfThemeId', id);
   }
 
-  createTheme(themeData: ModuleThemeCreateData): void {
-    const { id, name, description, parentThemeId: parentId } = themeData;
+  createTheme(data: ModuleThemeCreateData): void {
+    const { id, name, description, parentThemeId: parentId } = data;
     if (id in this.themes || !parentId || !(parentId in this.themes)) return;
 
     const newTheme = JSON.parse(JSON.stringify(this.themes[parentId])) as ModuleThemeRootReturn;
@@ -414,8 +448,8 @@ export class Client {
     };
   }
 
-  editThemeInfo(themeData: ModuleThemeEditData): void {
-    const { id, name, description, oldThemeId } = themeData;
+  editThemeInfo(data: ModuleThemeEditData): void {
+    const { id, name, description, oldThemeId } = data;
     if (!(oldThemeId in this.themes)) return;
 
     const theme = this.themes[oldThemeId];
@@ -434,10 +468,10 @@ export class Client {
     };
   }
 
-  deleteTheme(themeId: string): void {
-    const theme = this.themes[themeId];
+  deleteTheme(id: string): void {
+    const theme = this.themes[id];
     if (!theme || theme.type !== 'local') return;
-    delete this.themes[themeId];
+    delete this.themes[id];
 
     unwrap.set(this, 'selectedLightThemeId', this._checkThemeAvailableAndGetActual(unwrap.get(this.selectedLightThemeId), 'light'));
     unwrap.set(this, 'selectedDarkThemeId', this._checkThemeAvailableAndGetActual(unwrap.get(this.selectedDarkThemeId), 'dark'));

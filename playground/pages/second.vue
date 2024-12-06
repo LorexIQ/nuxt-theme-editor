@@ -36,10 +36,6 @@ console.log('second.vue useThemeBlock =>', scopeStyles.value);
     <button @click="themesEditor.setAutoThemeModeStatus(!themesEditor.getAutoThemeModeStatus())">
       AUTO [{{ themesEditor.getAutoThemeModeStatus() ? 'ON' : 'OFF' }}]
     </button>
-    <log-object
-      :value="themesEditor"
-      :replaces="{ ctx: '[CTX]' }"
-    />
   </div>
 </template>
 

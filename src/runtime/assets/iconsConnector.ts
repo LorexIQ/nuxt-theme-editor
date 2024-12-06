@@ -12,6 +12,7 @@ import WordsPen from '../components/icons/WordsPen.vue';
 import Plus from '../components/icons/Plus.vue';
 import Question from '../components/icons/Question.vue';
 import Sun from '../components/icons/Sun.vue';
+import Times from '../components/icons/Times.vue';
 import Tip from '../components/icons/Tip.vue';
 import Warn from '../components/icons/Warn.vue';
 
@@ -30,6 +31,7 @@ export default {
   Plus,
   Question,
   Sun,
+  Times,
   Tip,
   Warn
 };

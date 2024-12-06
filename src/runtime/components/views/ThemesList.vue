@@ -3,6 +3,7 @@ import type { ModuleClient } from '../../types';
 import BlockThemes from '../widgets/BlockThemes.vue';
 import ViewPage from '../widgets/ViewPage.vue';
 import IsSwitch from '../shared/IsSwitch.vue';
+import ClientErrors from '../features/ClientErrors.vue';
 import { computed } from '#imports';
 
 type Props = {
@@ -38,6 +39,14 @@ const selectedTheme = computed(() => props.client.getSelectedTheme());
       :client="client"
       @context-menu-open="sandbox.openThemeContextMenu(...$event)"
     />
+    <template #messages>
+      <div class="TE-themes-list-messages">
+        <ClientErrors
+          :client="client"
+          page="index"
+        />
+      </div>
+    </template>
     <template #footer>
       <div class="TE-themes-list-footer">
         <IsSwitch
@@ -45,7 +54,26 @@ const selectedTheme = computed(() => props.client.getSelectedTheme());
           @check="client.setAutoThemeModeStatus(true)"
           @uncheck="client.setAutoThemeModeStatus(false)"
         />
+        <p>Use the color scheme of the device</p>
       </div>
     </template>
   </ViewPage>
 </template>
+
+<style lang="scss" scoped>
+.TE-themes-list {
+  &-messages {
+    padding: 10px;
+  }
+  &-footer {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px;
+
+    & p {
+      color: var(--title);
+    }
+  }
+}
+</style>

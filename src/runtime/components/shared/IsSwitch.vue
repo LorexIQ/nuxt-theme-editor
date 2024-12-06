@@ -51,6 +51,7 @@ watch(innerValue, (newVal) => {
     background-color: var(--switchSlider);
     border: 1px solid var(--switchSliderBorder);
     border-radius: 5px;
+    transition: .3s;
   }
   &__circle {
     position: absolute;
