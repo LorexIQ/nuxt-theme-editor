@@ -7,6 +7,7 @@ import ThemeBlock from '../features/ThemeBlock.vue';
 import ViewPage from '../widgets/ViewPage.vue';
 import BlockRadioThemes from '../widgets/BlockRadioThemes.vue';
 import useErrorMessages from '../../helpers/client/useErrorMessages';
+import IsHr from '../shared/IsHr.vue';
 import { computed, reactive } from '#imports';
 
 type Props = {
@@ -59,51 +60,51 @@ function onActivate() {
     @on-active:on="onActivate"
   >
     <div class="TE-theme-create">
-      <div class="TE-theme-create__delimiter">
-        Theme Info
+      <div class="TE-theme-create__block">
+        <IsHr>Theme Info</IsHr>
+        <div class="TE-theme-create__block__row">
+          <IsInput
+            id="id"
+            v-model="themeCreateData.id"
+            title="ID"
+            is-required-icon
+            :max-length="30"
+            @input="activeErrors.remove(0, 1, 2)"
+          />
+        </div>
+        <div class="TE-theme-create__block__row">
+          <IsInput
+            id="name"
+            v-model="themeCreateData.name"
+            title="Name"
+            :placeholder="themeCreateData.id"
+            :max-length="30"
+          />
+        </div>
+        <div class="TE-theme-create__block__row">
+          <IsInput
+            id="description"
+            v-model="themeCreateData.description"
+            title="Description"
+            :max-length="200"
+          />
+        </div>
       </div>
-      <div class="TE-theme-create__row">
-        <IsInput
-          id="id"
-          v-model="themeCreateData.id"
-          title="ID"
-          is-required-icon
-          :max-length="30"
-          @input="activeErrors.remove(0, 1, 2)"
-        />
+      <div class="TE-theme-create__block">
+        <IsHr>Preview Card</IsHr>
+        <div class="TE-theme-create__block__row">
+          <ThemeBlock :theme="previewTheme" />
+        </div>
       </div>
-      <div class="TE-theme-create__row">
-        <IsInput
-          id="name"
-          v-model="themeCreateData.name"
-          title="Name"
-          :placeholder="themeCreateData.id"
-          :max-length="30"
-        />
-      </div>
-      <div class="TE-theme-create__row">
-        <IsInput
-          id="description"
-          v-model="themeCreateData.description"
-          title="Description"
-          :max-length="200"
-        />
-      </div>
-      <div class="TE-theme-create__delimiter">
-        Preview Card
-      </div>
-      <div class="TE-theme-create__row">
-        <ThemeBlock :theme="previewTheme" />
-      </div>
-      <div class="TE-theme-create__delimiter">
-        Parent Theme
-      </div>
-      <div class="TE-theme-create__row TE-theme-create__row--parent-theme">
-        <BlockRadioThemes
-          v-model="themeCreateData.parentThemeId"
-          :client="client"
-          @update:model-value="activeErrors.remove(3)"
-        />
+      <div class="TE-theme-create__block">
+        <IsHr>Parent Theme</IsHr>
+        <div class="TE-theme-create__block__row TE-theme-create__block__row--parent-theme">
+          <BlockRadioThemes
+            v-model="themeCreateData.parentThemeId"
+            :client="client"
+            @update:model-value="activeErrors.remove(3)"
+          />
+        </div>
       </div>
     </div>
     <template #messages>
@@ -152,29 +153,22 @@ function onActivate() {
 
 <style scoped lang="scss">
 .TE-theme-create {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
+  &__block {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding-bottom: 10px;
 
-  &__delimiter {
-    position: sticky;
-    top: 0;
-    z-index: 2;
-    text-align: center;
-    padding: 7px 0 5px;
-    border-bottom: 1px solid var(--border);
-    color: var(--title);
-    background-color: var(--bg);
-    box-shadow: 0 0 10px var(--bg);
-  }
-  &__row {
-    padding: 0 10px;
+    &__row {
+      padding: 0 10px;
 
-    & > .TE-theme-block {
-      cursor: default;
-    }
-    &--parent-theme {
-      height: 100%;
+      & > .TE-theme-block {
+        cursor: default;
+      }
+      &--parent-theme {
+        height: 100%;
+      }
     }
   }
 

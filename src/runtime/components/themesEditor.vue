@@ -5,6 +5,7 @@ import ThemesList from './views/ThemesList.vue';
 import ThemeCreate from './views/ThemeCreate.vue';
 import ThemeDelete from './views/ThemeDelete.vue';
 import ThemeEditInfo from './views/ThemeEditInfo.vue';
+import ThemeEditStyles from './views/ThemeEditStyles.vue';
 import Error404 from './views/Error404.vue';
 
 const client = useThemesEditor();
@@ -22,6 +23,7 @@ const client = useThemesEditor();
       <ThemeCreate :client="client" />
       <ThemeDelete :client="client" />
       <ThemeEditInfo :client="client" />
+      <ThemeEditStyles :client="client" />
       <Error404 :client="client" />
     </div>
   </div>

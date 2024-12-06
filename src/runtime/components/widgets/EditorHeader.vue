@@ -12,7 +12,7 @@ const router = client.getRouter();
 
 const logoParts: string[] = [
   'T',
-  'hemes',
+  'heme',
   'E',
   'ditor'
 ];
@@ -53,7 +53,7 @@ const isAnotherPage = computed(() => openedPage.value !== 'index');
   position: relative;
   z-index: 3;
   display: grid;
-  grid-template-columns: auto 74px auto 60px 0 auto;
+  grid-template-columns: auto 64px auto 60px 0 auto;
   align-items: center;
   justify-content: center;
   background-color: var(--bgHeader);

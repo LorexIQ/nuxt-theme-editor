@@ -6,6 +6,7 @@ import NotifyBlock from '../shared/NotifyBlock.vue';
 import ThemeBlock from '../features/ThemeBlock.vue';
 import ViewPage from '../widgets/ViewPage.vue';
 import useErrorMessages from '../../helpers/client/useErrorMessages';
+import IsHr from '../shared/IsHr.vue';
 import { computed, reactive } from '#imports';
 
 type Props = {
@@ -64,41 +65,41 @@ function onActivate() {
     @on-active:on="onActivate"
   >
     <div class="TE-theme-edit-info">
-      <div class="TE-theme-edit-info__delimiter">
-        Theme Info
+      <div class="TE-theme-edit-info__block">
+        <IsHr>Theme Info</IsHr>
+        <div class="TE-theme-edit-info__block__row">
+          <IsInput
+            id="id"
+            v-model="themeEditData.id"
+            title="ID"
+            is-required-icon
+            :max-length="30"
+            @input="activeErrors.remove(0, 1, 2)"
+          />
+        </div>
+        <div class="TE-theme-edit-info__block__row">
+          <IsInput
+            id="name"
+            v-model="themeEditData.name"
+            title="Name"
+            :placeholder="themeEditData.id"
+            :max-length="30"
+          />
+        </div>
+        <div class="TE-theme-edit-info__block__row">
+          <IsInput
+            id="description"
+            v-model="themeEditData.description"
+            title="Description"
+            :max-length="200"
+          />
+        </div>
       </div>
-      <div class="TE-theme-edit-info__row">
-        <IsInput
-          id="id"
-          v-model="themeEditData.id"
-          title="ID"
-          is-required-icon
-          :max-length="30"
-          @input="activeErrors.remove(0, 1, 2)"
-        />
-      </div>
-      <div class="TE-theme-edit-info__row">
-        <IsInput
-          id="name"
-          v-model="themeEditData.name"
-          title="Name"
-          :placeholder="themeEditData.id"
-          :max-length="30"
-        />
-      </div>
-      <div class="TE-theme-edit-info__row">
-        <IsInput
-          id="description"
-          v-model="themeEditData.description"
-          title="Description"
-          :max-length="200"
-        />
-      </div>
-      <div class="TE-theme-edit-info__delimiter">
-        Preview Card
-      </div>
-      <div class="TE-theme-edit-info__row">
-        <ThemeBlock :theme="previewTheme" />
+      <div class="TE-theme-edit-info__block">
+        <IsHr>Preview Card</IsHr>
+        <div class="TE-theme-edit-info__block__row">
+          <ThemeBlock :theme="previewTheme" />
+        </div>
       </div>
     </div>
     <template #messages>
@@ -141,29 +142,22 @@ function onActivate() {
 
 <style scoped lang="scss">
 .TE-theme-edit-info {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
+  &__block {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding-bottom: 10px;
 
-  &__delimiter {
-    position: sticky;
-    top: 0;
-    z-index: 2;
-    text-align: center;
-    padding: 7px 0 5px;
-    border-bottom: 1px solid var(--border);
-    color: var(--title);
-    background-color: var(--bg);
-    box-shadow: 0 0 10px var(--bg);
-  }
-  &__row {
-    padding: 0 10px;
+    &__row {
+      padding: 0 10px;
 
-    & > .TE-theme-block {
-      cursor: default;
-    }
-    &--parent-theme {
-      height: 100%;
+      & > .TE-theme-block {
+        cursor: default;
+      }
+      &--parent-theme {
+        height: 100%;
+      }
     }
   }
 

@@ -18,34 +18,33 @@ const selectedTheme = computed(() => props.client.getSelectedTheme());
 
 <template>
   <ViewPage
-    class="TE-themes-list"
     page-id="index"
     :client="client"
   >
-    <BlockThemes
-      type="system"
-      :is-open="selectedTheme ? selectedTheme.type === 'system' : true"
-      :client="client"
-      @context-menu-open="sandbox.openThemeContextMenu(...$event)"
-    />
-    <BlockThemes
-      type="global"
-      :is-open="selectedTheme?.type === 'global'"
-      :client="client"
-    />
-    <BlockThemes
-      type="local"
-      :is-open="selectedTheme?.type === 'local'"
-      :client="client"
-      @context-menu-open="sandbox.openThemeContextMenu(...$event)"
-    />
+    <div class="TE-themes-list">
+      <BlockThemes
+        type="system"
+        :is-open="selectedTheme ? selectedTheme.type === 'system' : true"
+        :client="client"
+        @context-menu-open="sandbox.openThemeContextMenu(...$event)"
+      />
+      <BlockThemes
+        type="global"
+        :is-open="selectedTheme?.type === 'global'"
+        :client="client"
+      />
+      <BlockThemes
+        type="local"
+        :is-open="selectedTheme?.type === 'local'"
+        :client="client"
+        @context-menu-open="sandbox.openThemeContextMenu(...$event)"
+      />
+    </div>
     <template #messages>
-      <div class="TE-themes-list-messages">
-        <ClientErrors
-          :client="client"
-          page="index"
-        />
-      </div>
+      <ClientErrors
+        :client="client"
+        page="index"
+      />
     </template>
     <template #footer>
       <div class="TE-themes-list-footer">
@@ -62,9 +61,6 @@ const selectedTheme = computed(() => props.client.getSelectedTheme());
 
 <style lang="scss" scoped>
 .TE-themes-list {
-  &-messages {
-    padding: 10px;
-  }
   &-footer {
     display: flex;
     align-items: center;

@@ -35,6 +35,7 @@ export default createConfigForNuxt({
         'no-extra-boolean-cast': 'off',
         '@stylistic/quotes': ['error', 'single'],
         '@stylistic/comma-dangle': ['error', 'never'],
+        '@stylistic/lines-between-class-members': 'off',
         '@stylistic/semi': ['error', 'always'],
         '@stylistic/template-curly-spacing': ['error', 'never'],
         '@stylistic/brace-style': ['error', '1tbs'],

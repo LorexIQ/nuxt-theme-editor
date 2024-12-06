@@ -1,9 +1,9 @@
 <script setup lang="ts">
-import type { ModuleClient } from '../../types';
+import type { ModuleClient, ModulePagesNames } from '../../types';
 import { computed, watch } from '#imports';
 
 type Props = {
-  pageId: string;
+  pageId: ModulePagesNames;
   client: ModuleClient;
 };
 type Emits = {

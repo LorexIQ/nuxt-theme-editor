@@ -1,4 +1,5 @@
 import type { ComputedRef } from 'vue';
+import type { Ref } from '@vue/reactivity';
 import type {
   ModuleDefineThemeBlockRootReturn,
   ModuleDefineThemeBlockSetting,
@@ -25,12 +26,17 @@ import unwrap from '../../helpers/unwrap';
 import defineChecker from '../../helpers/defineChecker';
 import getSystemTheme from '../../helpers/getSystemTheme';
 import { DEFAULT_PREVIEW_STYLES, DEFAULT_UI_STYLES } from '../../assets/defaultStyles';
+import useReloadMiddleware from '../../helpers/client/useReloadMiddleware';
 import { Sandbox } from './Sandbox';
 import { Router } from './Router';
 import { useRuntimeConfig, reactive, ref, computed, watch } from '#imports';
 
+type ThemeId = string | Ref<string | undefined>;
+type ThemeDefConfig = 'light' | 'dark' | 'system' | ThemeId | undefined;
+
 export class Client {
   private readonly config = useRuntimeConfig().public.themesEditor as ModuleOptionsExtend;
+  private readonly reloadMiddleware = useReloadMiddleware();
   private readonly sandbox = new Sandbox(this);
   private readonly router = new Router(this);
 
@@ -43,9 +49,14 @@ export class Client {
   private readonly selectedLightThemeId = ref<string>();
   private readonly selectedDarkThemeId = ref<string>();
   private readonly selectedSystemThemeId = getSystemTheme().theme;
+  private readonly editedThemeId = ref<string>();
   private readonly themes = reactive<ModuleThemes>({});
 
-  private readonly selectedThemeId = computed(() => unwrap.get(this.isAutoThemeMode) ? this._getSystemThemeAssociation() : unwrap.get(this.selectedSelfThemeId));
+  private readonly selectedThemeId = computed(() => {
+    const isAutoMode = unwrap.get(this.isAutoThemeMode);
+    const isEditMode = !!unwrap.get(this.editedThemeId);
+    return isEditMode ? unwrap.get(this.editedThemeId) : isAutoMode ? this._getSystemThemeAssociation() : unwrap.get(this.selectedSelfThemeId);
+  });
   private readonly selectedTheme = computed(() => {
     const themeId = unwrap.get(this.selectedThemeId);
     return themeId ? this._prepareSelectedTheme(this.themes[themeId]) : undefined;
@@ -93,6 +104,8 @@ export class Client {
       );
     }, { immediate: true });
 
+    watch(this.editedThemeId, themeId => this.reloadMiddleware[themeId ? 'on' : 'off']());
+
     watch(this.savedStorage, () => this._saveStorage());
   }
 
@@ -109,9 +122,13 @@ export class Client {
   }
 
   private _selectDefaultThemes(): void {
-    unwrap.set(this, 'selectedLightThemeId', this._checkThemeAvailableAndGetActual(this.config.defaultTheme));
-    unwrap.set(this, 'selectedDarkThemeId', this._checkThemeAvailableAndGetActual(this.config.defaultDarkTheme));
-    unwrap.set(this, 'selectedSelfThemeId', unwrap.get(this.selectedLightThemeId));
+    this._replaceSelectedThemes(this.config.defaultTheme, this.config.defaultDarkTheme, this.selectedLightThemeId);
+  }
+
+  private _replaceSelectedThemes(light?: ThemeId, dark?: ThemeId, self?: ThemeId, lightDef?: ThemeId, darkDef?: ThemeId, selfDef?: ThemeId): void {
+    unwrap.set(this, 'selectedLightThemeId', this._checkThemeAvailableAndGetActual(unwrap.get(light ?? this.selectedLightThemeId), lightDef, 'light'));
+    unwrap.set(this, 'selectedDarkThemeId', this._checkThemeAvailableAndGetActual(unwrap.get(dark ?? this.selectedDarkThemeId), darkDef, 'dark'));
+    unwrap.set(this, 'selectedSelfThemeId', this._checkThemeAvailableAndGetActual(unwrap.get(self ?? this.selectedSelfThemeId), selfDef, unwrap.get(this.isAutoThemeMode) ? 'system' : unwrap.get(this.selectedLightThemeId)));
   }
 
   private _readStorage(): void {
@@ -166,7 +183,7 @@ export class Client {
     return theme;
   }
 
-  private _buildSystemTheme(themeFile: ModuleDefineThemeBlockRootReturn, themeName: string, themeType: ModuleThemeType): ModuleThemeRootReturn {
+  private _buildSystemTheme(themeFile: ModuleDefineThemeBlockRootReturn, themeId: string, themeType: ModuleThemeType): ModuleThemeRootReturn {
     const cleanThemeStyles = (themeStyle: ModuleDefineThemeBlockSetting, selfId?: string): ModuleThemeCleanedSetting => {
       if (defineChecker(themeStyle, 'block')) return {
         id: themeStyle.id,
@@ -181,11 +198,11 @@ export class Client {
     };
 
     return {
-      id: themeName,
-      name: themeFile.meta.name ?? themeName,
+      id: themeId,
+      name: themeFile.meta.name ?? themeId,
       type: themeType,
       meta: {
-        name: themeName,
+        name: themeId,
         description: '',
 
         ...themeFile.meta,
@@ -254,14 +271,18 @@ export class Client {
     };
   }
 
-  private _checkThemeAvailableAndGetActual(themeName?: string, def?: 'light' | 'dark' | 'system' | string): string | undefined {
-    const isInThemes = themeName && themeName in this.themes;
+  private _checkThemeAvailableAndGetActual(themeId?: ThemeId, ...def: ThemeDefConfig[]): string | undefined {
+    const unwrapThemeId = unwrap.get(themeId);
+    const unwrapDef = def.map(unwrap.get).filter(Boolean);
+    const isInThemes = unwrapThemeId && unwrapThemeId in this.themes;
+    const currentDef = unwrapDef[0];
+    const lostDef = unwrapDef.slice(1);
 
-    if (isInThemes) return themeName;
-    else if (def === 'light') return this._checkThemeAvailableAndGetActual(this.config.defaultTheme);
-    else if (def === 'dark') return this._checkThemeAvailableAndGetActual(this.config.defaultDarkTheme);
-    else if (def === 'system') return this._getSystemThemeAssociation();
-    else if (def) return this._checkThemeAvailableAndGetActual(def);
+    if (isInThemes) return unwrapThemeId;
+    else if (currentDef === 'light') return this._checkThemeAvailableAndGetActual(this.config.defaultTheme);
+    else if (currentDef === 'dark') return this._checkThemeAvailableAndGetActual(this.config.defaultDarkTheme);
+    else if (currentDef === 'system') return this._getSystemThemeAssociation();
+    else if (currentDef) return this._checkThemeAvailableAndGetActual(currentDef, ...lostDef);
     else return undefined;
   }
 
@@ -428,6 +449,11 @@ export class Client {
     unwrap.set(this, 'selectedSelfThemeId', id);
   }
 
+  setEditedTheme(id?: string): void {
+    if (!id || !(id in this.themes)) unwrap.set(this, 'editedThemeId', undefined);
+    else unwrap.set(this, 'editedThemeId', id);
+  }
+
   createTheme(data: ModuleThemeCreateData): void {
     const { id, name, description, parentThemeId: parentId } = data;
     if (id in this.themes || !parentId || !(parentId in this.themes)) return;
@@ -466,15 +492,13 @@ export class Client {
         description: description
       }
     };
+    this._replaceSelectedThemes(undefined, undefined, undefined, id, id, id);
   }
 
   deleteTheme(id: string): void {
     const theme = this.themes[id];
     if (!theme || theme.type !== 'local') return;
     delete this.themes[id];
-
-    unwrap.set(this, 'selectedLightThemeId', this._checkThemeAvailableAndGetActual(unwrap.get(this.selectedLightThemeId), 'light'));
-    unwrap.set(this, 'selectedDarkThemeId', this._checkThemeAvailableAndGetActual(unwrap.get(this.selectedDarkThemeId), 'dark'));
-    unwrap.set(this, 'selectedSelfThemeId', this._checkThemeAvailableAndGetActual(unwrap.get(this.selectedSelfThemeId), unwrap.get(this.isAutoThemeMode) ? 'system' : unwrap.get(this.selectedLightThemeId)));
+    this._replaceSelectedThemes();
   }
 }
