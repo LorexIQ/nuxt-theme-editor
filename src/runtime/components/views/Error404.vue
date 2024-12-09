@@ -12,11 +12,7 @@ const router = props.client.getRouter();
 </script>
 
 <template>
-  <ViewPage
-    class="TE-error-404"
-    page-id="404"
-    :client="client"
-  >
+  <ViewPage>
     <h1>404</h1>
     <span>Страница не найдена</span>
     <IsButton @click="router.push('index', 'tab-fade-rl')">

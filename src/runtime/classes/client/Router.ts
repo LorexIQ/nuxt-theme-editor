@@ -53,7 +53,7 @@ export class Router {
     return unwrap.get(this.currentPage);
   }
 
-  getPath(): string {
+  getPath(): ModulePagesNames {
     return unwrap.get(this.path);
   }
 

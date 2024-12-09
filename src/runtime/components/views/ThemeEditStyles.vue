@@ -2,7 +2,7 @@
 import type { ModuleClient } from '../../types';
 import IsButton from '../shared/IsButton.vue';
 import ViewPage from '../widgets/ViewPage.vue';
-import { computed } from '#imports';
+import { computed, onBeforeMount, watch } from '#imports';
 
 type Props = {
   client: ModuleClient;
@@ -15,29 +15,29 @@ const router = client.getRouter();
 const themeId = computed(() => router.getQuery().themeId);
 const selectedTheme = computed(() => client.getSelectedTheme()!);
 
-function onActivate() {
+function goBack() {
+  client.setEditedTheme(undefined);
+  router.push('index', 'tab-fade-rl');
+}
+
+onBeforeMount(() => {
   if (!themeId.value || !client.getThemes()[themeId.value]) {
     router.push('index', 'tab-fade-lr');
     return;
   }
 
   client.setEditedTheme(themeId.value);
-}
-function goBack() {
-  client.setEditedTheme(undefined);
-  router.push('index', 'tab-fade-rl');
-}
+});
 </script>
 
 <template>
-  <ViewPage
-    page-id="editThemeStyles"
-    :client="client"
-    @on-active:on="onActivate"
-  >
+  <ViewPage>
     <div class="TE-theme-edit-styles">
-      <div class="TE-theme-edit-styles__all" />
+      <div
+        class="TE-theme-edit-styles__all"
+      />
     </div>
+
     <template #footer>
       <div class="TE-theme-edit-styles-footer">
         <IsButton @click="goBack">

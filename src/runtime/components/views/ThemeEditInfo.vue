@@ -7,7 +7,7 @@ import ThemeBlock from '../features/ThemeBlock.vue';
 import ViewPage from '../widgets/ViewPage.vue';
 import useErrorMessages from '../../helpers/client/useErrorMessages';
 import IsHr from '../shared/IsHr.vue';
-import { computed, reactive } from '#imports';
+import { computed, onBeforeMount, reactive } from '#imports';
 
 type Props = {
   client: ModuleClient;
@@ -41,29 +41,16 @@ function editTheme() {
   }
 }
 
-function onActivate() {
+onBeforeMount(() => {
   if (!themeId.value || !client.getThemes()[themeId.value]) {
     router.push('index', 'tab-fade-lr');
     return;
   }
-
-  const theme = client.getThemes()[themeId.value];
-  activeErrors.clear();
-  Object.assign(themeEditData, {
-    id: theme.id,
-    name: theme.name,
-    description: theme.meta.description,
-    oldThemeId: themeId.value
-  });
-}
+});
 </script>
 
 <template>
-  <ViewPage
-    page-id="editThemeInfo"
-    :client="client"
-    @on-active:on="onActivate"
-  >
+  <ViewPage>
     <div class="TE-theme-edit-info">
       <div class="TE-theme-edit-info__block">
         <IsHr>Theme Info</IsHr>

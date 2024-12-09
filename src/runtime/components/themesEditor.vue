@@ -7,8 +7,27 @@ import ThemeDelete from './views/ThemeDelete.vue';
 import ThemeEditInfo from './views/ThemeEditInfo.vue';
 import ThemeEditStyles from './views/ThemeEditStyles.vue';
 import Error404 from './views/Error404.vue';
+import { computed } from '#imports';
 
 const client = useThemesEditor();
+const router = client.getRouter();
+
+const pageComponent = computed(() => {
+  switch (router.getPath()) {
+    case 'index':
+      return ThemesList;
+    case 'newTheme':
+      return ThemeCreate;
+    case 'deleteTheme':
+      return ThemeDelete;
+    case 'editThemeInfo':
+      return ThemeEditInfo;
+    case 'editThemeStyles':
+      return ThemeEditStyles;
+    default:
+      return Error404;
+  }
+});
 </script>
 
 <template>
@@ -19,12 +38,12 @@ const client = useThemesEditor();
     <EditorHeader :client="client" />
 
     <div class="TE-root__content">
-      <ThemesList :client="client" />
-      <ThemeCreate :client="client" />
-      <ThemeDelete :client="client" />
-      <ThemeEditInfo :client="client" />
-      <ThemeEditStyles :client="client" />
-      <Error404 :client="client" />
+      <transition :name="router.getTransitionName()">
+        <Component
+          :is="pageComponent"
+          :client="client"
+        />
+      </transition>
     </div>
   </div>
 </template>

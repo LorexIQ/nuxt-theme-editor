@@ -3,7 +3,7 @@ import type { ModuleClient } from '../../types';
 import IsButton from '../shared/IsButton.vue';
 import ViewPage from '../widgets/ViewPage.vue';
 import IconsStore from '../shared/IconsStore.vue';
-import { computed } from '#imports';
+import { computed, onBeforeMount } from '#imports';
 
 type Props = {
   client: ModuleClient;
@@ -18,19 +18,17 @@ function onThemeDelete() {
   client.deleteTheme(themeId.value);
   router.push('index', 'tab-fade-rl');
 }
-function onActivate() {
+
+onBeforeMount(() => {
   if (!themeId.value || !client.getThemes()[themeId.value]) {
     router.push('index', 'tab-fade-lr');
+    return;
   }
-}
+});
 </script>
 
 <template>
-  <ViewPage
-    page-id="deleteTheme"
-    :client="client"
-    @on-active:on="onActivate"
-  >
+  <ViewPage>
     <div class="TE-theme-delete">
       <IconsStore
         icon="Question"

@@ -5,6 +5,7 @@ import type { Sandbox } from '../classes/client/Sandbox';
 import type { Router } from '../classes/client/Router';
 import type { Server } from '../classes/server/Server';
 import type { MetaFiles } from '../classes/server/MetaFiles';
+// @ts-ignore
 import type { ModuleMetaBlocks } from '../meta/themesStructure';
 import type { ModuleHelpersNestedKeys, ModuleHelpersStringKeys } from './helpers';
 

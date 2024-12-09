@@ -8,7 +8,7 @@ import ViewPage from '../widgets/ViewPage.vue';
 import BlockRadioThemes from '../widgets/BlockRadioThemes.vue';
 import useErrorMessages from '../../helpers/client/useErrorMessages';
 import IsHr from '../shared/IsHr.vue';
-import { computed, reactive } from '#imports';
+import { computed, onBeforeMount, reactive } from '#imports';
 
 type Props = {
   client: ModuleClient;
@@ -20,12 +20,17 @@ const router = client.getRouter();
 const themes = client.getThemes();
 
 const activeErrors = useErrorMessages();
-const themeCreateData = reactive({} as ModuleThemeCreateData);
-const previewTheme = computed(() => ({
+const themeCreateData = reactive<ModuleThemeCreateData>({
+  id: '',
+  name: '',
+  description: '',
+  parentThemeId: router.getQuery()['parentThemeId']
+});
+const previewTheme = computed<any>(() => ({
   id: themeCreateData.parentThemeId ?? 'default',
   name: themeCreateData.name || themeCreateData.id,
   meta: { description: themeCreateData.description }
-}) as any);
+}));
 
 function createTheme() {
   const id = themeCreateData.id;
@@ -42,23 +47,11 @@ function createTheme() {
   }
 }
 
-function onActivate() {
-  activeErrors.clear();
-  Object.assign(themeCreateData, {
-    id: '',
-    name: '',
-    description: '',
-    parentThemeId: router.getQuery()['parentThemeId']
-  });
-}
+onBeforeMount(() => {});
 </script>
 
 <template>
-  <ViewPage
-    page-id="newTheme"
-    :client="client"
-    @on-active:on="onActivate"
-  >
+  <ViewPage>
     <div class="TE-theme-create">
       <div class="TE-theme-create__block">
         <IsHr>Theme Info</IsHr>

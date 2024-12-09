@@ -17,10 +17,7 @@ const selectedTheme = computed(() => props.client.getSelectedTheme());
 </script>
 
 <template>
-  <ViewPage
-    page-id="index"
-    :client="client"
-  >
+  <ViewPage>
     <div class="TE-themes-list">
       <BlockThemes
         type="system"

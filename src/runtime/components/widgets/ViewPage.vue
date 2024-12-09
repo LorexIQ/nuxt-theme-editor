@@ -1,46 +1,17 @@
-<script setup lang="ts">
-import type { ModuleClient, ModulePagesNames } from '../../types';
-import { computed, watch } from '#imports';
-
-type Props = {
-  pageId: ModulePagesNames;
-  client: ModuleClient;
-};
-type Emits = {
-  (e: 'onActive:on'): void;
-  (e: 'onActive:off'): void;
-};
-
-const props = defineProps<Props>();
-const emit = defineEmits<Emits>();
-const client = props.client;
-const router = client.getRouter();
-
-const isActive = computed(() => router.getPath() === props.pageId);
-
-watch(isActive, (status) => {
-  if (status) emit('onActive:on');
-  else emit('onActive:off');
-}, { immediate: true });
-</script>
-
 <template>
-  <transition :name="router.getTransitionName()">
-    <div
-      v-if="isActive"
-      class="TE-view-page"
-    >
-      <div class="TE-view-page__template">
-        <slot />
-      </div>
-      <div class="TE-view-page__messages">
-        <slot name="messages" />
-      </div>
-      <div class="TE-view-page__footer">
-        <slot name="footer" />
-      </div>
+  <div
+    class="TE-view-page"
+  >
+    <div class="TE-view-page__template">
+      <slot />
     </div>
-  </transition>
+    <div class="TE-view-page__messages">
+      <slot name="messages" />
+    </div>
+    <div class="TE-view-page__footer">
+      <slot name="footer" />
+    </div>
+  </div>
 </template>
 
 <style scoped lang="scss">
