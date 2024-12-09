@@ -22,7 +22,13 @@ export default defineThemeBlockRoot({
       {
         test1: '#fff', // Это navbar road test 1 описание
         a: '#f1f1f1'
-      }
+      },
+      defineThemeBlock('road', [
+        {
+          test1: '#fff', // Это navbar road test 1 описание
+          a: '#f1f1f1'
+        }
+      ])
     ]),
     {
       test1: '$sidebar.test.testtesttest2',

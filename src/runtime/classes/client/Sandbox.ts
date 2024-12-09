@@ -1,6 +1,6 @@
 import { h, type Reactive, render } from 'vue';
 import type {
-  ModuleClient,
+  ModuleClient, ModuleDefaultStyleKeys,
   ModuleOptionsExtend,
   ModuleSandboxComponents,
   ModuleSandboxContextMenuItem,
@@ -14,6 +14,9 @@ import ModuleSandbox from '../../components/views/ModuleSandbox.vue';
 import { markRaw, reactive } from '#imports';
 
 const CONTEXT_MENU_ID = 'context-menu';
+const CONTEXT_MENU_THEMES_ID = `${CONTEXT_MENU_ID}-themes`;
+const CONTEXT_MENU_STYLES_ID = `${CONTEXT_MENU_ID}-styles`;
+const CONTEXT_MENU_INHERITANCE_ID = `${CONTEXT_MENU_ID}-inheritance`;
 
 export class Sandbox {
   private readonly config: ModuleOptionsExtend;
@@ -60,11 +63,11 @@ export class Sandbox {
   }
 
   closeContextMenu(): void {
-    const contextMenuComponentIndex = this.components.findIndex(component => component.id === CONTEXT_MENU_ID);
+    const contextMenuComponentIndex = this.components.findIndex(component => component.id.startsWith(CONTEXT_MENU_ID));
     if (contextMenuComponentIndex !== -1) this.components.splice(contextMenuComponentIndex, 1);
   }
 
-  openThemeContextMenu(event: MouseEvent, theme: ModuleThemeRootReturn, handlers?: ModuleSandboxHandlers): void {
+  openThemeContextMenu(event: MouseEvent, theme: ModuleThemeRootReturn, handlers: ModuleSandboxHandlers<ModuleThemeRootReturn> = {}): void {
     handlers;
     this.closeContextMenu();
     const router = this.ctx.getRouter();
@@ -74,7 +77,7 @@ export class Sandbox {
     const isSelectedDarkTheme = this.ctx.getSelectedDarkThemeId() === theme.id;
 
     this.components.push({
-      id: CONTEXT_MENU_ID,
+      id: CONTEXT_MENU_THEMES_ID,
       component: markRaw(ContextMenu),
       transitionName: 'fade',
       props: {
@@ -128,6 +131,68 @@ export class Sandbox {
             action: () => router.push(`deleteTheme?themeId=${theme.id}`, 'tab-fade-lr'),
             isVisible: () => theme.type === 'local'
           }
+        ]
+      },
+      emits: {
+        close: () => this.closeContextMenu()
+      }
+    });
+  }
+
+  openStyleContextMenu(event: MouseEvent, style: ModuleDefaultStyleKeys, currentValue: string, handlers: ModuleSandboxHandlers<[ModuleDefaultStyleKeys, ModuleDefaultStyleKeys]> = {}): void {
+    this.closeContextMenu();
+    const clickPosition: ModuleSandboxMousePosition = { x: event.pageX, y: event.pageY };
+
+    this.components.push({
+      id: CONTEXT_MENU_STYLES_ID,
+      component: markRaw(ContextMenu),
+      transitionName: 'fade',
+      props: {
+        clickPosition,
+        sandboxSize: this.boxSize,
+        tipText: 'Select an action',
+        items: <ModuleSandboxContextMenuItem[]>[
+          {
+            title: 'Use inheritance',
+            icon: 'Palette',
+            action: () => this.openStyleInheritanceContextMenu(event, style, currentValue, handlers)
+          },
+          {
+            title: 'Select by color picker',
+            icon: 'Palette',
+            action: () => console.log(123)
+          }
+        ]
+      },
+      emits: {
+        close: () => this.closeContextMenu()
+      }
+    });
+  }
+
+  openStyleInheritanceContextMenu(event: MouseEvent, style: ModuleDefaultStyleKeys, currentValue: string, handlers: ModuleSandboxHandlers<[ModuleDefaultStyleKeys, ModuleDefaultStyleKeys]> = {}): void {
+    handlers;
+    this.closeContextMenu();
+    const stylesPaths = this.ctx.getThemesStylesPaths().value;
+    const clickPosition: ModuleSandboxMousePosition = { x: event.pageX, y: event.pageY };
+
+    this.components.push({
+      id: CONTEXT_MENU_INHERITANCE_ID,
+      component: markRaw(ContextMenu),
+      transitionName: 'fade',
+      props: {
+        clickPosition,
+        sandboxSize: this.boxSize,
+        tipText: 'Select an inheritance',
+        maxHeight: 'min(100%, 300px)',
+        items: <ModuleSandboxContextMenuItem[]>[
+          ...stylesPaths.filter(stylePath => stylePath !== style).map(stylePath => ({
+            title: stylePath,
+            icon: 'Circle',
+            iconColor: this.ctx.getStylesKeyValueByPath(stylePath).value,
+            isDisabled: () => stylePath === currentValue.slice(1),
+            action: () => this.ctx.setThemeStyleValue(style, `$${stylePath}`, this.ctx.getEditedTheme())
+          }))
         ]
       },
       emits: {

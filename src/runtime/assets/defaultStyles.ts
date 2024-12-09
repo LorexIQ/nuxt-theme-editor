@@ -11,14 +11,14 @@ export const DEFAULT_PREVIEW_STYLES: Required<ModuleDefineThemeMetaPreview> = {
 
 export const DEFAULT_UI_STYLES: Required<ModuleDefineThemeMetaUI> = {
   bg: '#fff',
-  bgHover: '#f6f6f6',
+  bgHover: '#fafafa',
   bgHeader: '#f6f6f6',
   bgFooter: '#fff',
   bgBlockHeader: '#f6f6f6',
   bgGlass: '#00000019',
   blurGlass: '3px',
   shadow: '#00000033',
-  border: '#e6e6e6',
+  border: '#00000019',
   title: '#333',
   titleTransparent: '#999',
 
@@ -34,26 +34,26 @@ export const DEFAULT_UI_STYLES: Required<ModuleDefineThemeMetaUI> = {
 
   switchSlider: '#999',
   switchSliderChecked: '#1e752a',
-  switchSliderBorder: '#e6e6e6',
+  switchSliderBorder: '#00000019',
   switchCircle: '#333',
   switchCircleChecked: '#2ecc71',
-  switchCircleBorder: '#e6e6e6',
+  switchCircleBorder: '#00000019',
 
   buttonDefaultBg: '#fafafa',
   buttonDefaultBgHover: '#fff',
-  buttonDefaultBorder: '#e6e6e6',
+  buttonDefaultBorder: '#00000019',
   buttonDefaultText: '#555',
   buttonDefaultTextHover: '#333',
 
   buttonSuccessBg: '#2ECC71CB',
   buttonSuccessBgHover: '#2ecc71',
-  buttonSuccessBorder: '#e6e6e6',
+  buttonSuccessBorder: '#00000019',
   buttonSuccessText: '#2C3E50CC',
   buttonSuccessTextHover: '#2c3e50',
 
   buttonErrorBg: '#FF5151E6',
   buttonErrorBgHover: '#ff5151',
-  buttonErrorBorder: '#e6e6e6',
+  buttonErrorBorder: '#00000019',
   buttonErrorText: '#f5f5f5',
   buttonErrorTextHover: '#f5f5f5',
 

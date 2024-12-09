@@ -12,12 +12,17 @@ type Props = {
   clickPosition: ModuleSandboxMousePosition;
   items: ModuleSandboxContextMenuItem[];
   tipText?: string;
+  blurBg?: boolean;
+  maxHeight?: string;
 };
 type Emits = {
   (e: 'close'): void;
 };
 
-const props = defineProps<Props>();
+const props = withDefaults(defineProps<Props>(), {
+  blurBg: true,
+  maxHeight: '100%'
+});
 const emit = defineEmits<Emits>();
 const sandboxSize = props.sandboxSize;
 
@@ -30,13 +35,14 @@ const menuPosition = computed(() => {
 
   return {
     left: left + 'px',
-    top: top + 'px'
+    top: top + 'px',
+    maxHeight: props.maxHeight
   };
 });
 
 function selectItem(item: ModuleSandboxContextMenuItem) {
-  item.action();
   closeContextMenu();
+  item.action();
 }
 function closeContextMenu() {
   emit('close');
@@ -52,6 +58,7 @@ onMounted(() => {
 <template>
   <div
     class="TE-context-menu"
+    :class="{ 'TE-context-menu--blur-bg': blurBg }"
     @contextmenu.self.prevent="closeContextMenu"
     @click.self="closeContextMenu"
   >
@@ -108,12 +115,12 @@ onMounted(() => {
   right: 0;
   bottom: 0;
   left: 0;
-  backdrop-filter: blur(var(--blurGlass));
-  background-color: var(--bgGlass);
   user-select: none;
 
   &__menu {
     position: absolute;
+    display: grid;
+    grid-template-rows: auto 1fr;
     width: max-content;
     border-radius: 5px;
     background-color: var(--bg);
@@ -127,6 +134,9 @@ onMounted(() => {
       border-bottom: 1px solid var(--border);
     }
     &__items {
+      height: 100%;
+      overflow-y: auto;
+
       &__item {
         display: grid;
         grid-template-columns: auto;
@@ -163,6 +173,11 @@ onMounted(() => {
         }
       }
     }
+  }
+
+  &--blur-bg {
+    backdrop-filter: blur(var(--blurGlass));
+    background-color: var(--bgGlass);
   }
 }
 </style>

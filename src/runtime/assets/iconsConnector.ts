@@ -2,6 +2,7 @@ import Arrow from '../components/icons/Arrow.vue';
 import Asterisk from '../components/icons/Asterisk.vue';
 import Bin from '../components/icons/Bin.vue';
 import Check from '../components/icons/Check.vue';
+import Circle from '../components/icons/Circle.vue';
 import Error from '../components/icons/Error.vue';
 import Info from '../components/icons/Info.vue';
 import Moon from '../components/icons/Moon.vue';
@@ -21,6 +22,7 @@ export default {
   Asterisk,
   Bin,
   Check,
+  Circle,
   Error,
   Info,
   Moon,

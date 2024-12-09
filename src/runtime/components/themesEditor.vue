@@ -49,7 +49,7 @@ const pageComponent = computed(() => {
 </template>
 
 <style lang="scss">
-.TE-root {
+.TE-root, .TE-sandbox {
   & * {
     font-family: 'Roboto', sans-serif;
     box-sizing: border-box;

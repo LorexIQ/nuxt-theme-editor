@@ -13,7 +13,7 @@ defineProps<Props>();
   <div class="TE-theme-block">
     <div
       class="TE-theme-block__preview"
-      v-bind="{ [`theme-${theme.id}-preview`]: '' }"
+      v-bind="{ [`theme-default-preview`]: '', [`theme-${theme.id}-preview`]: '' }"
     >
       <slot name="preview">
         <ThemePreview />

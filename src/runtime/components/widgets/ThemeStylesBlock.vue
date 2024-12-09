@@ -1,14 +1,23 @@
 <script setup lang="ts">
 import StyleEditBlock from '../features/StyleEditBlock.vue';
+import type { ModuleDefaultStyleKeys } from '../../types';
 import { computed } from '#imports';
 
 type Props = {
   styles: Record<string, any>[];
   rawStyles: Record<string, any>[];
   id?: string;
+  ctxPath?: string[];
+};
+type Emits = {
+  (e: 'contextMenuOpen', v: [MouseEvent, ModuleDefaultStyleKeys, string]): void;
 };
 
 const props = defineProps<Props>();
+const emit = defineEmits<Emits>();
+
+const ctxPathComputed = computed(() => (props.ctxPath ?? []).join(' > '));
+const styleCtxPathComputed = computed(() => (props.ctxPath ?? []).join('.'));
 const stylesBlocks = computed(() => props.styles.map((stylesBlock, index) => ({
   id: stylesBlock.id,
   stylesBlock,
@@ -26,23 +35,34 @@ const stylesBlocks = computed(() => props.styles.map((stylesBlock, index) => ({
       :id="block.id"
       :styles="block.stylesBlock.styles"
       :raw-styles="block.rawStylesBlock.styles"
+      :ctx-path="[...ctxPath ?? [], block.id]"
+      @context-menu-open="emit('contextMenuOpen', $event)"
     />
     <div
       v-else
       class="TE-theme-styles-block"
     >
       <div class="TE-theme-styles-block__header">
-        {{ id }}
+        {{ ctxPathComputed }}
       </div>
       <div class="TE-theme-styles-block__styles">
-        <StyleEditBlock
+        <template
           v-for="styleKey of Object.keys(block.stylesBlock)"
-          :id="`${id}-${styleKey}`"
           :key="`${id}-${styleKey}`"
-          :style-key="styleKey"
-          :styles="block.stylesBlock"
-          :raw-styles="block.rawStylesBlock"
-        />
+        >
+          <!-- Перенести в компонент все превенты, хуенты, всё лишнее -->
+          <StyleEditBlock
+            :id="`${id}-${styleKey}`"
+            :style-key="styleKey"
+            :styles="block.stylesBlock"
+            :raw-styles="block.rawStylesBlock"
+            @contextmenu.prevent="emit('contextMenuOpen', [
+              $event,
+              `${styleCtxPathComputed}.${styleKey}` as any,
+              block.rawStylesBlock[styleKey],
+            ])"
+          />
+        </template>
       </div>
     </div>
   </template>

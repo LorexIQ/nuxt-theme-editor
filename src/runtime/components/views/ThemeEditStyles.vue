@@ -12,10 +12,10 @@ type Props = {
 const props = defineProps<Props>();
 const client = props.client;
 const router = client.getRouter();
+const sandbox = client.getSandbox();
 
 const themeId = computed(() => router.getQuery().themeId);
 const selectedTheme = computed(() => client.getSelectedTheme()!);
-const selectedThemeRAW = computed(() => client.getSelectedTheme()!);
 
 function goBack() {
   client.setEditedTheme(undefined);
@@ -39,7 +39,9 @@ onBeforeMount(() => {
         <ThemeStylesBlock
           :styles="selectedTheme.styles"
           :raw-styles="selectedTheme.target.styles"
+          @context-menu-open="sandbox.openStyleContextMenu(...$event)"
         />
+        {{ client.getThemesStylesPaths() }}
       </div>
     </div>
 

@@ -18,10 +18,10 @@ const rawValue = computed(() => props.rawStyles[props.styleKey]);
   <div class="TE-style-edit-block">
     <div
       class="TE-style-edit-block__picker"
-      :style="{ backgroundColor: currentValue }"
+      :style="`background-color: ${currentValue};`"
     />
     <div class="TE-style-edit-block_key">
-      {{ styleKey }} = {{ currentValue }} ({{ rawValue }})
+      {{ styleKey }} = {{ currentValue }} {{ rawValue }}
     </div>
   </div>
 </template>
@@ -33,13 +33,19 @@ const rawValue = computed(() => props.rawStyles[props.styleKey]);
   gap: 5px;
   padding: 4px;
   border-bottom: 1px solid var(--border);
+  background-color: var(--bg);
+  transition: .3s;
+  cursor: pointer;
 
   &__picker {
     aspect-ratio: 1;
     width: 27px;
     border: 1px solid var(--border);
     border-radius: 5px;
-    cursor: pointer;
+  }
+
+  &:hover {
+    background-color: var(--bgHover);
   }
 }
 </style>

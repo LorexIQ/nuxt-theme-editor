@@ -23,7 +23,6 @@ function getComponentId(instance: ComponentInternalInstance) {
 
 export default function useBlock(block: ModuleDefaultBlockKeys) {
   const client = useClient().value;
-  console.log('INIT SCOPE');
   const blockStyles = client.getStylesByPath(block);
   const currentInstance = getCurrentInstance()!;
 

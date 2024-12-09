@@ -1,6 +1,5 @@
 import type { Component } from 'vue';
 import type { ModuleIcons } from './share';
-import type { ModuleThemeRootReturn } from './themes';
 
 export type ModuleSandboxComponent = {
   id: string;
@@ -26,4 +25,4 @@ export type ModuleSandboxSize = {
   width: number;
   height: number;
 };
-export type ModuleSandboxHandlers = { [name: string]: (theme: ModuleThemeRootReturn) => any };
+export type ModuleSandboxHandlers<T> = { [name: string]: (payload: T) => any };
