@@ -18,7 +18,7 @@ export const DEFAULT_UI_STYLES: Required<ModuleDefineThemeMetaUI> = {
   bgGlass: '#00000019',
   blurGlass: '3px',
   shadow: '#00000033',
-  border: '#00000019',
+  border: '#e6e6e6',
   title: '#333',
   titleTransparent: '#999',
 
@@ -34,26 +34,26 @@ export const DEFAULT_UI_STYLES: Required<ModuleDefineThemeMetaUI> = {
 
   switchSlider: '#999',
   switchSliderChecked: '#1e752a',
-  switchSliderBorder: '#00000019',
+  switchSliderBorder: '#e6e6e6',
   switchCircle: '#333',
   switchCircleChecked: '#2ecc71',
-  switchCircleBorder: '#00000019',
+  switchCircleBorder: '#e6e6e6',
 
   buttonDefaultBg: '#fafafa',
   buttonDefaultBgHover: '#fff',
-  buttonDefaultBorder: '#00000019',
+  buttonDefaultBorder: '#e6e6e6',
   buttonDefaultText: '#555',
   buttonDefaultTextHover: '#333',
 
   buttonSuccessBg: '#2ECC71CB',
   buttonSuccessBgHover: '#2ecc71',
-  buttonSuccessBorder: '#00000019',
+  buttonSuccessBorder: '#e6e6e6',
   buttonSuccessText: '#2C3E50CC',
   buttonSuccessTextHover: '#2c3e50',
 
   buttonErrorBg: '#FF5151E6',
   buttonErrorBgHover: '#ff5151',
-  buttonErrorBorder: '#00000019',
+  buttonErrorBorder: '#e6e6e6',
   buttonErrorText: '#f5f5f5',
   buttonErrorTextHover: '#f5f5f5',
 

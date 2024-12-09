@@ -41,7 +41,7 @@ export class Client {
   private readonly sandbox = new Sandbox(this);
   private readonly router = new Router(this);
 
-  private readonly themesPathsCache: ModuleObject<number[]> = {};
+  private readonly themesPathsCache: ModuleObject<(number | string)[]> = reactive({});
   private readonly errorsMessages = reactive<ModuleErrorMessage[]>([]);
   private readonly usesScopesProperties = reactive<ModuleObject<ModuleObject>>({});
 
@@ -50,17 +50,16 @@ export class Client {
   private readonly selectedLightThemeId = ref<string>();
   private readonly selectedDarkThemeId = ref<string>();
   private readonly selectedSystemThemeId = useSystemTheme().theme;
-  private readonly editedThemeId = ref<string>();
   private readonly themes = reactive<ModuleThemes>({});
 
-  private readonly selectedThemeId = computed(() => {
-    const isAutoMode = unwrap.get(this.isAutoThemeMode);
-    const isEditMode = !!unwrap.get(this.editedThemeId);
-    return isEditMode ? unwrap.get(this.editedThemeId) : isAutoMode ? this._getSystemThemeAssociation() : unwrap.get(this.selectedSelfThemeId);
-  });
+  private readonly editedTheme = ref<ModuleThemeRootReturn>();
+  private readonly editedThemeId = computed(() => this.editedTheme.value?.id);
+
+  private readonly selectedThemeId = computed(() => unwrap.get(this.isAutoThemeMode) ? this._getSystemThemeAssociation() : unwrap.get(this.selectedSelfThemeId));
   private readonly selectedTheme = computed(() => {
     const themeId = unwrap.get(this.selectedThemeId);
-    return themeId ? this._prepareSelectedTheme(this.themes[themeId]) : undefined;
+    const editedTheme = unwrap.get(this.editedTheme);
+    return editedTheme ? this._prepareSelectedTheme(editedTheme) : themeId ? this._prepareSelectedTheme(this.themes[themeId]) : undefined;
   });
 
   private readonly savedStorage = computed<ModuleStorage>(() => {
@@ -78,6 +77,7 @@ export class Client {
 
   constructor() {
     this._readSystemThemes();
+    this._createThemesPaths();
     this._selectDefaultThemes();
     this._readStorage();
     this._initWatchers();
@@ -290,47 +290,50 @@ export class Client {
     }
   }
 
-  private _searchBlockStylesByPath(stylesPath: string, styles?: ModuleThemeSelectedStyles[]): ModuleObject {
-    const finder = (blocksIds: string[], styles?: ModuleThemeSelectedStyles[]): [ModuleObject, number[]] => {
+  private _createThemesPaths(): void {
+    const finder = (styles?: ModuleThemeSelectedStyles[], ctx: [string, number | string][] = []) => {
+      const results: ModuleObject<(number | string)[]> = {};
+
       if (styles) {
         for (let styleIndex = 0; styleIndex < styles.length; ++styleIndex) {
-          const style = styles[styleIndex];
+          const stylesBlock = styles[styleIndex];
 
-          if (style.id && Array.isArray(style.styles)) {
-            if (style.id === blocksIds[0]) {
-              const childrenStyles = finder(blocksIds.slice(1), style.styles);
-              return [childrenStyles[0], [styleIndex, ...childrenStyles[1]]];
-            }
-          } else if (!blocksIds.length) {
-            return [style as ModuleObject, [styleIndex]];
+          if (stylesBlock.id) {
+            Object.assign(results, finder(stylesBlock.styles as any, [...ctx, [stylesBlock.id, styleIndex]]));
+          } else {
+            const ctxKeys = ctx.map(block => block[0]);
+            const ctxIndexes = ctx.map(block => block[1]);
+
+            Object.assign(results, {
+              ...{ [ctxKeys.join('.')]: [...ctxIndexes, 0] },
+              ...Object.keys(stylesBlock).reduce((acc, key) => ({
+                ...acc,
+                [[...ctxKeys, key].join('.')]: [...ctxIndexes, 0, key]
+              }), {})
+            });
           }
         }
       }
 
-      return [{}, []];
+      return results;
     };
 
-    if (!styles) {
-      return {};
-    } else if (this.themesPathsCache[stylesPath]) {
-      return this.themesPathsCache[stylesPath].reduce((acc, index) => acc?.styles[index], { styles } as any) ?? {};
-    } else {
-      const findBlock = finder(stylesPath.split('.'), styles);
-      this.themesPathsCache[stylesPath] = findBlock[1];
-      return findBlock[0];
+    console.log(finder(this.themes[this.config.defaultTheme].styles));
+    Object.assign(this.themesPathsCache, finder(this.themes[this.config.defaultTheme].styles));
+  }
+
+  private _getValueByThemesCache(blockPath: string, styles?: ModuleThemeSelectedStyles[]): ModuleObject | string | undefined {
+    if (styles && blockPath in this.themesPathsCache) {
+      return this.themesPathsCache[blockPath].reduce((acc, index) => acc?.styles?.[index] ?? acc?.[index], { styles } as any);
     }
   }
 
   getStylesByPath(blockPath: ModuleDefaultBlockKeys, theme?: ModuleThemeRootReturn): ComputedRef<ModuleObject> {
-    return computed(() => this._searchBlockStylesByPath(blockPath, (theme ?? unwrap.get(this.selectedTheme))?.styles));
+    return computed(() => this._getValueByThemesCache(blockPath, (theme ?? unwrap.get(this.selectedTheme))?.styles) as any ?? {});
   }
 
   getStylesKeyValueByPath(stylePath: ModuleDefaultStyleKeys, theme?: ModuleThemeRootReturn): ComputedRef<string> {
-    const stylePathParts = (stylePath as string).split('.');
-    const blockPath = stylePathParts.length > 1 ? stylePathParts.slice(0, -1).join('.') : '';
-    const styleName = stylePathParts[stylePathParts.length - 1] as any;
-
-    return computed(() => unwrap.get(this._searchBlockStylesByPath(blockPath, (theme ?? unwrap.get(this.selectedTheme))?.styles)[styleName]) ?? 'UNKNOWN STYLE');
+    return computed(() => this._getValueByThemesCache(stylePath, (theme ?? unwrap.get(this.selectedTheme))?.styles) as any ?? 'UNKNOWN STYLE');
   }
 
   registerScopeStyles(scopeId: string, styles: ComputedRef<ModuleObject>): void {
@@ -428,8 +431,8 @@ export class Client {
   }
 
   setEditedTheme(id?: string): void {
-    if (!id || !(id in this.themes)) unwrap.set(this, 'editedThemeId', undefined);
-    else unwrap.set(this, 'editedThemeId', id);
+    if (!id || !(id in this.themes)) unwrap.set(this, 'editedTheme', undefined);
+    else unwrap.set(this, 'editedTheme', JSON.parse(JSON.stringify(this.themes[id])));
   }
 
   createTheme(data: ModuleThemeCreateData): void {

@@ -1,6 +1,6 @@
 import type { Component } from 'vue';
 import type { ModuleIcons } from './share';
-import type { ModuleThemeRootReturn } from '~/src/runtime/types/themes';
+import type { ModuleThemeRootReturn } from './themes';
 
 export type ModuleSandboxComponent = {
   id: string;

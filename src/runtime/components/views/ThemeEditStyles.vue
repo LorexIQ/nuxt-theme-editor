@@ -2,6 +2,7 @@
 import type { ModuleClient } from '../../types';
 import IsButton from '../shared/IsButton.vue';
 import ViewPage from '../widgets/ViewPage.vue';
+import ThemeStylesBlock from '../widgets/ThemeStylesBlock.vue';
 import { computed, onBeforeMount } from '#imports';
 
 type Props = {
@@ -14,6 +15,7 @@ const router = client.getRouter();
 
 const themeId = computed(() => router.getQuery().themeId);
 const selectedTheme = computed(() => client.getSelectedTheme()!);
+const selectedThemeRAW = computed(() => client.getSelectedTheme()!);
 
 function goBack() {
   client.setEditedTheme(undefined);
@@ -33,9 +35,12 @@ onBeforeMount(() => {
 <template>
   <ViewPage>
     <div class="TE-theme-edit-styles">
-      <div
-        class="TE-theme-edit-styles__all"
-      />
+      <div class="TE-theme-edit-styles__all">
+        <ThemeStylesBlock
+          :styles="selectedTheme.styles"
+          :raw-styles="selectedTheme.target.styles"
+        />
+      </div>
     </div>
 
     <template #footer>
