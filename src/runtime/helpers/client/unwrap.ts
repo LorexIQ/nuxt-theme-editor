@@ -1,5 +1,5 @@
 import type { Ref } from '@vue/reactivity';
-import type { ModuleObject } from '../types';
+import type { ModuleObject } from '../../types';
 import { isRef } from '#imports';
 
 export default {

@@ -1,8 +1,8 @@
 import { ref } from '#imports';
 
-const theme = ref<'light' | 'dark'>(getSystemTheme());
+const theme = ref<'light' | 'dark'>(useSystemTheme());
 
-function getSystemTheme(): 'light' | 'dark' {
+function useSystemTheme(): 'light' | 'dark' {
   return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
 }
 

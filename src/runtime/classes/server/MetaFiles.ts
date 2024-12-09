@@ -1,16 +1,16 @@
 import fs from 'node:fs';
 import type { Resolver } from '@nuxt/kit';
 import { createResolver } from '@nuxt/kit';
-import uPath from '../../helpers/uPath';
 import type {
   ModuleDefineThemeBlockSetting,
   ModuleObject,
   ModuleOptionsExtend,
   ModuleServer
 } from '../../types';
-import defineChecker from '../../helpers/defineChecker';
-import tsMorphProject from '../../helpers/tsMorphProject';
+import uPath from '../../helpers/server/uPath';
+import tsMorphProject from '../../helpers/server/tsMorphProject';
 import writeThemeStructure from '../../helpers/server/writeThemeStructure';
+import defineChecker from '../../helpers/defineChecker';
 
 export class MetaFiles {
   private readonly metaResolver: Resolver;

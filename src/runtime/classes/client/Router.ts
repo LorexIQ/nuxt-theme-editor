@@ -6,7 +6,7 @@ import type {
   ModulePageAnimations,
   ModulePagesNames
 } from '../../types';
-import unwrap from '../../helpers/unwrap';
+import unwrap from '../../helpers/client/unwrap';
 import pagesMeta from '../../assets/pagesMeta';
 import { computed, ref } from '#imports';
 

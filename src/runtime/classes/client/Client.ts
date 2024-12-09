@@ -22,10 +22,10 @@ import type {
 } from '../../types';
 // @ts-ignore
 import connectorMeta from '../../meta/connector';
-import unwrap from '../../helpers/unwrap';
-import defineChecker from '../../helpers/defineChecker';
-import getSystemTheme from '../../helpers/getSystemTheme';
 import { DEFAULT_PREVIEW_STYLES, DEFAULT_UI_STYLES } from '../../assets/defaultStyles';
+import unwrap from '../../helpers/client/unwrap';
+import useSystemTheme from '../../helpers/client/useSystemTheme';
+import defineChecker from '../../helpers/defineChecker';
 import useReloadMiddleware from '../../helpers/client/useReloadMiddleware';
 import mergeObjects from '../../helpers/mergeObjects';
 import { Sandbox } from './Sandbox';
@@ -49,7 +49,7 @@ export class Client {
   private readonly selectedSelfThemeId = ref<string>();
   private readonly selectedLightThemeId = ref<string>();
   private readonly selectedDarkThemeId = ref<string>();
-  private readonly selectedSystemThemeId = getSystemTheme().theme;
+  private readonly selectedSystemThemeId = useSystemTheme().theme;
   private readonly editedThemeId = ref<string>();
   private readonly themes = reactive<ModuleThemes>({});
 

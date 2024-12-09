@@ -1,5 +1,5 @@
-import clientGetter from '../helpers/clientGetter';
+import useClient from '../helpers/client/useClient';
 
 export default function () {
-  return clientGetter().value;
+  return useClient().value;
 }

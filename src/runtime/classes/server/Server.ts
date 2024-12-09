@@ -1,8 +1,6 @@
 import fs from 'node:fs';
 import type { Nuxt } from '@nuxt/schema';
 import { createResolver, type Resolver } from '@nuxt/kit';
-import defineThemeBlock from '../../composables/defineThemeBlock';
-import defineThemeBlockRoot from '../../composables/defineThemeBlockRoot';
 import type {
   ModuleDefineThemeBlockRootReturn,
   ModuleMetaFilesWatcherHash,
@@ -11,9 +9,11 @@ import type {
   ModuleOptionsExtendMeta,
   ModuleServerThemes
 } from '../../types';
-import uPath from '../../helpers/uPath';
-import logger from '../../helpers/logger';
-import { loadTsModule } from '../../helpers/loadTsModule';
+import defineThemeBlock from '../../composables/defineThemeBlock';
+import defineThemeBlockRoot from '../../composables/defineThemeBlockRoot';
+import uPath from '../../helpers/server/uPath';
+import logger from '../../helpers/server/logger';
+import { loadTsModule } from '../../helpers/server/loadTsModule';
 import { MetaFiles } from './MetaFiles';
 import { ThemesFiles } from './ThemesFiles';
 

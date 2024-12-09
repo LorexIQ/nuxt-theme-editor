@@ -3,9 +3,9 @@ import { pathToFileURL } from 'node:url';
 import esbuild from 'esbuild';
 import { resolveAlias } from '@nuxt/kit';
 import type { SourceFile } from 'ts-morph';
+import type { ModuleLoadTsModuleBaseReturn } from '../../types';
 import uPath from './uPath';
 import tsMorphProject from './tsMorphProject';
-import type { ModuleLoadTsModuleBaseReturn } from '~/src/runtime/types';
 
 function clearTemp(tempPath: string, file?: SourceFile): void {
   if (fs.existsSync(tempPath)) fs.unlinkSync(tempPath);

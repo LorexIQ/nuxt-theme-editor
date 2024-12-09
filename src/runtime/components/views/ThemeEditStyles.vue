@@ -2,7 +2,7 @@
 import type { ModuleClient } from '../../types';
 import IsButton from '../shared/IsButton.vue';
 import ViewPage from '../widgets/ViewPage.vue';
-import { computed, onBeforeMount, watch } from '#imports';
+import { computed, onBeforeMount } from '#imports';
 
 type Props = {
   client: ModuleClient;

@@ -5,8 +5,8 @@ import type {
   ModuleOptionsExtend,
   ModuleServer
 } from '../../types';
-import tsMorphProject from '../../helpers/tsMorphProject';
-import logger from '../../helpers/logger';
+import tsMorphProject from '../../helpers/server/tsMorphProject';
+import logger from '../../helpers/server/logger';
 import writeThemeStructure from '../../helpers/server/writeThemeStructure';
 
 export class ThemesFiles {

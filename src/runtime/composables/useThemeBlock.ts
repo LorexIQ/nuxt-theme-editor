@@ -1,5 +1,5 @@
 import type { ComponentInternalInstance } from '@vue/runtime-core';
-import clientGetter from '../helpers/clientGetter';
+import useClient from '../helpers/client/useClient';
 import type { ModuleDefaultBlockKeys } from '../types';
 import { getCurrentInstance, onMounted, onUnmounted } from '#imports';
 
@@ -22,7 +22,7 @@ function getComponentId(instance: ComponentInternalInstance) {
 }
 
 export default function useBlock(block: ModuleDefaultBlockKeys) {
-  const client = clientGetter().value;
+  const client = useClient().value;
   const blockStyles = client.getStylesByPath(block);
   const currentInstance = getCurrentInstance()!;
 

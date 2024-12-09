@@ -1,5 +1,5 @@
-import type { ModuleOptionsExtend } from '../types';
-import { Client } from '../classes/client/Client';
+import type { ModuleOptionsExtend } from '../../types';
+import { Client } from '../../classes/client/Client';
 import { useRuntimeConfig, useState } from '#imports';
 
 export default function () {
