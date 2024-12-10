@@ -27,7 +27,7 @@ import unwrap from '../../helpers/client/unwrap';
 import useSystemTheme from '../../helpers/client/useSystemTheme';
 import defineChecker from '../../helpers/defineChecker';
 import useReloadMiddleware from '../../helpers/client/useReloadMiddleware';
-import mergeObjects from '../../helpers/mergeObjects';
+import mergeThemes from '../../helpers/mergeThemes';
 import { Sandbox } from './Sandbox';
 import { Router } from './Router';
 import { useRuntimeConfig, reactive, ref, computed, watch } from '#imports';
@@ -149,7 +149,7 @@ export class Client {
   }
 
   private _buildCustomTheme(theme: ModuleThemeRootReturn, index: number): ModuleThemeRootReturn {
-    theme = mergeObjects(theme, JSON.parse(JSON.stringify(this.themes[this.config.defaultTheme])));
+    theme = mergeThemes(theme, JSON.parse(JSON.stringify(this.themes[this.config.defaultTheme])));
     let themeId = theme.id;
 
     if (themeId in this.themes) {
@@ -180,7 +180,7 @@ export class Client {
       name: themeFile.meta.name ?? themeId,
       type: themeType,
       meta: {
-        name: themeId,
+        name: themeFile.meta.name ?? '',
         description: '',
 
         ...themeFile.meta,
@@ -441,7 +441,6 @@ export class Client {
         if (cache.length > i + 1) {
           return acc?.styles?.[index];
         } else {
-          console.log(acc, index);
           acc[index] = newValue;
           return acc;
         }
@@ -472,7 +471,10 @@ export class Client {
 
   setEditedTheme(id?: string): void {
     if (!id || !(id in this.themes)) unwrap.set(this, 'editedTheme', undefined);
-    else unwrap.set(this, 'editedTheme', JSON.parse(JSON.stringify(this.themes[id])));
+    else unwrap.set(this, 'editedTheme', mergeThemes(
+      JSON.parse(JSON.stringify(this.themes[id])),
+      JSON.parse(JSON.stringify(this.themes[this.config.defaultTheme])))
+    );
   }
 
   createTheme(data: ModuleThemeCreateData): void {
@@ -489,8 +491,8 @@ export class Client {
       meta: {
         ...newTheme.meta,
 
-        name: name || id,
-        description: description
+        name,
+        description
       }
     };
   }
@@ -509,8 +511,8 @@ export class Client {
       meta: {
         ...theme.meta,
 
-        name: name || id,
-        description: description
+        name,
+        description
       }
     };
     this._replaceSelectedThemes(undefined, undefined, undefined, id, id, id);

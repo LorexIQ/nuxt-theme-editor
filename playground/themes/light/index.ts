@@ -18,12 +18,12 @@ export default defineThemeBlockRoot({
   },
   sidebar,
   defineThemeBlock('navbar', [
-    defineThemeBlock('road', [
+    defineThemeBlock('road321312312312313123', [
       {
         test1: '#fff', // Это navbar road test 1 описание
         a: '#f1f1f1'
       },
-      defineThemeBlock('road', [
+      defineThemeBlock('road12312321312312321', [
         {
           test1: '#fff', // Это navbar road test 1 описание
           a: '#f1f1f1'

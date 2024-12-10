@@ -5,6 +5,7 @@ import type {
   ModuleSandboxSize
 } from '../../types';
 import IconsStore from '../shared/IconsStore.vue';
+import TextRunner from './TextRunner.vue';
 import { computed, onMounted, ref } from '#imports';
 
 type Props = {
@@ -13,6 +14,7 @@ type Props = {
   items: ModuleSandboxContextMenuItem[];
   tipText?: string;
   blurBg?: boolean;
+  maxWidth?: string;
   maxHeight?: string;
 };
 type Emits = {
@@ -21,6 +23,7 @@ type Emits = {
 
 const props = withDefaults(defineProps<Props>(), {
   blurBg: true,
+  maxWidth: '100%',
   maxHeight: '100%'
 });
 const emit = defineEmits<Emits>();
@@ -36,6 +39,7 @@ const menuPosition = computed(() => {
   return {
     left: left + 'px',
     top: top + 'px',
+    maxWidth: props.maxWidth,
     maxHeight: props.maxHeight
   };
 });
@@ -99,7 +103,7 @@ onMounted(() => {
               class="TE-context-menu__menu__items__item__title"
               :style="`color: ${item.titleColor};`"
             >
-              {{ item.title }}
+              <TextRunner>{{ item.title }}</TextRunner>
             </div>
           </div>
         </template>
@@ -162,6 +166,10 @@ onMounted(() => {
             width: 100%;
             height: 100%;
           }
+        }
+        &__title {
+          width: 100%;
+          overflow: hidden;
         }
 
         &--disabled {

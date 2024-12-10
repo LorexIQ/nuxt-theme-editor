@@ -184,7 +184,8 @@ export class Sandbox {
         clickPosition,
         sandboxSize: this.boxSize,
         tipText: 'Select an inheritance',
-        maxHeight: 'min(100%, 300px)',
+        maxWidth: 'min(100%, 300px)',
+        maxHeight: 'min(100%, 400px)',
         items: <ModuleSandboxContextMenuItem[]>[
           ...stylesPaths.filter(stylePath => stylePath !== style).map(stylePath => ({
             title: stylePath,

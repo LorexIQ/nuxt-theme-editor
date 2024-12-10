@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import StyleEditBlock from '../features/StyleEditBlock.vue';
 import type { ModuleDefaultStyleKeys } from '../../types';
+import TextRunner from '../shared/TextRunner.vue';
 import { computed } from '#imports';
 
 type Props = {
@@ -43,7 +44,9 @@ const stylesBlocks = computed(() => props.styles.map((stylesBlock, index) => ({
       class="TE-theme-styles-block"
     >
       <div class="TE-theme-styles-block__header">
-        {{ ctxPathComputed }}
+        <TextRunner stop-on-hover>
+          {{ ctxPathComputed }}
+        </TextRunner>
       </div>
       <div class="TE-theme-styles-block__styles">
         <template

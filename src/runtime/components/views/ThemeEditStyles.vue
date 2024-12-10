@@ -41,6 +41,7 @@ onBeforeMount(() => {
           :raw-styles="selectedTheme.target.styles"
           @context-menu-open="sandbox.openStyleContextMenu(...$event)"
         />
+
         {{ client.getThemesStylesPaths() }}
       </div>
     </div>
