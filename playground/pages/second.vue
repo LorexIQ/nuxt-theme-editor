@@ -1,12 +1,22 @@
 <script setup lang="ts">
+import useEyeDropper from '~/composables/useEyeDropper';
+import ColorPicker from '~/components/ColorPicker/index.vue';
+
 const router = useRouter();
 const themesEditor = useThemesEditor();
 const scopeStyles = useThemeBlock('sidebar.test');
 console.log('second.vue useThemeBlock =>', scopeStyles.value);
+useEyeDropper();
+const color = ref('#8C8C8C5C');
 </script>
 
 <template>
   <div class="page-second">
+    <ColorPicker
+      v-model="color"
+      :sucker-hide="false"
+    />
+    {{ color }}
     <h4>PAGE: SECOND</h4>
     {{ themesEditor.getStylesKeyValueByPath('sidebar.test.testtesttest') }}
 

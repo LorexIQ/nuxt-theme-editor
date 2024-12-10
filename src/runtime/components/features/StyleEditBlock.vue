@@ -1,6 +1,9 @@
 <script setup lang="ts">
 import TextRunner from '../shared/TextRunner.vue';
+import type { ModuleDefaultStyleKeys } from '../../types';
 import { computed } from '#imports';
+
+export type StyleContextMenuData = [MouseEvent, ModuleDefaultStyleKeys, string];
 
 type Props = {
   id: string;
@@ -8,15 +11,24 @@ type Props = {
   styles: Record<string, string>;
   rawStyles: Record<string, string>;
 };
+type Emits = {
+  (e: 'contextMenuOpen', v: StyleContextMenuData): void;
+  (e: 'click', v: StyleContextMenuData): void;
+};
 
 const props = defineProps<Props>();
+const emit = defineEmits<Emits>();
 
 const currentValue = computed(() => props.styles[props.styleKey]);
 const rawValue = computed(() => props.rawStyles[props.styleKey]);
 </script>
 
 <template>
-  <div class="TE-style-edit-block">
+  <div
+    class="TE-style-edit-block"
+    @click="emit('click', [$event, id as any, rawValue])"
+    @contextmenu.prevent="emit('contextMenuOpen', [$event, id as any, rawValue])"
+  >
     <div
       class="TE-style-edit-block__picker"
       :style="`background-color: ${currentValue};`"

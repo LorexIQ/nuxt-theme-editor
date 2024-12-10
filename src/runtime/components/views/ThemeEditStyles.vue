@@ -39,6 +39,7 @@ onBeforeMount(() => {
         <ThemeStylesBlock
           :styles="selectedTheme.styles"
           :raw-styles="selectedTheme.target.styles"
+          @click="sandbox.openStyleInheritanceContextMenu(...$event)"
           @context-menu-open="sandbox.openStyleContextMenu(...$event)"
         />
 

@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import StyleEditBlock from '../features/StyleEditBlock.vue';
-import type { ModuleDefaultStyleKeys } from '../../types';
+import type { StyleContextMenuData } from '../features/StyleEditBlock.vue';
 import TextRunner from '../shared/TextRunner.vue';
 import { computed } from '#imports';
 
@@ -11,7 +11,8 @@ type Props = {
   ctxPath?: string[];
 };
 type Emits = {
-  (e: 'contextMenuOpen', v: [MouseEvent, ModuleDefaultStyleKeys, string]): void;
+  (e: 'contextMenuOpen', v: StyleContextMenuData): void;
+  (e: 'click', v: StyleContextMenuData): void;
 };
 
 const props = defineProps<Props>();
@@ -37,6 +38,7 @@ const stylesBlocks = computed(() => props.styles.map((stylesBlock, index) => ({
       :styles="block.stylesBlock.styles"
       :raw-styles="block.rawStylesBlock.styles"
       :ctx-path="[...ctxPath ?? [], block.id]"
+      @click="emit('click', $event)"
       @context-menu-open="emit('contextMenuOpen', $event)"
     />
     <div
@@ -53,17 +55,13 @@ const stylesBlocks = computed(() => props.styles.map((stylesBlock, index) => ({
           v-for="styleKey of Object.keys(block.stylesBlock)"
           :key="`${id}-${styleKey}`"
         >
-          <!-- Перенести в компонент все превенты, хуенты, всё лишнее -->
           <StyleEditBlock
-            :id="`${id}-${styleKey}`"
+            :id="`${styleCtxPathComputed}.${styleKey}`"
             :style-key="styleKey"
             :styles="block.stylesBlock"
             :raw-styles="block.rawStylesBlock"
-            @contextmenu.prevent="emit('contextMenuOpen', [
-              $event,
-              `${styleCtxPathComputed}.${styleKey}` as any,
-              block.rawStylesBlock[styleKey],
-            ])"
+            @click="emit('click', $event)"
+            @context-menu-open="emit('contextMenuOpen', $event)"
           />
         </template>
       </div>
