@@ -1,7 +1,3 @@
-<template>
-  <canvas ref="containerRef" />
-</template>
-
 <script lang="ts" setup>
 import { createAlphaSquare } from './composible';
 
@@ -10,9 +6,7 @@ type Props = {
   width: number;
 };
 
-const props = withDefaults(defineProps<Props>(), {
-  width: 100
-});
+const props = defineProps<Props>();
 
 const containerRef = ref<HTMLCanvasElement>();
 const alphaSize = ref(5);
@@ -41,3 +35,13 @@ onMounted(() => {
   renderColor();
 });
 </script>
+
+<template>
+  <canvas ref="containerRef" />
+</template>
+
+<style lang="scss" scoped>
+canvas {
+  border-radius: 2px;
+}
+</style>

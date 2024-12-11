@@ -1,7 +1,6 @@
-import type { CP_RGB, CP_RGBH } from './index.vue';
-import type { CP_RGBA } from '~/components/ColorPicker/index.vue';
+import type { CP_RGB, CP_RGBH, CP_HSV, CP_RGBA, CP_HEX, CP_RGBAHSV } from './types';
 
-export function createAlphaSquare(size: number) {
+export function createAlphaSquare(size: number): HTMLCanvasElement {
   const canvas = document.createElement('canvas');
   const ctx: any = canvas.getContext('2d');
   const doubleSize = size * 2;
@@ -16,15 +15,14 @@ export function createAlphaSquare(size: number) {
 
   return canvas;
 }
-
 export function createLinearGradient(
   direction: 'l' | 'p',
-  ctx: any,
-  width: any,
-  height: any,
-  color1: any,
-  color2: any
-) {
+  ctx: CanvasRenderingContext2D,
+  width: number,
+  height: number,
+  color1: string,
+  color2: string
+): void {
   const isL = direction === 'l';
   const gradient = ctx.createLinearGradient(0, 0, isL ? width : 0, isL ? 0 : height);
   gradient.addColorStop(0.01, color1);
@@ -33,24 +31,30 @@ export function createLinearGradient(
   ctx.fillRect(0, 0, width, height);
 }
 
-export function rgba2hex({ r, g, b, a }: any, toUpper: boolean) {
-  const change = (val: any) => ('0' + Number(val).toString(16)).slice(-2);
-  const color = `#${change(r)}${change(g)}${change(b)}${a !== undefined && a !== 1 ? change(a) : ''}`;
+export function rgba2hex(rgba: CP_RGB | CP_RGBA, toUpper = false): CP_HEX {
+  const change = (val: any) => ('0' + Number(Math.floor(val)).toString(16)).slice(-2);
+
+  const { r, g, b, a } = rgba as any;
+  const color = `#${change(r)}${change(g)}${change(b)}${a !== undefined && a !== 1 ? change(a * 255) : ''}`;
+
   return toUpper ? color.toUpperCase() : color;
 }
-export function hex2rgba(hex: string): CP_RGBA {
+export function hex2rgba(hex: CP_HEX): CP_RGBA {
+  const change = (val: string) => parseInt(val, 16);
+
   hex = hex.slice(1);
-  const change = (val: string) => parseInt(val, 16) || 0;
+
   return {
-    r: change(hex.slice(0, 2)),
-    g: change(hex.slice(2, 4)),
-    b: change(hex.slice(4, 6)),
-    a: change(hex.slice(6, 8)) / 255
+    r: change(hex.slice(0, 2)) || 0,
+    g: change(hex.slice(2, 4)) || 0,
+    b: change(hex.slice(4, 6)) || 0,
+    a: (change(hex.slice(6, 8)) || 255) / 255
   };
 }
-export function rgb2rgba(rgba: any) {
+export function rgbStr2rgba(rgba: any): CP_RGBA {
   if (typeof rgba === 'string') {
     rgba = (/rgba?\((.*?)\)/.exec(rgba) || ['', '0,0,0,1'])[1].split(',');
+
     return {
       r: Number(rgba[0]) || 0,
       g: Number(rgba[1]) || 0,
@@ -61,7 +65,6 @@ export function rgb2rgba(rgba: any) {
     return rgba;
   }
 }
-
 export function rgb2rgbHue(rgb: CP_RGB): CP_RGBH {
   let { r, g, b } = rgb;
 
@@ -91,8 +94,6 @@ export function rgb2rgbHue(rgb: CP_RGB): CP_RGBH {
     }
   }
 
-  if (!h || h === 360) return { r: 255, g: 0, b: 0, h: 0 };
-
   const hToC = (a: number) => {
     if (a > 360) a -= 360;
     else if (a < 0) a += 360;
@@ -114,11 +115,12 @@ export function rgb2rgbHue(rgb: CP_RGB): CP_RGBH {
     b: hToC(h + 120)
   };
 }
+export function rgb2hsv(rgb: CP_RGB): CP_HSV {
+  let { r, g, b } = rgb;
 
-export function rgb2hsv({ r, g, b }: any) {
-  r = r / 255;
-  g = g / 255;
-  b = b / 255;
+  r /= 255;
+  g /= 255;
+  b /= 255;
 
   const max = Math.max(r, g, b);
   const min = Math.min(r, g, b);
@@ -145,4 +147,36 @@ export function rgb2hsv({ r, g, b }: any) {
   const v = parseFloat(max.toFixed(2));
 
   return { h, s, v };
+}
+export function any2rgbahsv(color: any): CP_RGBAHSV {
+  let rgba: any = { r: 0, g: 0, b: 0, a: 1 };
+
+  if (/#/.test(color)) {
+    rgba = hex2rgba(color);
+  } else if (/rgb/.test(color)) {
+    rgba = rgbStr2rgba(color);
+  } else if (typeof color === 'string') {
+    rgba = rgbStr2rgba(`rgba(${color})`);
+  } else if (Object.prototype.toString.call(color) === '[object Object]') {
+    rgba = color;
+  }
+
+  let { a } = rgba;
+  const { r, g, b } = rgba;
+  const { h, s, v } = rgb2hsv(rgba);
+  a = Math.round((a === undefined ? 1 : a) * 100) / 100;
+
+  return {
+    r,
+    g,
+    b,
+    a: a < 0 ? 0 : a > 1 ? 1 : a,
+    h,
+    s,
+    v
+  };
+}
+
+export function isUndefined(value: any): value is undefined {
+  return typeof value === 'undefined';
 }

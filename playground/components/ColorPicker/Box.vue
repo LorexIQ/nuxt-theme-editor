@@ -1,17 +1,3 @@
-<template>
-  <div class="color-type">
-    <span class="name">
-      {{ name }}
-    </span>
-    <input
-      v-model="modelColor"
-      class="value"
-      @focusin="handleFocus(true)"
-      @focusout="handleFocus(false)"
-    >
-  </div>
-</template>
-
 <script lang="ts" setup>
 type Props = {
   name: string;
@@ -35,13 +21,28 @@ function handleFocus(status: boolean) {
 }
 </script>
 
-<style lang="scss">
-.color-type {
-  display: flex;
-  margin-top: 8px;
-  font-size: 12px;
+<template>
+  <div class="color-picker-box">
+    <span class="color-picker-box__name">
+      {{ name }}
+    </span>
+    <input
+      v-model="modelColor"
+      class="color-picker-box__value"
+      @focusin="handleFocus(true)"
+      @focusout="handleFocus(false)"
+    >
+  </div>
+</template>
 
-  .name {
+<style lang="scss">
+.color-picker-box {
+  display: flex;
+  font-size: 12px;
+  border-radius: 2px;
+  overflow: hidden;
+
+  &__name {
     width: 60px;
     height: 30px;
     float: left;
@@ -49,17 +50,21 @@ function handleFocus(status: boolean) {
     justify-content: center;
     align-items: center;
     color: #999;
-    background: #252930;
+    background: #e7e8e9;
   }
-  .value {
+  &__value {
     flex: 1;
     height: 30px;
     min-width: 100px;
     padding: 0 12px;
     border: 0;
-    color: #fff;
-    background: #2e333a;
+    color: #666;
+    background: #eceef0;
     box-sizing: border-box;
+
+    &:focus {
+      outline: none;
+    }
   }
 }
 </style>

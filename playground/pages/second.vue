@@ -7,7 +7,7 @@ const themesEditor = useThemesEditor();
 const scopeStyles = useThemeBlock('sidebar.test');
 console.log('second.vue useThemeBlock =>', scopeStyles.value);
 useEyeDropper();
-const color = ref('#8C8C8C5C');
+const color = ref('#8C8C8C7F');
 </script>
 
 <template>

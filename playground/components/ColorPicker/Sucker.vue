@@ -50,7 +50,7 @@
 </template>
 
 <script lang="ts" setup>
-import type { CP_RGBA } from './index.vue';
+import type { CP_RGBA } from './types';
 
 type Props = {
   suckerCanvas: HTMLCanvasElement;
