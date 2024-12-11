@@ -7,15 +7,14 @@ import Hue from './Hue.vue';
 import Alpha from './Alpha.vue';
 import Preview from './Preview.vue';
 import Box from './Box.vue';
-import EyeDropper from '~/components/ColorPicker/EyeDropper.vue';
+import EyeDropper from './EyeDropper.vue';
 
 type Props = {
   modelValue?: string;
 };
 type Emits = {
   (e: 'update:modelValue', v: string): void;
-  (e: 'changeColor', v: CP_Colors): void;
-  (e: 'openSucker', v: boolean): void;
+  (e: 'change', v: CP_Colors): void;
 };
 
 const props = withDefaults(defineProps<Props>(), {
@@ -23,9 +22,11 @@ const props = withDefaults(defineProps<Props>(), {
 });
 const emit = defineEmits<Emits>();
 
+const isPreventSelects = ref(false);
+const isEyeDropper = ref(!!window.EyeDropper);
+
 const modelRgba = ref('');
 const modelHex = ref('');
-const isPreventSelects = ref(false);
 const oldColor = ref(props.modelValue);
 const hueColor = reactive<CP_RGBH>({
   r: 0,
@@ -53,7 +54,7 @@ initColorValue();
 initHueColor();
 
 watch(hexString, value => emit('update:modelValue', value));
-watch(rgba, value => emit('changeColor', {
+watch(rgba, value => emit('change', {
   rgba: value,
   hsv: hsv.value,
   hex: modelHex.value
@@ -88,6 +89,11 @@ function selectHue(color: CP_RGBH) {
 function selectAlpha(a: number) {
   fullColorSpector.a = a;
   setText();
+}
+function selectEyeDropper(color: string) {
+  isPreventSelects.value = true;
+  inputHex(color);
+  nextTick(() => isPreventSelects.value = false);
 }
 
 function inputHex(color: string) {
@@ -127,13 +133,19 @@ function inputRgba(color: string) {
         @select="selectAlpha"
       />
     </div>
-    <div class="color-picker__rows">
+    <div
+      class="color-picker__rows"
+      :class="{ 'color-picker__rows--with-eye-dropper': isEyeDropper }"
+    >
       <Preview
         class="color-picker__rows__preview"
         :old-color="oldColor"
         :color="rgbaString"
       />
-      <EyeDropper />
+      <EyeDropper
+        v-if="isEyeDropper"
+        @select="selectEyeDropper"
+      />
       <Box
         class="color-picker__rows__hex"
         name="HEX"
@@ -171,11 +183,11 @@ function inputRgba(color: string) {
   &__rows {
     display: grid;
     grid-template-areas:
-      "PREVIEW EYEDROPPER"
+      "PREVIEW PREVIEW"
       "HEX HEX"
       "RGBA RGBA";
-    grid-template-columns: auto 38px;
-    grid-template-rows: 38px auto auto;
+    grid-template-columns: auto 30px;
+    grid-template-rows: 30px auto auto;
     gap: 8px;
 
     &__preview {
@@ -187,13 +199,22 @@ function inputRgba(color: string) {
     &__rgba {
       grid-area: RGBA;
     }
+
+    &--with-eye-dropper {
+      grid-template-areas:
+        "PREVIEW EYEDROPPER"
+        "HEX HEX"
+        "RGBA RGBA";
+      grid-template-columns: auto 38px;
+      grid-template-rows: 38px auto auto;
+    }
   }
 }
 </style>
 
 <style lang="scss">
 .color-picker, .color-picker * {
-  vertical-align:bottom;
+  vertical-align: bottom;
 }
 
 .color-picker--box-border {

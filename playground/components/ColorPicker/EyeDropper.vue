@@ -2,10 +2,23 @@
 import Pipette from './icons/Pipette.vue';
 import Loader from './icons/Loader.vue';
 
-const isDropperOpen = ref(false);
+type Emits = {
+  (e: 'select', v: string): void;
+};
 
-function openDropper() {
-  isDropperOpen.value = true;
+const emit = defineEmits<Emits>();
+
+const isDropperOpen = ref(false);
+const eyeDropper = new window.EyeDropper!();
+
+async function openDropper() {
+  try {
+    isDropperOpen.value = true;
+    const color = await eyeDropper.open();
+    emit('select', color.sRGBHex.toUpperCase());
+  } catch { /* empty */ }
+
+  isDropperOpen.value = false;
 }
 </script>
 

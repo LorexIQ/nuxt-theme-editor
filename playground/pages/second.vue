@@ -12,10 +12,7 @@ const color = ref('rgba(140,140,140,1)');
 
 <template>
   <div class="page-second">
-    <ColorPicker
-      v-model="color"
-      :sucker-hide="false"
-    />
+    <ColorPicker v-model="color" />
     {{ color }}
     <h4>PAGE: SECOND</h4>
     {{ themesEditor.getStylesKeyValueByPath('sidebar.test.testtesttest') }}
