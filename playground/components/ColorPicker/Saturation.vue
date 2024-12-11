@@ -56,8 +56,6 @@ function sliderXYGenerator(width: number, height: number): CP_STYLES_XY {
     :select-generator="selectGenerator"
     :slider-x-y-generator="sliderXYGenerator"
     :prevent-select="preventSelect"
-    :width="152"
-    :height="152"
     :slider-bg="`rgb(${color.r}, ${color.g}, ${color.b})`"
     @select="emit('select', $event)"
   />

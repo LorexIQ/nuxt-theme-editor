@@ -7,6 +7,7 @@ import Hue from './Hue.vue';
 import Alpha from './Alpha.vue';
 import Preview from './Preview.vue';
 import Box from './Box.vue';
+import EyeDropper from '~/components/ColorPicker/EyeDropper.vue';
 
 type Props = {
   modelValue?: string;
@@ -107,78 +108,107 @@ function inputRgba(color: string) {
 
 <template>
   <div class="color-picker">
-    <Saturation
-      class="color-picker__saturation"
-      :color="fullColorSpector"
-      :hue-color="hueColor"
-      :prevent-select="isPreventSelects"
-      @select="selectSaturation"
-    />
-    <Hue
-      class="color-picker__hue"
-      :rgbh="hueColor"
-      @select="selectHue"
-    />
-    <Alpha
-      class="color-picker__alpha"
-      :rgba="rgba"
-      @select="selectAlpha"
-    />
-    <Preview
-      class="color-picker__preview"
-      :old-color="oldColor"
-      :color="rgbaString"
-    />
-    <Box
-      class="color-picker__hex"
-      name="HEX"
-      :color="modelHex"
-      @input-color="inputHex"
-      @input-focus="handleInputFocus"
-    />
-    <Box
-      class="color-picker__rgba"
-      name="RGBA"
-      :color="modelRgba"
-      @input-color="inputRgba"
-      @input-focus="handleInputFocus"
-    />
+    <div class="color-picker__pickers">
+      <Saturation
+        class="color-picker__pickers__saturation"
+        :color="fullColorSpector"
+        :hue-color="hueColor"
+        :prevent-select="isPreventSelects"
+        @select="selectSaturation"
+      />
+      <Hue
+        class="color-picker__pickers__hue"
+        :rgbh="hueColor"
+        @select="selectHue"
+      />
+      <Alpha
+        class="color-picker__pickers__alpha"
+        :rgba="rgba"
+        @select="selectAlpha"
+      />
+    </div>
+    <div class="color-picker__rows">
+      <Preview
+        class="color-picker__rows__preview"
+        :old-color="oldColor"
+        :color="rgbaString"
+      />
+      <EyeDropper />
+      <Box
+        class="color-picker__rows__hex"
+        name="HEX"
+        :color="modelHex"
+        @input-color="inputHex"
+        @input-focus="handleInputFocus"
+      />
+      <Box
+        class="color-picker__rows__rgba"
+        name="RGBA"
+        :color="modelRgba"
+        @input-color="inputRgba"
+        @input-focus="handleInputFocus"
+      />
+    </div>
   </div>
 </template>
 
 <style lang="scss" scoped>
 .color-picker {
-  display: grid;
-  grid-template-columns: 152px 15px 15px;
-  grid-template-areas:
-    "SATURATION HUE ALPLA"
-    "PREVIEW PREVIEW PREVIEW"
-    "HEX HEX HEX"
-    "RGBA RGBA RGBA";
+  display: flex;
+  flex-direction: column;
   gap: 8px;
-  width: max-content;
+  width: 198px;
   padding: 10px;
   background: #ffffff;
   border-radius: 5px;
   box-shadow: 0 0 16px 0 rgba(0, 0, 0, 0.16);
 
-  &__saturation {
-    grid-area: SATURATION;
+  &__pickers {
+    display: grid;
+    grid-template-columns: 152px 15px 15px;
+    gap: 8px;
   }
-  &__hue {
-    grid-area: HUE;
+  &__rows {
+    display: grid;
+    grid-template-areas:
+      "PREVIEW EYEDROPPER"
+      "HEX HEX"
+      "RGBA RGBA";
+    grid-template-columns: auto 38px;
+    grid-template-rows: 38px auto auto;
+    gap: 8px;
+
+    &__preview {
+      grid-area: PREVIEW;
+    }
+    &__hex {
+      grid-area: HEX;
+    }
+    &__rgba {
+      grid-area: RGBA;
+    }
   }
-  &__alpha {
-    grid-area: ALPLA;
-  }
-  &__preview {
-    grid-area: PREVIEW;
-  }
-  &__hex {
-    grid-area: HEX;
-  }
-  &__rgba {
-    grid-area: RGBA;
+}
+</style>
+
+<style lang="scss">
+.color-picker, .color-picker * {
+  vertical-align:bottom;
+}
+
+.color-picker--box-border {
+  position: relative;
+  border-radius: 2px;
+  overflow: hidden;
+
+  &::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    box-shadow: 0 0 1px 0.5px rgba(0, 0, 0, 0.2) inset;
   }
 }
 </style>

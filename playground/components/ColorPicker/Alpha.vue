@@ -51,8 +51,6 @@ function sliderXYGenerator(width: number, height: number): CP_STYLES_Y {
     :select-generator="selectGenerator"
     :slider-x-y-generator="sliderXYGenerator"
     :prevent-select="false"
-    :width="15"
-    :height="152"
     @select="emit('select', $event)"
   />
 </template>

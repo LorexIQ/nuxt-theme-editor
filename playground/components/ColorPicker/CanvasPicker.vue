@@ -8,8 +8,6 @@ type Props = {
   selectGenerator: (ctx: CanvasRenderingContext2D, width: number, height: number, sliderPos: CP_STYLES_XY) => T;
   sliderXYGenerator: (width: number, height: number) => Partial<CP_STYLES_XY>;
   preventSelect: boolean;
-  width: number;
-  height: number;
   sliderBg?: string;
 };
 type Emits = {
@@ -27,20 +25,19 @@ const containerRef = ref<HTMLDivElement>();
 const containerCanvasRef = ref<HTMLCanvasElement>();
 const sliderPosition = reactive<CP_STYLES_XY>({ x: 0, y: 0 });
 const sliderStyles = computed<CP_STYLES_POS>(() => ({ left: `${sliderPosition.x}px`, top: `${sliderPosition.y}px` }));
+const width = computed(() => containerRef.value?.clientWidth ?? 0);
+const height = computed(() => containerRef.value?.clientHeight ?? 0);
 
 function renderBg() {
   const canvas = containerCanvasRef.value!;
-  const width = props.width;
-  const height = props.height;
-
   const ctx = canvas.getContext('2d')!;
-  canvas.width = width;
-  canvas.height = height;
+  canvas.width = width.value;
+  canvas.height = height.value;
 
-  props.bgGenerator(ctx, width, height);
+  props.bgGenerator(ctx, width.value, height.value);
 }
 function renderSlider() {
-  const buildPosition = props.sliderXYGenerator(props.width, props.height);
+  const buildPosition = props.sliderXYGenerator(width.value, height.value);
   if (!isUndefined(buildPosition.x)) sliderPosition.x = buildPosition.x;
   if (!isUndefined(buildPosition.y)) sliderPosition.y = buildPosition.y;
 }
@@ -55,13 +52,13 @@ function select(event: MouseEvent) {
 
     if (isX) {
       if (x < 0) x = 0;
-      else if (x > props.width) x = props.width;
+      else if (x > width.value) x = width.value;
       sliderPosition.x = x - halfSlider;
     }
 
     if (isY) {
       if (y < 0) y = 0;
-      else if (y > props.height) y = props.height;
+      else if (y > height.value) y = height.value;
       sliderPosition.y = y - halfSlider;
     }
 
@@ -84,7 +81,7 @@ function commitSelect() {
   if (props.preventSelect) return;
 
   const ctx = getCanvasCtx();
-  emit('select', props.selectGenerator(ctx, props.width, props.height, sliderPosition));
+  emit('select', props.selectGenerator(ctx, width.value, height.value, sliderPosition));
 }
 function getCanvasCtx() {
   const canvas = containerCanvasRef.value!;
@@ -114,16 +111,18 @@ defineExpose({
     ref="containerRef"
     class="canvas-picker"
     :class="`canvas-picker--${mode}`"
-    :style="{ height: `${height}px` }"
     @mousedown.prevent.stop="select"
   >
-    <canvas ref="containerCanvasRef" />
+    <div class="canvas-picker__canvas color-picker--box-border">
+      <canvas ref="containerCanvasRef" />
+    </div>
     <div
       :style="{
         ...sliderStyles,
         backgroundColor: sliderBg,
       }"
       class="canvas-picker__slider"
+      @mousedown.prevent.stop="select"
     />
   </div>
 </template>
@@ -131,16 +130,13 @@ defineExpose({
 <style lang="scss" scoped>
 .canvas-picker {
   position: relative;
-  width: max-content;
+  width: 100%;
+  height: 100%;
   cursor: pointer;
 
-  & > canvas {
-    border-radius: 2px;
-  }
   &__slider {
     position: absolute;
     box-shadow: 0 0 1px 1px rgba(0, 0, 0, 0.3);
-    pointer-events: none;
     box-sizing: border-box;
   }
 

@@ -22,7 +22,7 @@ function handleFocus(status: boolean) {
 </script>
 
 <template>
-  <div class="color-picker-box">
+  <div class="color-picker-box color-picker--box-border">
     <span class="color-picker-box__name">
       {{ name }}
     </span>
@@ -39,8 +39,6 @@ function handleFocus(status: boolean) {
 .color-picker-box {
   display: flex;
   font-size: 12px;
-  border-radius: 2px;
-  overflow: hidden;
 
   &__name {
     width: 60px;
