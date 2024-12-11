@@ -3,22 +3,20 @@ import { createAlphaSquare } from './composible';
 
 type Props = {
   color: string;
-  width: number;
+  oldColor: string;
 };
 
 const props = defineProps<Props>();
 
 const containerRef = ref<HTMLCanvasElement>();
-const alphaSize = ref(5);
+const width = 198;
 
 watch(() => props.color, () => renderColor());
 
 function renderColor() {
   const canvas = containerRef.value!;
-  const width = props.width;
   const height = 30;
-  const size = alphaSize.value;
-  const canvasSquare = createAlphaSquare(size);
+  const canvasSquare = createAlphaSquare(5);
 
   const ctx = canvas.getContext('2d')!;
   canvas.width = width;
@@ -28,7 +26,10 @@ function renderColor() {
   ctx.fillRect(0, 0, width, height);
 
   ctx.fillStyle = props.color;
-  ctx.fillRect(0, 0, width, height);
+  ctx.fillRect(0, 0, width / 2, height);
+
+  ctx.fillStyle = props.oldColor;
+  ctx.fillRect(width / 2, 0, width / 2, height);
 }
 
 onMounted(() => {
@@ -37,11 +38,26 @@ onMounted(() => {
 </script>
 
 <template>
-  <canvas ref="containerRef" />
+  <div class="color-picker-preview">
+    <canvas ref="containerRef" />
+  </div>
 </template>
 
 <style lang="scss" scoped>
-canvas {
+.color-picker-preview {
+  position: relative;
+  height: 30px;
   border-radius: 2px;
+  overflow: hidden;
+
+  &::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    box-shadow: 0 0 1px 0.5px rgba(0, 0, 0, 0.2) inset;
+  }
 }
 </style>

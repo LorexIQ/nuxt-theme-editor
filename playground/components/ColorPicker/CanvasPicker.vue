@@ -151,6 +151,7 @@ defineExpose({
     height: 10px;
     border-radius: 50%;
     border: 1px solid #fff;
+    box-shadow: 0 0 2px 0.5px rgba(0, 0, 0, 0.2) inset, 0 0 1px 1px rgba(0, 0, 0, 0.3);
   }
   &--x .canvas-picker__slider {
     left: 100px;

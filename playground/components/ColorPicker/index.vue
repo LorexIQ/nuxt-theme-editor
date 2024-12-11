@@ -10,10 +10,6 @@ import Box from './Box.vue';
 
 type Props = {
   modelValue?: string;
-  theme?: string;
-  suckerHide?: boolean;
-  suckerCanvas?: HTMLCanvasElement;
-  suckerArea?: [number, number, number, number];
 };
 type Emits = {
   (e: 'update:modelValue', v: string): void;
@@ -22,15 +18,14 @@ type Emits = {
 };
 
 const props = withDefaults(defineProps<Props>(), {
-  color: '#000000',
-  theme: 'dark',
-  suckerHide: true
+  modelValue: '#000000'
 });
 const emit = defineEmits<Emits>();
 
 const modelRgba = ref('');
 const modelHex = ref('');
 const isPreventSelects = ref(false);
+const oldColor = ref(props.modelValue);
 const hueColor = reactive<CP_RGBH>({
   r: 0,
   g: 0,
@@ -131,8 +126,8 @@ function inputRgba(color: string) {
     />
     <Preview
       class="color-picker__preview"
+      :old-color="oldColor"
       :color="rgbaString"
-      :width="198"
     />
     <Box
       class="color-picker__hex"
