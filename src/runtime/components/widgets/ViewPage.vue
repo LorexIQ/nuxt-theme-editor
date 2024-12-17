@@ -1,14 +1,44 @@
+<script lang="ts" setup>
+import { ref } from '#imports';
+
+type Emits = {
+  (e: 'scrollend', v: Event): void;
+};
+
+const emit = defineEmits<Emits>();
+
+const templateRef = ref<HTMLDivElement>();
+const messagesRef = ref<HTMLDivElement>();
+const footerRef = ref<HTMLDivElement>();
+
+defineExpose({
+  templateRef,
+  messagesRef,
+  footerRef
+});
+</script>
+
 <template>
   <div
     class="TE-view-page"
   >
-    <div class="TE-view-page__template">
+    <div
+      ref="templateRef"
+      class="TE-view-page__template"
+      @scrollend="emit('scrollend', $event)"
+    >
       <slot />
     </div>
-    <div class="TE-view-page__messages">
+    <div
+      ref="messagesRef"
+      class="TE-view-page__messages"
+    >
       <slot name="messages" />
     </div>
-    <div class="TE-view-page__footer">
+    <div
+      ref="footerRef"
+      class="TE-view-page__footer"
+    >
       <slot name="footer" />
     </div>
   </div>

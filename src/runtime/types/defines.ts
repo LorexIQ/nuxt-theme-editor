@@ -81,6 +81,8 @@ export type ModuleDefineThemeMetaUI = Partial<{
   contextMenuIcon: string;
   contextMenuIconSuccess: string;
   contextMenuIconError: string;
+
+  animationAlert: string;
 }>;
 export type ModuleDefineThemeMeta = {
   name?: string;

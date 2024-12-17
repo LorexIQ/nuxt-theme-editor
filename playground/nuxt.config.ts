@@ -23,7 +23,6 @@ export default defineNuxtConfig({
   },
 
   themesEditor: {
-    defaultTheme: 'light',
-    enableDefaultThemeGenerator: true
+    defaultTheme: 'light'
   }
 });

@@ -4,13 +4,13 @@ import type {
   ModuleOptionsExtend,
   ModuleSandboxComponents,
   ModuleSandboxContextMenuItem,
-  ModuleSandboxHandlers,
   ModuleSandboxMousePosition,
   ModuleSandboxSize,
   ModuleThemeRootReturn
 } from '../../types';
 import ContextMenu from '../../components/shared/ContextMenu.vue';
 import ModuleSandbox from '../../components/views/ModuleSandbox.vue';
+import type { StylePickerData } from '../../components/features/StyleEditBlock.vue';
 import { markRaw, reactive } from '#imports';
 
 const CONTEXT_MENU_ID = 'context-menu';
@@ -67,8 +67,7 @@ export class Sandbox {
     if (contextMenuComponentIndex !== -1) this.components.splice(contextMenuComponentIndex, 1);
   }
 
-  openThemeContextMenu(event: MouseEvent, theme: ModuleThemeRootReturn, handlers: ModuleSandboxHandlers<ModuleThemeRootReturn> = {}): void {
-    handlers;
+  openThemeContextMenu(event: MouseEvent, theme: ModuleThemeRootReturn): void {
     this.closeContextMenu();
     const router = this.ctx.getRouter();
     const clickPosition: ModuleSandboxMousePosition = { x: event.pageX, y: event.pageY };
@@ -139,7 +138,7 @@ export class Sandbox {
     });
   }
 
-  openStyleContextMenu(event: MouseEvent, style: ModuleDefaultStyleKeys, currentValue: string, handlers: ModuleSandboxHandlers<[ModuleDefaultStyleKeys, ModuleDefaultStyleKeys]> = {}): void {
+  openStyleContextMenu(event: MouseEvent, pickerRef: StylePickerData, style: ModuleDefaultStyleKeys, currentValue: string): void {
     this.closeContextMenu();
     const clickPosition: ModuleSandboxMousePosition = { x: event.pageX, y: event.pageY };
 
@@ -155,12 +154,12 @@ export class Sandbox {
           {
             title: 'Use inheritance',
             icon: 'Palette',
-            action: () => this.openStyleInheritanceContextMenu(event, style, currentValue, handlers)
+            action: () => this.openStyleInheritanceContextMenu(event, style, currentValue)
           },
           {
             title: 'Select by color picker',
             icon: 'Palette',
-            action: () => console.log(123)
+            action: () => this.openStylePickerMenu(event, pickerRef)
           }
         ]
       },
@@ -170,8 +169,23 @@ export class Sandbox {
     });
   }
 
-  openStyleInheritanceContextMenu(event: MouseEvent, style: ModuleDefaultStyleKeys, currentValue: string, handlers: ModuleSandboxHandlers<[ModuleDefaultStyleKeys, ModuleDefaultStyleKeys]> = {}): void {
-    handlers;
+  openStyleClickMenu(event: MouseEvent, pickerRef: StylePickerData, style: ModuleDefaultStyleKeys, currentValue: string): void {
+    this.closeContextMenu();
+
+    if (currentValue.startsWith('$')) {
+      this.openStyleInheritanceContextMenu(event, style, currentValue);
+    } else {
+      this.openStylePickerMenu(event, pickerRef);
+    }
+  }
+
+  openStylePickerMenu(event: MouseEvent, pickerRef: StylePickerData): void {
+    this.closeContextMenu();
+
+    pickerRef.show(event);
+  }
+
+  openStyleInheritanceContextMenu(event: MouseEvent, style: ModuleDefaultStyleKeys, currentValue: string): void {
     this.closeContextMenu();
     const stylesPaths = this.ctx.getThemesStylesPaths().value;
     const clickPosition: ModuleSandboxMousePosition = { x: event.pageX, y: event.pageY };

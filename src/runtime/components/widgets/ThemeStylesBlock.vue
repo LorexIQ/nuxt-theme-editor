@@ -13,6 +13,7 @@ type Props = {
 type Emits = {
   (e: 'contextMenuOpen', v: StyleContextMenuData): void;
   (e: 'click', v: StyleContextMenuData): void;
+  (e: 'inheritanceClick', v: string): void;
 };
 
 const props = defineProps<Props>();
@@ -40,6 +41,7 @@ const stylesBlocks = computed(() => props.styles.map((stylesBlock, index) => ({
       :ctx-path="[...ctxPath ?? [], block.id]"
       @click="emit('click', $event)"
       @context-menu-open="emit('contextMenuOpen', $event)"
+      @inheritance-click="emit('inheritanceClick', $event)"
     />
     <div
       v-else
@@ -62,6 +64,7 @@ const stylesBlocks = computed(() => props.styles.map((stylesBlock, index) => ({
             :raw-styles="block.rawStylesBlock"
             @click="emit('click', $event)"
             @context-menu-open="emit('contextMenuOpen', $event)"
+            @inheritance-click="emit('inheritanceClick', $event)"
           />
         </template>
       </div>

@@ -43,6 +43,7 @@ export default defineNuxtModule<ModuleOptions>({
     addPlugin(resolver.resolve('./runtime/plugin'));
 
     await installModule('nuxt-transition-expand');
+    await installModule('nuxt-color-picker');
     await addComponent({
       name: 'themesEditor',
       filePath: resolver.resolve('./runtime/components/themesEditor.vue')
