@@ -1,3 +1,4 @@
+import type { ComputedRef } from 'vue';
 import type {
   ModuleDefineThemeBlockRootReturn,
   ModuleDefineThemeMeta
@@ -27,6 +28,11 @@ type ThemeStyleValueType = string;
 export type ModuleThemeStyleObject = ModuleObject<ThemeStyleValueType>;
 export type ModuleThemeStyleBlock = ModuleThemeStyleBlockReturn<ThemeStyleValueType>;
 export type ModuleThemeSelectedStyles = ModuleThemeStyleObject | ModuleThemeStyleBlock;
+export type ModuleThemeScopes = ModuleObject<{
+  scopesIds: string[];
+  styles: ModuleThemeScopesStyles;
+}>;
+export type ModuleThemeScopesStyles = ModuleObject | ComputedRef<ModuleObject>;
 export type ModuleThemeSelected = ModuleThemeRootReturn<ThemeStyleValueType> & {
   target: ModuleThemeRootReturn;
 };

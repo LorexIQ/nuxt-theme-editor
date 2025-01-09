@@ -31,12 +31,16 @@ const pickerRef = ref<StylePickerData>();
 
 const currentValue = computed(() => props.styles[props.styleKey]);
 const rawValue = computed(() => props.rawStyles[props.styleKey]);
+const isCircular = computed(() => currentValue.value === 'CIRCULAR');
 </script>
 
 <template>
   <div
     :id="`style:${props.id}`"
     class="TE-style-edit-block"
+    :class="{
+      'TE-style-edit-block--circular': isCircular,
+    }"
     @contextmenu.prevent="emit('contextMenuOpen', [$event, pickerRef!, id as any, rawValue])"
   >
     <color-picker
@@ -65,7 +69,8 @@ const rawValue = computed(() => props.rawStyles[props.styleKey]);
       v-if="rawValue.startsWith('$')"
       class="TE-style-edit-block__inheritance"
     >
-      <span>Inheritance from</span>
+      <span v-if="isCircular">Circular Inheritance</span>
+      <span v-else>Inheritance from</span>
       <div
         class="TE-style-edit-block__inheritance__value"
         @click="emit('inheritanceClick', rawValue)"
@@ -83,13 +88,28 @@ const rawValue = computed(() => props.rawStyles[props.styleKey]);
 </template>
 
 <style scoped lang="scss">
+@mixin blink($color) {
+  animation: blink-animation 1s infinite;
+
+  @keyframes blink-animation {
+    0%, 100% {
+      background-color: var(--bg);
+    }
+    50% {
+      background-color: $color;
+    }
+  }
+}
+
 .TE-style-edit-block {
+  --inheritanceBgHover: var(--bgHover);
+
   display: grid;
   align-items: center;
   grid-template-columns: auto 1px 1fr 1px 1fr;
   border-bottom: 1px solid var(--border);
   background-color: var(--bg);
-  transition: .3s;
+  transition: .3s background-color;
 
   & > div {
     width: 100%;
@@ -124,7 +144,7 @@ const rawValue = computed(() => props.rawStyles[props.styleKey]);
       top: -2px;
       right: 10px;
       color: var(--titleTransparent);
-      background-color: var(--bg);
+      background-color: inherit;
       transition: .3s;
     }
     &__value {
@@ -134,13 +154,14 @@ const rawValue = computed(() => props.rawStyles[props.styleKey]);
       padding: 4px;
       border: 1px solid var(--border);
       border-radius: 3px;
+      background-color: inherit;
       overflow: hidden;
-      transition: .3s;
       cursor: pointer;
       text-align: right;
+      transition: .3s background-color;
 
       &:hover {
-        background-color: var(--bgHover);
+        background-color: rgba(0, 0, 0, 0.025);
       }
     }
   }
@@ -152,8 +173,11 @@ const rawValue = computed(() => props.rawStyles[props.styleKey]);
     text-align: right;
   }
 
+  &--circular {
+    @include blink(var(--animationCircular));
+  }
   &--alert {
-    --bg: var(--animationAlert)
+    background-color: var(--animationAlert) !important;
   }
 }
 </style>

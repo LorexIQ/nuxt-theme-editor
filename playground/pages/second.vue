@@ -26,6 +26,8 @@ console.log('second.vue useThemeBlock =>', scopeStyles.value);
     <button @click="themesEditor.setAutoThemeModeStatus(!themesEditor.getAutoThemeModeStatus())">
       AUTO [{{ themesEditor.getAutoThemeModeStatus() ? 'ON' : 'OFF' }}]
     </button>
+    {{ scopeStyles }}
+    <test-block />
   </div>
 </template>
 

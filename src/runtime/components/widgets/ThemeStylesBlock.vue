@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import StyleEditBlock from '../features/StyleEditBlock.vue';
 import type { StyleContextMenuData } from '../features/StyleEditBlock.vue';
+import StyleEditBlock from '../features/StyleEditBlock.vue';
 import TextRunner from '../shared/TextRunner.vue';
 import { computed } from '#imports';
 

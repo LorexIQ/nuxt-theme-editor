@@ -28,11 +28,11 @@ export default function useBlock(block: ModuleDefaultBlockKeys) {
 
   onMounted(() => {
     const scopeId = getComponentId(currentInstance);
-    if (client.checkScopeRegistration(scopeId)) console.warn(`useThemeBlock is already used in [${currentInstance.type.__file}]. The styles of the last called function will be used. Only one call is allowed.`);
-    client.registerScopeStyles(scopeId, blockStyles);
+    if (client.checkScopeRegistration(scopeId, block)) console.warn(`useThemeBlock('${block}') is already used in [${currentInstance.type.__file}]. Registration will be skipped.`);
+    client.registerScopeStyles(scopeId, block, blockStyles);
   });
   onUnmounted(() => {
-    client.unregisterScopeStyles(getComponentId(currentInstance));
+    client.unregisterScopeStyles(getComponentId(currentInstance), block);
   });
 
   return blockStyles;

@@ -83,5 +83,6 @@ export const DEFAULT_UI_STYLES: Required<ModuleDefineThemeMetaUI> = {
   contextMenuIconSuccess: '#2ecc71',
   contextMenuIconError: '#ff5151',
 
-  animationAlert: '#c0f0d4'
+  animationAlert: '#c0f0d4',
+  animationCircular: '#f0c0c0'
 };

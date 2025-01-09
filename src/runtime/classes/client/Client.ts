@@ -18,7 +18,7 @@ import type {
   ModuleThemeEditData,
   ModuleErrorMessage,
   ModuleErrorType,
-  ModulePagesNames
+  ModulePagesNames, ModuleThemeScopes, ModuleThemeScopesStyles
 } from '../../types';
 // @ts-ignore
 import connectorMeta from '../../meta/connector';
@@ -43,7 +43,7 @@ export class Client {
 
   private readonly themesPathsCache: ModuleObject<(number | string)[]> = reactive({});
   private readonly errorsMessages = reactive<ModuleErrorMessage[]>([]);
-  private readonly usesScopesProperties = reactive<ModuleObject<ModuleObject>>({});
+  private readonly usesScopesProperties = reactive<ModuleThemeScopes>({});
 
   private readonly isAutoThemeMode = ref(false);
   private readonly selectedSelfThemeId = ref<string>();
@@ -92,16 +92,18 @@ export class Client {
       this._appendStyleToHead(`${this.config.keys.style}:ui`, { [uiStylesKey]: { ...theme?.meta.uiStyles } });
     }, { immediate: true });
 
-    watch(this.usesScopesProperties, scopes => this._appendStyleToHead(`${this.config.keys.style}:scope`, scopes, true), { immediate: true });
+    watch(this.usesScopesProperties, properties => this._appendStyleToHead(
+      `${this.config.keys.style}:scope`,
+      Object.values(properties).reduce((acc, property) => ({ ...acc, [property.scopesIds.map(scopeId => `[${scopeId}]`).join(',\n')]: property.styles }), {})
+    ), { immediate: true });
 
     watch(this.themes, (themes) => {
       this._appendStyleToHead(
         `${this.config.keys.style}:preview`,
         {
-          'theme-default-preview': DEFAULT_PREVIEW_STYLES,
-          ...Object.values(themes).reduce((accum, theme) => ({ ...accum, [`theme-${theme.id}-preview`]: theme.meta.previewStyles }), {})
-        },
-        true
+          '[theme-default-preview]': DEFAULT_PREVIEW_STYLES,
+          ...Object.values(themes).reduce((acc, theme) => ({ ...acc, [`[theme-${theme.id}-preview]`]: theme.meta.previewStyles }), {})
+        }
       );
     }, { immediate: true });
 
@@ -111,15 +113,24 @@ export class Client {
   }
 
   private _readSystemThemes(): void {
+    const getConnectorTheme = (themeName: string) => (connectorMeta as any)[`THEME_${themeName}`] as ModuleDefineThemeBlockRootReturn;
     Object.keys(this.themes).forEach(key => delete this.themes[key]);
-    Object.assign(this.themes, this.config.themes.reduce((accum, themeName) => {
-      const theme = (connectorMeta as any)[`THEME_${themeName}`] as ModuleDefineThemeBlockRootReturn;
 
-      return {
-        ...accum,
-        [themeName]: this._buildSystemTheme(theme, themeName, 'system')
-      };
-    }, {}));
+    const defaultThemeName = this.config.defaultTheme;
+    const defaultTheme = this._buildSystemTheme(getConnectorTheme(defaultThemeName), defaultThemeName, 'system');
+
+    Object.assign(this.themes, {
+      [defaultThemeName]: defaultTheme,
+      ...this.config.themes
+        .filter(themeName => themeName !== defaultThemeName)
+        .reduce((accum, themeName) => ({
+          ...accum,
+          [themeName]: mergeThemes(
+            this._buildSystemTheme(getConnectorTheme(themeName), themeName, 'system'),
+            JSON.parse(JSON.stringify(defaultTheme))
+          )
+        }), {})
+    });
   }
 
   private _selectDefaultThemes(): void {
@@ -274,19 +285,20 @@ export class Client {
     else return undefined;
   }
 
-  private _appendStyleToHead(id: string, scopes: ModuleObject<ModuleObject>, shielding = false) {
+  private _appendStyleToHead(id: string, scopes: ModuleObject<ModuleThemeScopesStyles>) {
     const styleContent = Object.keys(scopes).map((scopeId) => {
       const scopeStyles = scopes[scopeId];
       return [
-        shielding ? `[${scopeId}] {` : `${scopeId} {`,
-        ...Object.keys(scopeStyles).map(key => `  --${key}: ${unwrap.get(scopeStyles[key])};`),
+        `${scopeId} {`,
+        ...Object.keys(scopeStyles).map(key => `  --${key}: ${unwrap.get(scopeStyles)[key]};`),
         '}'
       ].join('\n');
     }).join('\n\n');
 
-    const _styleElement = document.getElementById(id);
+    const _styleElement = document.getElementById(id) as HTMLStyleElement | null;
     const styleElement = _styleElement ?? document.createElement('style');
     styleElement.id = id;
+    styleElement.type = 'text/css';
     styleElement.textContent = styleContent;
     if (!_styleElement) document.head.appendChild(styleElement);
   }
@@ -347,16 +359,34 @@ export class Client {
     return computed(() => this._getValueByThemesCache('S', stylePath, (theme ?? unwrap.get(this.selectedTheme))?.styles) as any ?? 'UNKNOWN STYLE');
   }
 
-  registerScopeStyles(scopeId: string, styles: ComputedRef<ModuleObject>): void {
-    (this.usesScopesProperties as ModuleObject<any>)[scopeId] = styles;
+  registerScopeStyles(scopeId: string, blockPath: ModuleDefaultBlockKeys, styles: ComputedRef<ModuleObject>): void {
+    const blockPathStyles = this.usesScopesProperties[blockPath];
+
+    if (blockPathStyles) {
+      if (!blockPathStyles.scopesIds.includes(scopeId)) {
+        blockPathStyles.scopesIds.push(scopeId);
+      }
+    } else {
+      this.usesScopesProperties[blockPath] = {
+        scopesIds: [scopeId],
+        styles
+      };
+    }
   }
 
-  unregisterScopeStyles(scopeId: string): void {
-    delete this.usesScopesProperties[scopeId];
+  unregisterScopeStyles(scopeId: string, blockPath: ModuleDefaultBlockKeys): void {
+    const blockPathStyles = this.usesScopesProperties[blockPath];
+
+    if (blockPathStyles) {
+      const scopeIdIndex = blockPathStyles.scopesIds.indexOf(scopeId);
+
+      if (scopeIdIndex !== -1) blockPathStyles.scopesIds.splice(scopeIdIndex, 1);
+      if (blockPathStyles.scopesIds.length === 0) delete this.usesScopesProperties[blockPath];
+    }
   }
 
-  checkScopeRegistration(scopeId: string): boolean {
-    return !!this.usesScopesProperties[scopeId];
+  checkScopeRegistration(scopeId: string, blockPath: ModuleDefaultBlockKeys): boolean {
+    return !!this.usesScopesProperties[blockPath]?.scopesIds.includes(scopeId);
   }
 
   getConfig(): ModuleOptionsExtend {
