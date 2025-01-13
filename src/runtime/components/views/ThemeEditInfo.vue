@@ -23,14 +23,14 @@ const themeId = computed(() => router.getQuery().themeId);
 const theme = client.getThemes()[themeId.value];
 const themeEditData = reactive({
   id: theme.id,
-  name: theme.meta.name,
-  description: theme.meta.description,
+  name: theme.name === theme.id ? '' : theme.name,
+  description: theme.description,
   oldThemeId: themeId.value
 } as ModuleThemeEditData);
 const previewTheme = computed(() => ({
   id: themeId.value ?? 'default',
   name: themeEditData.name || themeEditData.id,
-  meta: { description: themeEditData.description }
+  description: themeEditData.description
 }) as any);
 
 function editTheme() {

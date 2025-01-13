@@ -18,7 +18,7 @@ import type {
   ModuleThemeEditData,
   ModuleErrorMessage,
   ModuleErrorType,
-  ModulePagesNames, ModuleThemeScopes, ModuleThemeScopesStyles
+  ModulePagesNames, ModuleThemeScopes, ModuleThemeScopesStyles, ModuleDefineThemeMetaPreview, ModuleDefineThemeMetaUI
 } from '../../types';
 // @ts-ignore
 import connectorMeta from '../../meta/connector';
@@ -28,6 +28,7 @@ import useSystemTheme from '../../helpers/client/useSystemTheme';
 import defineChecker from '../../helpers/defineChecker';
 import useReloadMiddleware from '../../helpers/client/useReloadMiddleware';
 import mergeThemes from '../../helpers/mergeThemes';
+import useIdProtect from '../../helpers/client/useIdProtect';
 import { Sandbox } from './Sandbox';
 import { Router } from './Router';
 import { useRuntimeConfig, reactive, ref, computed, watch } from '#imports';
@@ -36,6 +37,10 @@ type ThemeId = string | Ref<string | undefined>;
 type ThemeDefConfig = 'light' | 'dark' | 'system' | ThemeId | undefined;
 
 export class Client {
+  private readonly runtimeUIId = useIdProtect('ui');
+  private readonly runtimePreviewId = useIdProtect('preview');
+  private readonly runtimeSelectedId = useIdProtect('selected');
+
   private readonly config = useRuntimeConfig().public.themesEditor as ModuleOptionsExtend;
   private readonly reloadMiddleware = useReloadMiddleware();
   private readonly sandbox = new Sandbox(this);
@@ -89,7 +94,8 @@ export class Client {
 
     watch(this.selectedTheme, (theme) => {
       this._appendStyleToHead(`${this.config.keys.style}:root`, theme ? { [rootStylesKey]: (theme as any).styles[0].styles[0] } : {});
-      this._appendStyleToHead(`${this.config.keys.style}:ui`, { [uiStylesKey]: { ...theme?.meta.uiStyles } });
+      this._appendStyleToHead(`${this.config.keys.style}:preview`, { [`[theme-${useIdProtect('selected')}-preview]`]: unwrap.get(this.getSelectedStylesPreview()) });
+      this._appendStyleToHead(`${this.config.keys.style}:ui`, { [uiStylesKey]: unwrap.get(this.getSelectedStylesUI()) });
     }, { immediate: true });
 
     watch(this.usesScopesProperties, properties => this._appendStyleToHead(
@@ -99,10 +105,10 @@ export class Client {
 
     watch(this.themes, (themes) => {
       this._appendStyleToHead(
-        `${this.config.keys.style}:preview`,
+        `${this.config.keys.style}:preview:all`,
         {
-          '[theme-default-preview]': DEFAULT_PREVIEW_STYLES,
-          ...Object.values(themes).reduce((acc, theme) => ({ ...acc, [`[theme-${theme.id}-preview]`]: theme.meta.previewStyles }), {})
+          [`[theme-${useIdProtect('default')}-preview]`]: DEFAULT_PREVIEW_STYLES,
+          ...Object.values(themes).reduce((acc, theme) => ({ ...acc, [`[theme-${theme.id}-preview]`]: unwrap.get(this.getSelectedStylesPreview(theme)) }), {})
         }
       );
     }, { immediate: true });
@@ -189,21 +195,25 @@ export class Client {
     return {
       id: themeId,
       name: themeFile.meta.name ?? themeId,
+      description: themeFile.meta.description ?? '',
       type: themeType,
-      meta: {
-        name: themeFile.meta.name ?? '',
-        description: '',
-
-        ...themeFile.meta,
-
-        previewStyles: {
-          ...themeFile.meta.previewStyles
+      styles: [
+        ...themeFile.styles.map(style => cleanThemeStyles(style, 'global')),
+        {
+          id: useIdProtect('ui'),
+          styles: [{
+            ...DEFAULT_UI_STYLES,
+            ...themeFile.meta.uiStyles
+          }]
         },
-        uiStyles: {
-          ...themeFile.meta.uiStyles
+        {
+          id: useIdProtect('preview'),
+          styles: [{
+            ...DEFAULT_PREVIEW_STYLES,
+            ...themeFile.meta.previewStyles
+          }]
         }
-      },
-      styles: themeFile.styles.map(style => cleanThemeStyles(style, 'global'))
+      ]
     };
   }
 
@@ -254,19 +264,7 @@ export class Client {
     return {
       ...themeCopy,
       target: selectedTheme,
-      styles: themeCopy.styles.map(style => prepareStyle(style)),
-      meta: {
-        ...themeCopy.meta,
-
-        uiStyles: {
-          ...DEFAULT_UI_STYLES,
-          ...themeCopy.meta.uiStyles
-        },
-        previewStyles: {
-          ...DEFAULT_PREVIEW_STYLES,
-          ...themeCopy.meta.previewStyles
-        }
-      }
+      styles: themeCopy.styles.map(style => prepareStyle(style))
     };
   }
 
@@ -359,6 +357,18 @@ export class Client {
     return computed(() => this._getValueByThemesCache('S', stylePath, (theme ?? unwrap.get(this.selectedTheme))?.styles) as any ?? 'UNKNOWN STYLE');
   }
 
+  getSelectedStyles(theme?: ModuleThemeRootReturn): ComputedRef<ModuleThemeCleanedSetting[]> {
+    return computed(() => (theme ?? this.selectedTheme.value)?.styles.filter(block => !block.id.startsWith(this.config.systemUUID.toString())) ?? []);
+  }
+
+  getSelectedStylesUI(theme?: ModuleThemeRootReturn): ComputedRef<ModuleDefineThemeMetaUI> {
+    return this.getStylesByPath(this.runtimeUIId as any, theme);
+  }
+
+  getSelectedStylesPreview(theme?: ModuleThemeRootReturn): ComputedRef<ModuleDefineThemeMetaPreview> {
+    return this.getStylesByPath(this.runtimePreviewId as any, theme);
+  }
+
   registerScopeStyles(scopeId: string, blockPath: ModuleDefaultBlockKeys, styles: ComputedRef<ModuleObject>): void {
     const blockPathStyles = this.usesScopesProperties[blockPath];
 
@@ -434,11 +444,19 @@ export class Client {
   }
 
   getThemesBlocksPaths(): ComputedRef<ModuleDefaultBlockKeys[]> {
-    return computed(() => Object.keys(this.themesPathsCache).filter(path => path[0] === 'B').map(path => path.slice(2))) as any;
+    return computed(() =>
+      Object.keys(this.themesPathsCache)
+        .filter(path => path.startsWith('B') && !path.startsWith(`B.${this.config.systemUUID}`))
+        .map(path => path.slice(2))
+    ) as any;
   }
 
   getThemesStylesPaths(): ComputedRef<ModuleDefaultStyleKeys[]> {
-    return computed(() => Object.keys(this.themesPathsCache).filter(path => path[0] === 'S').map(path => path.slice(2))) as any;
+    return computed(() =>
+      Object.keys(this.themesPathsCache)
+        .filter(path => path.startsWith('S') && !path.startsWith(`S.${this.config.systemUUID}`))
+        .map(path => path.slice(2))
+    ) as any;
   }
 
   getErrors(type?: ModuleErrorType, page?: ModulePagesNames): ModuleErrorMessage[] {
@@ -463,8 +481,10 @@ export class Client {
   }
 
   setThemeStyleValue(stylePath: ModuleDefaultStyleKeys, newValue: string, theme?: ModuleThemeRootReturn): void {
+    console.log(stylePath, newValue, theme);
     const styles = theme?.styles ?? unwrap.get(this.selectedTheme)?.styles;
     const cache = this.themesPathsCache[`S.${stylePath}`];
+    console.log(this.themesPathsCache);
 
     if (styles && cache) {
       cache.reduce((acc, index, i) => {
@@ -517,13 +537,8 @@ export class Client {
 
       id,
       name: name || id,
-      type: 'local',
-      meta: {
-        ...newTheme.meta,
-
-        name,
-        description
-      }
+      description,
+      type: 'local'
     };
   }
 
@@ -538,12 +553,7 @@ export class Client {
 
       id,
       name: name || id,
-      meta: {
-        ...theme.meta,
-
-        name,
-        description
-      }
+      description
     };
     this._replaceSelectedThemes(undefined, undefined, undefined, id, id, id);
   }
@@ -553,5 +563,17 @@ export class Client {
     if (!theme || theme.type !== 'local') return;
     delete this.themes[id];
     this._replaceSelectedThemes();
+  }
+
+  getRuntimeUIId() {
+    return this.runtimeUIId;
+  }
+
+  getRuntimePreviewId() {
+    return this.runtimePreviewId;
+  }
+
+  getRuntimeSelectedId() {
+    return this.runtimeSelectedId;
   }
 }

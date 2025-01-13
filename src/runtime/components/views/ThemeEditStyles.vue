@@ -2,6 +2,7 @@
 import type { ModuleClient } from '../../types';
 import IsButton from '../shared/IsButton.vue';
 import ViewPage from '../widgets/ViewPage.vue';
+import ThemeStylesPreviewBlock from '../widgets/ThemeStylesPreviewBlock.vue';
 import ThemeStylesBlock from '../widgets/ThemeStylesBlock.vue';
 import { computed, onBeforeMount, ref } from '#imports';
 
@@ -17,7 +18,9 @@ const sandbox = client.getSandbox();
 const viewPageRef = ref();
 const alertInheritance = ref<HTMLElement>();
 const themeId = computed(() => router.getQuery().themeId);
-const selectedTheme = computed(() => client.getSelectedTheme()!);
+const theme = computed(() => client.getSelectedTheme()!);
+const themeStyles = computed(() => client.getSelectedStyles(theme.value).value);
+const themeTargetStyles = computed(() => client.getSelectedStyles(theme.value.target).value);
 
 function goBack() {
   client.setEditedTheme(undefined);
@@ -31,15 +34,18 @@ function goToInheritance(inheritanceId: string) {
 
   alertInheritance.value = inheritanceStyle!;
   const templateHeight = viewPageRef.value.templateRef.clientHeight;
-  const templateTop = viewPageRef.value.templateRef.scrollTop;
-  const templateBottom = templateTop + templateHeight;
-  const inheritancePosition = inheritanceStyle.getBoundingClientRect().top;
+  const templatePosition = viewPageRef.value.templateRef.getBoundingClientRect().top;
+  const templateScrollTop = viewPageRef.value.templateRef.scrollTop;
+  const templateScrollBottom = templateScrollTop + templateHeight;
+  const inheritanceBoundingRect = inheritanceStyle.getBoundingClientRect();
+  const inheritancePosition = inheritanceBoundingRect.top + templateScrollTop - templatePosition;
+  const inheritanceHeight = inheritanceBoundingRect.height;
   let scrollTo = 0;
 
-  if (inheritancePosition < templateTop) {
-    scrollTo = inheritancePosition;
-  } else if (inheritancePosition > templateBottom) {
-    scrollTo = inheritancePosition + templateHeight;
+  if (inheritancePosition < templateScrollTop + 35) {
+    scrollTo = inheritancePosition - 35;
+  } else if (inheritancePosition > templateScrollBottom) {
+    scrollTo = inheritancePosition - templateHeight + inheritanceHeight;
   } else {
     inheritanceAnimation();
     return;
@@ -76,18 +82,23 @@ onBeforeMount(() => {
     ref="viewPageRef"
     @scrollend="inheritanceAnimation"
   >
-    <div class="TE-theme-edit-styles">
-      <div class="TE-theme-edit-styles__all">
+    <template #default>
+      <div class="TE-theme-edit-styles">
+        <ThemeStylesPreviewBlock
+          :client="client"
+          @click="sandbox.openStyleClickMenu(...$event)"
+          @context-menu-open="sandbox.openStyleContextMenu(...$event)"
+          @inheritance-click="goToInheritance"
+        />
         <ThemeStylesBlock
-          :styles="selectedTheme.styles"
-          :raw-styles="selectedTheme.target.styles"
+          :styles="themeStyles"
+          :raw-styles="themeTargetStyles"
           @click="sandbox.openStyleClickMenu(...$event)"
           @context-menu-open="sandbox.openStyleContextMenu(...$event)"
           @inheritance-click="goToInheritance"
         />
       </div>
-    </div>
-
+    </template>
     <template #footer>
       <div class="TE-theme-edit-styles-footer">
         <IsButton @click="goBack">
@@ -103,10 +114,6 @@ onBeforeMount(() => {
 
 <style scoped lang="scss">
 .TE-theme-edit-styles {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-
   &-footer {
     display: flex;
     justify-content: flex-end;

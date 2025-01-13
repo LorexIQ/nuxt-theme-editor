@@ -21,6 +21,7 @@ const meta = {
 export default defineNuxtModule<ModuleOptions>({
   meta,
   defaults: {
+    systemUUID: 'system',
     defaultTheme: 'light',
     themesDir: './themes'
   },

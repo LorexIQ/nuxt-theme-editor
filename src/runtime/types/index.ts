@@ -9,6 +9,7 @@ export * from './themes';
 export type ModuleObject<T = string> = { [name: string]: T };
 
 export type ModuleOptions = {
+  systemUUID: string;
   defaultTheme: string;
   themesDir: string;
   defaultDarkTheme?: string;

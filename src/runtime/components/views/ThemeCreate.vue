@@ -5,9 +5,10 @@ import IsButton from '../shared/IsButton.vue';
 import NotifyBlock from '../shared/NotifyBlock.vue';
 import ThemeBlock from '../features/ThemeBlock.vue';
 import ViewPage from '../widgets/ViewPage.vue';
+import IsHr from '../shared/IsHr.vue';
 import BlockRadioThemes from '../widgets/BlockRadioThemes.vue';
 import useErrorMessages from '../../helpers/client/useErrorMessages';
-import IsHr from '../shared/IsHr.vue';
+import useIdProtect from '../../helpers/client/useIdProtect';
 import { computed, onBeforeMount, reactive } from '#imports';
 
 type Props = {
@@ -27,7 +28,7 @@ const themeCreateData = reactive<ModuleThemeCreateData>({
   parentThemeId: router.getQuery()['parentThemeId']
 });
 const previewTheme = computed<any>(() => ({
-  id: themeCreateData.parentThemeId ?? 'default',
+  id: themeCreateData.parentThemeId ?? useIdProtect('default'),
   name: themeCreateData.name || themeCreateData.id,
   meta: { description: themeCreateData.description }
 }));

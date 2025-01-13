@@ -27,7 +27,12 @@ console.log('second.vue useThemeBlock =>', scopeStyles.value);
       AUTO [{{ themesEditor.getAutoThemeModeStatus() ? 'ON' : 'OFF' }}]
     </button>
     {{ scopeStyles }}
-    <test-block />
+    <div style="max-height: 700px; overflow-y: auto">
+      <log-object
+        v-if="themesEditor.getEditedTheme()"
+        :value="themesEditor.getEditedTheme()"
+      />
+    </div>
   </div>
 </template>
 

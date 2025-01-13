@@ -13,7 +13,7 @@ defineProps<Props>();
   <div class="TE-theme-block">
     <div
       class="TE-theme-block__preview"
-      v-bind="{ [`theme-default-preview`]: '', [`theme-${theme.id}-preview`]: '' }"
+      v-bind="{ [`theme-${theme.id}-preview`]: '' }"
     >
       <slot name="preview">
         <ThemePreview />
@@ -28,9 +28,9 @@ defineProps<Props>();
       </div>
       <div
         class="TE-theme-block__info__description"
-        :class="{ 'TE-theme-block__info__description--transparent': !theme.meta.description }"
+        :class="{ 'TE-theme-block__info__description--transparent': !theme.description }"
       >
-        <span>{{ theme.meta.description || 'Description isn\'t set' }}</span>
+        <span>{{ theme.description || 'Description isn\'t set' }}</span>
       </div>
     </div>
     <slot name="status" />

@@ -4,7 +4,12 @@ export default defineNuxtConfig({
 
   plugins: ['./plugins/test.ts'], ssr: false,
 
-  devtools: { enabled: true },
+  devtools: {
+    enabled: true,
+    timeline: {
+      enabled: true
+    }
+  },
 
   css: [
     './assets/main.scss'

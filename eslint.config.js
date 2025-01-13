@@ -18,6 +18,7 @@ export default createConfigForNuxt({
         'no-new-func': 'off',
         'no-eval': 'off',
         'vue/multi-word-component-names': 'off',
+        'vue/attribute-hyphenation': 'off',
         'antfu/no-import-node-modules-by-path': 'off',
         '@typescript-eslint/unified-signatures': 'off',
         '@typescript-eslint/no-explicit-any': 'off',
