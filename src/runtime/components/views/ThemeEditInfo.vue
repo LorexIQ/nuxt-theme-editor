@@ -57,7 +57,10 @@ onBeforeMount(() => {
 
 <template>
   <ViewPage>
-    <div class="TE-theme-edit-info">
+    <div
+      class="TE-theme-edit-info"
+      @keyup.enter="editTheme"
+    >
       <div class="TE-theme-edit-info__block">
         <IsHr>Theme Info</IsHr>
         <div class="TE-theme-edit-info__block__row">

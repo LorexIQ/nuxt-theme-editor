@@ -28,13 +28,14 @@ const props = withDefaults(defineProps<Props>(), {
 });
 const emit = defineEmits<Emits>();
 const sandboxSize = props.sandboxSize;
+const padding = 5;
 
 const menuRef = ref<HTMLDivElement>();
 const menuBoundingRect = ref<DOMRect>();
 const menuPosition = computed(() => {
   const menuRect = menuBoundingRect.value;
-  const left = menuRect && menuRect.right > sandboxSize.width ? sandboxSize.width - menuRect.width : props.clickPosition.x;
-  const top = menuRect && menuRect.bottom > sandboxSize.height ? sandboxSize.height - menuRect.height : props.clickPosition.y;
+  const left = menuRect && menuRect.right > sandboxSize.width ? sandboxSize.width - menuRect.width - padding : props.clickPosition.x < padding ? padding : props.clickPosition.x;
+  const top = menuRect && menuRect.bottom > sandboxSize.height ? sandboxSize.height - menuRect.height - padding : props.clickPosition.y < padding ? padding : props.clickPosition.y;
 
   return {
     left: left + 'px',

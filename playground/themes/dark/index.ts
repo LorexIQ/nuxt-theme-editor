@@ -2,9 +2,9 @@ import sidebar from './sidebar';
 
 export default defineThemeBlockRoot({
   previewStyles: {
-    defaultPreviewCardBG1: 'purple',
-    defaultPreviewCardBG2: 'pink',
-    defaultPreviewCardBG3: 'brown'
+    bg1: 'purple',
+    bg2: 'pink',
+    bg3: 'brown'
   }
 }, [
   {

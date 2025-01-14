@@ -19,22 +19,22 @@
 
   &__block {
     &:first-child {
-      background-color: var(--defaultPreviewCardBG1);
+      background-color: var(--bg1);
     }
     &:nth-child(2) {
-      background-color: var(--defaultPreviewCardBG2);
+      background-color: var(--bg2);
     }
     &:nth-child(3) {
-      background-color: var(--defaultPreviewCardBG3);
+      background-color: var(--bg3);
     }
     &:nth-child(4) {
-      background-color: var(--defaultPreviewCardBG4);
+      background-color: var(--bg4);
     }
     &:nth-child(5) {
-      background-color: var(--defaultPreviewCardBG5);
+      background-color: var(--bg5);
     }
     &:last-child {
-      background-color: var(--defaultPreviewCardBG6);
+      background-color: var(--bg6);
     }
   }
 }

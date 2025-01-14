@@ -18,5 +18,9 @@ export default [
   {
     name: 'deleteTheme',
     title: 'Delete'
+  },
+  {
+    name: 'editThemeStylesCancel',
+    title: 'Cancel Changes'
   }
 ] as const;

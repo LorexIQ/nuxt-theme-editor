@@ -53,7 +53,10 @@ onBeforeMount(() => {});
 
 <template>
   <ViewPage>
-    <div class="TE-theme-create">
+    <div
+      class="TE-theme-create"
+      @keyup.enter="createTheme"
+    >
       <div class="TE-theme-create__block">
         <IsHr>Theme Info</IsHr>
         <div class="TE-theme-create__block__row">

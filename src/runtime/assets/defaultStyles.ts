@@ -1,12 +1,12 @@
 import type { ModuleDefineThemeMetaPreview, ModuleDefineThemeMetaUI } from '../types';
 
 export const DEFAULT_PREVIEW_STYLES: Required<ModuleDefineThemeMetaPreview> = {
-  defaultPreviewCardBG1: '#FFFFFF',
-  defaultPreviewCardBG2: '#CCCCCC',
-  defaultPreviewCardBG3: '#999999',
-  defaultPreviewCardBG4: '#666666',
-  defaultPreviewCardBG5: '#333333',
-  defaultPreviewCardBG6: '#000000'
+  bg1: '#FFFFFF',
+  bg2: '#CCCCCC',
+  bg3: '#999999',
+  bg4: '#666666',
+  bg5: '#333333',
+  bg6: '#000000'
 };
 
 export const DEFAULT_UI_STYLES: Required<ModuleDefineThemeMetaUI> = {

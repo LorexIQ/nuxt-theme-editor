@@ -24,8 +24,7 @@ const themeStyles = computed(() => client.getSelectedStyles(theme.value).value);
 const themeTargetStyles = computed(() => client.getSelectedStyles(theme.value.target).value);
 
 function goBack() {
-  client.setEditedTheme(undefined);
-  router.push('index', 'tab-fade-rl');
+  router.push(`editThemeStylesCancel?themeId=${themeId.value}`, 'tab-fade-lr');
 }
 function goToInheritance(inheritanceId: string) {
   if (!inheritanceId.startsWith('$') || !viewPageRef.value) return;
@@ -74,7 +73,7 @@ onBeforeMount(() => {
     return;
   }
 
-  client.setEditedTheme(themeId.value);
+  if (!client.getEditedTheme()) client.setEditedTheme(themeId.value);
 });
 </script>
 
@@ -111,7 +110,21 @@ onBeforeMount(() => {
         <IsButton @click="goBack">
           Go back
         </IsButton>
-        <IsButton decor="success">
+        <IsButton
+          decor="success"
+          :items="[
+            {
+              title: 'Save',
+              action: () => {},
+              icon: 'Save',
+            },
+            {
+              title: 'Save the draft',
+              action: () => {},
+              icon: 'SaveEdit',
+            },
+          ]"
+        >
           Save
         </IsButton>
       </div>

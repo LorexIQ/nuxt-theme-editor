@@ -14,9 +14,6 @@ import type { StylePickerData } from '../../components/features/StyleEditBlock.v
 import { markRaw, reactive } from '#imports';
 
 const CONTEXT_MENU_ID = 'context-menu';
-const CONTEXT_MENU_THEMES_ID = `${CONTEXT_MENU_ID}-themes`;
-const CONTEXT_MENU_STYLES_ID = `${CONTEXT_MENU_ID}-styles`;
-const CONTEXT_MENU_INHERITANCE_ID = `${CONTEXT_MENU_ID}-inheritance`;
 
 export class Sandbox {
   private readonly config: ModuleOptionsExtend;
@@ -76,7 +73,7 @@ export class Sandbox {
     const isSelectedDarkTheme = this.ctx.getSelectedDarkThemeId() === theme.id;
 
     this.components.push({
-      id: CONTEXT_MENU_THEMES_ID,
+      id: CONTEXT_MENU_ID,
       component: markRaw(ContextMenu),
       transitionName: 'fade',
       props: {
@@ -143,7 +140,7 @@ export class Sandbox {
     const clickPosition: ModuleSandboxMousePosition = { x: event.pageX, y: event.pageY };
 
     this.components.push({
-      id: CONTEXT_MENU_STYLES_ID,
+      id: CONTEXT_MENU_ID,
       component: markRaw(ContextMenu),
       transitionName: 'fade',
       props: {
@@ -191,7 +188,7 @@ export class Sandbox {
     const clickPosition: ModuleSandboxMousePosition = { x: event.pageX, y: event.pageY };
 
     this.components.push({
-      id: CONTEXT_MENU_INHERITANCE_ID,
+      id: CONTEXT_MENU_ID,
       component: markRaw(ContextMenu),
       transitionName: 'fade',
       props: {
@@ -209,6 +206,28 @@ export class Sandbox {
             action: () => this.ctx.setThemeStyleValue(style, `$${stylePath}`, this.ctx.getEditedTheme())
           }))
         ]
+      },
+      emits: {
+        close: () => this.closeContextMenu()
+      }
+    });
+  }
+
+  openCustomContextMenu(event: MouseEvent, items: ModuleSandboxContextMenuItem[]): void {
+    this.closeContextMenu();
+    const clickPosition: ModuleSandboxMousePosition = { x: event.pageX, y: event.pageY };
+
+    this.components.push({
+      id: CONTEXT_MENU_ID,
+      component: markRaw(ContextMenu),
+      transitionName: 'fade',
+      props: {
+        clickPosition,
+        sandboxSize: this.boxSize,
+        tipText: 'Select an action',
+        maxWidth: 'min(100%, 300px)',
+        maxHeight: 'min(100%, 400px)',
+        items
       },
       emits: {
         close: () => this.closeContextMenu()

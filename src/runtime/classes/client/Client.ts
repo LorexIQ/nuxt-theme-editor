@@ -113,7 +113,7 @@ export class Client {
       );
     }, { immediate: true });
 
-    // watch(this.editedThemeId, themeId => this.reloadMiddleware[themeId ? 'on' : 'off']());
+    watch(this.editedThemeId, themeId => this.reloadMiddleware[themeId ? 'on' : 'off']());
 
     watch(this.savedStorage, () => this._saveStorage());
   }
@@ -481,10 +481,8 @@ export class Client {
   }
 
   setThemeStyleValue(stylePath: ModuleDefaultStyleKeys, newValue: string, theme?: ModuleThemeRootReturn): void {
-    console.log(stylePath, newValue, theme);
     const styles = theme?.styles ?? unwrap.get(this.selectedTheme)?.styles;
     const cache = this.themesPathsCache[`S.${stylePath}`];
-    console.log(this.themesPathsCache);
 
     if (styles && cache) {
       cache.reduce((acc, index, i) => {

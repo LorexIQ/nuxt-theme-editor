@@ -1,12 +1,12 @@
 import type { ModuleObject } from './index';
 
 export type ModuleDefineThemeMetaPreview = ModuleObject & Partial<{
-  defaultPreviewCardBG1: string;
-  defaultPreviewCardBG2: string;
-  defaultPreviewCardBG3: string;
-  defaultPreviewCardBG4: string;
-  defaultPreviewCardBG5: string;
-  defaultPreviewCardBG6: string;
+  bg1: string;
+  bg2: string;
+  bg3: string;
+  bg4: string;
+  bg5: string;
+  bg6: string;
 }>;
 export type ModuleDefineThemeMetaUI = Partial<{
   bg: string;

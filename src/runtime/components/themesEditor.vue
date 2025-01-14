@@ -6,6 +6,7 @@ import ThemeCreate from './views/ThemeCreate.vue';
 import ThemeDelete from './views/ThemeDelete.vue';
 import ThemeEditInfo from './views/ThemeEditInfo.vue';
 import ThemeEditStyles from './views/ThemeEditStyles.vue';
+import ThemeEditStylesCancel from './views/ThemeEditStylesCancel.vue';
 import Error404 from './views/Error404.vue';
 import { computed } from '#imports';
 
@@ -24,6 +25,8 @@ const pageComponent = computed(() => {
       return ThemeEditInfo;
     case 'editThemeStyles':
       return ThemeEditStyles;
+    case 'editThemeStylesCancel':
+      return ThemeEditStylesCancel;
     default:
       return Error404;
   }

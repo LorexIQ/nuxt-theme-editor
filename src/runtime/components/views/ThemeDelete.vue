@@ -1,9 +1,7 @@
 <script setup lang="ts">
 import type { ModuleClient } from '../../types';
-import IsButton from '../shared/IsButton.vue';
-import ViewPage from '../widgets/ViewPage.vue';
-import IconsStore from '../shared/IconsStore.vue';
-import { computed, onBeforeMount } from '#imports';
+import QuestionPageBlock from '../shared/QuestionPageBlock.vue';
+import { computed } from '#imports';
 
 type Props = {
   client: ModuleClient;
@@ -19,67 +17,27 @@ function onThemeDelete() {
   router.push('index', 'tab-fade-rl');
 }
 
-onBeforeMount(() => {
+function onBeforeMount() {
   if (!themeId.value || !client.getThemes()[themeId.value]) {
     router.push('index', 'tab-fade-lr');
     return;
   }
-});
+}
 </script>
 
 <template>
-  <ViewPage>
-    <div class="TE-theme-delete">
-      <IconsStore
-        icon="Question"
-        size="80px"
-      />
-
-      <span>Are you sure you want to delete the theme</span>
-      <div class="TE-theme-delete__actions">
-        <IsButton @click="router.push('index', 'tab-fade-rl')">
-          Cancel
-        </IsButton>
-        <IsButton
-          decor="error"
-          @click="onThemeDelete"
-        >
-          Delete
-        </IsButton>
-      </div>
-    </div>
-  </ViewPage>
+  <QuestionPageBlock
+    class="TE-theme-delete"
+    icon="Question"
+    question-title="Are you sure you want to delete the theme"
+    first-btn-title="Cancel"
+    second-btn-title="Delete"
+    :before-mount="onBeforeMount"
+    @click-first="router.push('index', 'tab-fade-rl')"
+    @click-second="onThemeDelete"
+  />
 </template>
 
 <style lang="scss" scoped>
-.TE-theme-delete {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  gap: 5px;
-  height: 100%;
-  text-align: center;
-
-  & h1 {
-    font-family: 'Segoe Print', sans-serif;
-    font-weight: 600;
-    font-size: 70px;
-    line-height: 80px;
-    color: var(--title);
-  }
-  & span {
-    font-size: 14px;
-    font-weight: 600;
-    color: var(--title);
-  }
-  & .TE-is-button {
-    margin-top: 10px;
-  }
-
-  &__actions {
-    display: flex;
-    gap: 5px;
-  }
-}
+.TE-theme-delete {}
 </style>
