@@ -113,7 +113,7 @@ export class Client {
       );
     }, { immediate: true });
 
-    watch(this.editedThemeId, themeId => this.reloadMiddleware[themeId ? 'on' : 'off']());
+    // watch(this.editedThemeId, themeId => this.reloadMiddleware[themeId ? 'on' : 'off']());
 
     watch(this.savedStorage, () => this._saveStorage());
   }

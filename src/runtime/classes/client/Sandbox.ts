@@ -15,6 +15,10 @@ import { markRaw, reactive } from '#imports';
 
 const CONTEXT_MENU_ID = 'context-menu';
 
+function UUID() {
+  return `${CONTEXT_MENU_ID}-${Date.now()}`;
+}
+
 export class Sandbox {
   private readonly config: ModuleOptionsExtend;
   private readonly id: string;
@@ -73,7 +77,7 @@ export class Sandbox {
     const isSelectedDarkTheme = this.ctx.getSelectedDarkThemeId() === theme.id;
 
     this.components.push({
-      id: CONTEXT_MENU_ID,
+      id: UUID(),
       component: markRaw(ContextMenu),
       transitionName: 'fade',
       props: {
@@ -140,7 +144,7 @@ export class Sandbox {
     const clickPosition: ModuleSandboxMousePosition = { x: event.pageX, y: event.pageY };
 
     this.components.push({
-      id: CONTEXT_MENU_ID,
+      id: UUID(),
       component: markRaw(ContextMenu),
       transitionName: 'fade',
       props: {
@@ -188,7 +192,7 @@ export class Sandbox {
     const clickPosition: ModuleSandboxMousePosition = { x: event.pageX, y: event.pageY };
 
     this.components.push({
-      id: CONTEXT_MENU_ID,
+      id: UUID(),
       component: markRaw(ContextMenu),
       transitionName: 'fade',
       props: {
@@ -218,7 +222,7 @@ export class Sandbox {
     const clickPosition: ModuleSandboxMousePosition = { x: event.pageX, y: event.pageY };
 
     this.components.push({
-      id: CONTEXT_MENU_ID,
+      id: UUID(),
       component: markRaw(ContextMenu),
       transitionName: 'fade',
       props: {

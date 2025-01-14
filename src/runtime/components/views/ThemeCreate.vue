@@ -30,7 +30,7 @@ const themeCreateData = reactive<ModuleThemeCreateData>({
 const previewTheme = computed<any>(() => ({
   id: themeCreateData.parentThemeId ?? useIdProtect('default'),
   name: themeCreateData.name || themeCreateData.id,
-  meta: { description: themeCreateData.description }
+  description: themeCreateData.description
 }));
 
 function createTheme() {
