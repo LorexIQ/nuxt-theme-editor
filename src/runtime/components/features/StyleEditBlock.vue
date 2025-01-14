@@ -56,7 +56,7 @@ const isCircular = computed(() => currentValue.value === 'CIRCULAR');
     >
       <div
         class="TE-style-edit-block__picker"
-        :style="`background-color: ${currentValue};`"
+        :style="`--current: ${currentValue};`"
         @click="emit('click', [$event, pickerRef!, id as any, rawValue])"
       />
     </color-picker>
@@ -118,11 +118,28 @@ const isCircular = computed(() => currentValue.value === 'CIRCULAR');
     overflow: hidden;
   }
   &__picker {
+    position: relative;
     aspect-ratio: 1;
     width: 30px;
     border: 1px solid var(--border);
     border-radius: 5px;
     cursor: pointer;
+    overflow: hidden;
+
+    &::before, &::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+    }
+    &::before {
+      background: var(--alpha);
+    }
+    &::after {
+      background: var(--current);
+    }
   }
   &__hr {
     height: 100%;

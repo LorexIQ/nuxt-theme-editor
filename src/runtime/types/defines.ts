@@ -15,7 +15,6 @@ export type ModuleDefineThemeMetaUI = Partial<{
   bgFooter: string;
   bgBlockHeader: string;
   bgGlass: string;
-  blurGlass: string;
   shadow: string;
   border: string;
   title: string;

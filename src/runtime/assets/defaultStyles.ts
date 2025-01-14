@@ -16,7 +16,6 @@ export const DEFAULT_UI_STYLES: Required<ModuleDefineThemeMetaUI> = {
   bgFooter: '#fff',
   bgBlockHeader: '#f6f6f6',
   bgGlass: '#00000019',
-  blurGlass: '3px',
   shadow: '#00000033',
   border: '#00000019',
   title: '#333',

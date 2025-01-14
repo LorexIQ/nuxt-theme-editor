@@ -3,6 +3,7 @@ import type { ModuleClient } from '../../types';
 import IsButton from '../shared/IsButton.vue';
 import ViewPage from '../widgets/ViewPage.vue';
 import ThemeStylesPreviewBlock from '../widgets/ThemeStylesPreviewBlock.vue';
+import ThemeStylesUIBlock from '../widgets/ThemeStylesUIBlock.vue';
 import ThemeStylesBlock from '../widgets/ThemeStylesBlock.vue';
 import { computed, onBeforeMount, ref } from '#imports';
 
@@ -85,6 +86,12 @@ onBeforeMount(() => {
     <template #default>
       <div class="TE-theme-edit-styles">
         <ThemeStylesPreviewBlock
+          :client="client"
+          @click="sandbox.openStyleClickMenu(...$event)"
+          @context-menu-open="sandbox.openStyleContextMenu(...$event)"
+          @inheritance-click="goToInheritance"
+        />
+        <ThemeStylesUIBlock
           :client="client"
           @click="sandbox.openStyleClickMenu(...$event)"
           @context-menu-open="sandbox.openStyleContextMenu(...$event)"

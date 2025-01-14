@@ -184,7 +184,7 @@ onMounted(() => {
   }
 
   &--blur-bg {
-    backdrop-filter: blur(var(--blurGlass));
+    backdrop-filter: blur(3px);
     background-color: var(--bgGlass);
   }
 }

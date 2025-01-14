@@ -28,6 +28,9 @@ const pageComponent = computed(() => {
       return Error404;
   }
 });
+const addStyles = computed(() => ({
+  '--alpha': 'url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAAAXNSR0IArs4c6QAAAChJREFUKFNjPHP19n8GNGCspYIuxMA4FBT+//8fwzNnr93B9MwQUAgAe7I0XsEPG9EAAAAASUVORK5CYII=)'
+}));
 </script>
 
 <template>
@@ -37,7 +40,10 @@ const pageComponent = computed(() => {
   >
     <EditorHeader :client="client" />
 
-    <div class="TE-root__content">
+    <div
+      class="TE-root__content"
+      :style="addStyles"
+    >
       <transition :name="router.getTransitionName()">
         <Component
           :is="pageComponent"
