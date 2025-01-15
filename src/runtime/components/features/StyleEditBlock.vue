@@ -3,7 +3,6 @@ import type { Ref } from 'vue';
 import TextRunner from '../shared/TextRunner.vue';
 import type { ModuleDefaultStyleKeys } from '../../types';
 import { computed, ref } from '#imports';
-import type { ColorPicker } from '#components';
 
 export type StylePickerData = {
   color: Ref<string | undefined>;

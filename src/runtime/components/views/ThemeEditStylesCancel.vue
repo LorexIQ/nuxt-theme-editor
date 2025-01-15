@@ -16,7 +16,7 @@ function onCancel() {
   router.push(`editThemeStyles?themeId=${themeId.value}`, 'tab-fade-rl');
 }
 function onApprove() {
-  client.setEditedTheme();
+  client.setThemeSelectedAsEdited(undefined);
   router.push('index', 'tab-fade-rl');
 }
 </script>

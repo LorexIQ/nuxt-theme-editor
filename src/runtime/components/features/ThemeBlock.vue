@@ -1,9 +1,9 @@
 <script setup lang="ts">
-import type { ModuleThemeRootReturn } from '../../types';
+import type { ModuleTheme } from '../../types';
 import ThemePreview from './ThemePreview.vue';
 
 type Props = {
-  theme: ModuleThemeRootReturn;
+  theme: ModuleTheme;
 };
 
 defineProps<Props>();

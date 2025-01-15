@@ -20,7 +20,7 @@ const themes = client.getThemes();
 
 const activeErrors = useErrorMessages();
 const themeId = computed(() => router.getQuery().themeId);
-const theme = client.getThemes()[themeId.value];
+const theme = client.getThemeById(themeId.value)!;
 const themeEditData = reactive({
   id: theme.id,
   name: theme.name === theme.id ? '' : theme.name,
@@ -48,7 +48,7 @@ function editTheme() {
 }
 
 onBeforeMount(() => {
-  if (!themeId.value || !client.getThemes()[themeId.value]) {
+  if (!themeId.value || !client.getThemeById(themeId.value)) {
     router.push('index', 'tab-fade-lr');
     return;
   }

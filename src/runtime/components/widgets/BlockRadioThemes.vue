@@ -32,7 +32,6 @@ watch(innerValue, newVal => emit('update:modelValue', newVal));
       <template #status>
         <ThemeBlockStatus
           view-mode="horizontal"
-          :client="client"
           :theme="theme"
         />
       </template>

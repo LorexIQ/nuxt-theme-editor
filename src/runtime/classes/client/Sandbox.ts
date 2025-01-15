@@ -6,7 +6,7 @@ import type {
   ModuleSandboxContextMenuItem,
   ModuleSandboxMousePosition,
   ModuleSandboxSize,
-  ModuleThemeRootReturn
+  ModuleTheme
 } from '../../types';
 import ContextMenu from '../../components/shared/ContextMenu.vue';
 import ModuleSandbox from '../../components/views/ModuleSandbox.vue';
@@ -68,11 +68,11 @@ export class Sandbox {
     if (contextMenuComponentIndex !== -1) this.components.splice(contextMenuComponentIndex, 1);
   }
 
-  openThemeContextMenu(event: MouseEvent, theme: ModuleThemeRootReturn): void {
+  openThemeContextMenu(event: MouseEvent, theme: ModuleTheme): void {
     this.closeContextMenu();
     const router = this.ctx.getRouter();
     const clickPosition: ModuleSandboxMousePosition = { x: event.pageX, y: event.pageY };
-    const isSelectedTheme = this.ctx.getSelectedTheme()?.id === theme.id;
+    const isSelectedTheme = theme.isSelected;
     const isSelectedLightTheme = this.ctx.getSelectedLightThemeId() === theme.id;
     const isSelectedDarkTheme = this.ctx.getSelectedDarkThemeId() === theme.id;
 
@@ -90,21 +90,21 @@ export class Sandbox {
             isDisabled: () => isSelectedTheme,
             icon: isSelectedTheme ? 'Check' : 'Palette',
             iconColor: isSelectedTheme ? 'var(--contextMenuIconSuccess)' : undefined,
-            action: () => this.ctx.setTheme(theme.id)
+            action: () => this.ctx.setThemeSelectedAsMain(theme.id)
           },
           {
             title: isSelectedLightTheme ? 'Light theme is set' : 'Set as light theme',
             isDisabled: () => isSelectedLightTheme,
             icon: isSelectedLightTheme ? 'Check' : 'Sun',
             iconColor: isSelectedLightTheme ? 'var(--contextMenuIconSuccess)' : undefined,
-            action: () => this.ctx.setLightTheme(theme.id)
+            action: () => this.ctx.setThemeSelectedAsLight(theme.id)
           },
           {
             title: isSelectedDarkTheme ? 'Dark theme is set' : 'Set as dark theme',
             isDisabled: () => isSelectedDarkTheme,
             icon: isSelectedDarkTheme ? 'Check' : 'Moon',
             iconColor: isSelectedDarkTheme ? 'var(--contextMenuIconSuccess)' : undefined,
-            action: () => this.ctx.setDarkTheme(theme.id)
+            action: () => this.ctx.setThemeSelectedAsDark(theme.id)
           },
           {
             title: 'Create theme copy',
@@ -188,8 +188,11 @@ export class Sandbox {
 
   openStyleInheritanceContextMenu(event: MouseEvent, style: ModuleDefaultStyleKeys, currentValue: string): void {
     this.closeContextMenu();
-    const stylesPaths = this.ctx.getThemesStylesPaths().value;
+    const stylesPaths = this.ctx.getThemesPathsStyles().value;
+    const editedTheme = this.ctx.getEditedTheme();
     const clickPosition: ModuleSandboxMousePosition = { x: event.pageX, y: event.pageY };
+
+    if (!editedTheme) return;
 
     this.components.push({
       id: UUID(),
@@ -205,9 +208,9 @@ export class Sandbox {
           ...stylesPaths.filter(stylePath => stylePath !== style).map(stylePath => ({
             title: stylePath,
             icon: 'Circle',
-            iconColor: this.ctx.getStylesKeyValueByPath(stylePath).value,
+            iconColor: editedTheme.getPreparedStyleValue(stylePath).value,
             isDisabled: () => stylePath === currentValue.slice(1),
-            action: () => this.ctx.setThemeStyleValue(style, `$${stylePath}`, this.ctx.getEditedTheme())
+            action: () => editedTheme!.setStyleValue(style, `$${stylePath}`, 'edited')
           }))
         ]
       },

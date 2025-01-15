@@ -4,6 +4,7 @@ import StyleEditBlock from '../features/StyleEditBlock.vue';
 import DropDownBlock from '../shared/DropDownBlock.vue';
 import type { ModuleClient } from '../../types';
 import ThemeBlock from '../../components/features/ThemeBlock.vue';
+import unwrap from '../../helpers/client/unwrap';
 import { computed } from '#imports';
 
 type Props = {
@@ -19,9 +20,9 @@ const props = defineProps<Props>();
 const emit = defineEmits<Emits>();
 
 const client = props.client;
-const theme = computed(() => client.getSelectedTheme()!);
-const themePreviewStyles = computed(() => client.getSelectedStylesPreview(theme.value).value);
-const themePreviewTargetStyles = computed(() => client.getSelectedStylesPreview(theme.value.target).value);
+const theme = computed(() => client.getEditedTheme()!);
+const themePreviewStyles = computed(() => unwrap.get(theme.value.getPrepareStylesPreview()));
+const themePreviewTargetStyles = computed(() => unwrap.get(theme.value.getStylesPreview('edited')));
 </script>
 
 <template>

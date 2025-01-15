@@ -17,10 +17,10 @@ console.log('second.vue useThemeBlock =>', scopeStyles.value);
       <div class="test-blocks__left" />
       <div class="test-blocks__right" />
     </div>
-    <button @click="themesEditor.setTheme('light')">
+    <button @click="themesEditor.setThemeSelectedAsMain('light')">
       LIGHT
     </button>
-    <button @click="themesEditor.setTheme('dark')">
+    <button @click="themesEditor.setThemeSelectedAsMain('dark')">
       DARK
     </button>
     <button @click="themesEditor.setAutoThemeModeStatus(!themesEditor.getAutoThemeModeStatus())">
@@ -31,6 +31,7 @@ console.log('second.vue useThemeBlock =>', scopeStyles.value);
       <log-object
         v-if="themesEditor.getEditedTheme()"
         :value="themesEditor.getEditedTheme()"
+        :replaces="{ pathsCache: '...', ctx: '...', config: '...' }"
       />
     </div>
   </div>

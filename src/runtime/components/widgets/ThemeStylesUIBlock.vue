@@ -3,6 +3,7 @@ import type { StyleContextMenuData } from '../features/StyleEditBlock.vue';
 import StyleEditBlock from '../features/StyleEditBlock.vue';
 import DropDownBlock from '../shared/DropDownBlock.vue';
 import type { ModuleClient } from '../../types';
+import unwrap from '../../helpers/client/unwrap';
 import { computed } from '#imports';
 
 type Props = {
@@ -18,9 +19,9 @@ const props = defineProps<Props>();
 const emit = defineEmits<Emits>();
 
 const client = props.client;
-const theme = computed(() => client.getSelectedTheme()!);
-const themeUIStyles = computed(() => client.getSelectedStylesUI(theme.value).value);
-const themeUITargetStyles = computed(() => client.getSelectedStylesUI(theme.value.target).value);
+const theme = computed(() => client.getEditedTheme()!);
+const themeUIStyles = computed(() => unwrap.get(theme.value.getPrepareStylesUI()));
+const themeUITargetStyles = computed(() => unwrap.get(theme.value.getStylesUI('edited')));
 </script>
 
 <template>

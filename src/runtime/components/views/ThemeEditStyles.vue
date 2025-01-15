@@ -5,6 +5,7 @@ import ViewPage from '../widgets/ViewPage.vue';
 import ThemeStylesPreviewBlock from '../widgets/ThemeStylesPreviewBlock.vue';
 import ThemeStylesUIBlock from '../widgets/ThemeStylesUIBlock.vue';
 import ThemeStylesBlock from '../widgets/ThemeStylesBlock.vue';
+import unwrap from '../../helpers/client/unwrap';
 import { computed, onBeforeMount, ref } from '#imports';
 
 type Props = {
@@ -19,9 +20,9 @@ const sandbox = client.getSandbox();
 const viewPageRef = ref();
 const alertInheritance = ref<HTMLElement>();
 const themeId = computed(() => router.getQuery().themeId);
-const theme = computed(() => client.getSelectedTheme()!);
-const themeStyles = computed(() => client.getSelectedStyles(theme.value).value);
-const themeTargetStyles = computed(() => client.getSelectedStyles(theme.value.target).value);
+const theme = computed(() => client.getEditedTheme()!);
+const themeStyles = computed(() => unwrap.get(theme.value.getPreparedStylesWithoutSystem()));
+const themeTargetStyles = computed(() => unwrap.get(theme.value.getStylesWithoutSystem('edited')));
 
 function goBack() {
   router.push(`editThemeStylesCancel?themeId=${themeId.value}`, 'tab-fade-lr');
@@ -66,14 +67,19 @@ function inheritanceAnimation() {
     alertInheritance.value = undefined;
   }, 300);
 }
+function onSave() {
+  client.saveEditedThemeStyles();
+  client.setThemeSelectedAsEdited(undefined);
+  router.push('index', 'tab-fade-lr');
+}
 
 onBeforeMount(() => {
-  if (!themeId.value || !client.getThemes()[themeId.value]) {
+  if (!themeId.value || !client.getThemeById(themeId.value)) {
     router.push('index', 'tab-fade-lr');
     return;
   }
 
-  if (!client.getEditedTheme()) client.setEditedTheme(themeId.value);
+  if (!client.getEditedTheme()) client.setThemeSelectedAsEdited(themeId.value);
 });
 </script>
 
@@ -115,7 +121,7 @@ onBeforeMount(() => {
           :items="[
             {
               title: 'Save',
-              action: () => {},
+              action: onSave,
               icon: 'Save',
             },
             {
@@ -124,6 +130,7 @@ onBeforeMount(() => {
               icon: 'SaveEdit',
             },
           ]"
+          @click="onSave"
         >
           Save
         </IsButton>

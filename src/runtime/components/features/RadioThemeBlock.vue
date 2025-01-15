@@ -1,10 +1,10 @@
 <script setup lang="ts">
 import IsRadio from '../shared/IsRadio.vue';
-import type { ModuleThemeRootReturn } from '../../types';
+import type { ModuleTheme } from '../../types';
 import { ref, watch } from '#imports';
 
 type Props = {
-  theme: ModuleThemeRootReturn;
+  theme: ModuleTheme;
   modelValue?: string;
 };
 type Emits = {

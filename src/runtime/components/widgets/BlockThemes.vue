@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { ModuleClient, ModuleThemeRootReturn, ModuleThemeType } from '../../types';
+import type { ModuleClient, ModuleTheme, ModuleThemeType } from '../../types';
 import ThemeBlock from '../features/ThemeBlock.vue';
 import ThemeBlockStatus from '../features/ThemeBlockStatus.vue';
 import IconsStore from '../shared/IconsStore.vue';
@@ -12,7 +12,7 @@ type Props = {
   isOpen?: boolean;
 };
 type Emits = {
-  (e: 'contextMenuOpen', v: [MouseEvent, ModuleThemeRootReturn]): void;
+  (e: 'contextMenuOpen', v: [MouseEvent, ModuleTheme]): void;
 };
 
 const props = withDefaults(defineProps<Props>(), {
@@ -64,14 +64,11 @@ const title = computed(() => {
               :key="theme.id"
               :client="client"
               :theme="theme"
-              @dblclick="client.setTheme(theme.id)"
+              @dblclick="client.setThemeSelectedAsMain(theme.id)"
               @contextmenu.prevent="emit('contextMenuOpen', [$event, theme])"
             >
               <template #status>
-                <ThemeBlockStatus
-                  :client="client"
-                  :theme="theme"
-                />
+                <ThemeBlockStatus :theme="theme" />
               </template>
             </ThemeBlock>
           </div>

@@ -1,7 +1,8 @@
 import type { ComponentInternalInstance } from '@vue/runtime-core';
 import useClient from '../helpers/client/useClient';
 import type { ModuleDefaultBlockKeys } from '../types';
-import { getCurrentInstance, onMounted, onUnmounted } from '#imports';
+import unwrap from '../helpers/client/unwrap';
+import { computed, getCurrentInstance, onMounted, onUnmounted } from '#imports';
 
 function getComponentId(instance: ComponentInternalInstance) {
   const instanceType = instance.type as any;
@@ -23,7 +24,7 @@ function getComponentId(instance: ComponentInternalInstance) {
 
 export default function useBlock(block: ModuleDefaultBlockKeys) {
   const client = useClient().value;
-  const blockStyles = client.getStylesByPath(block);
+  const blockStyles = computed(() => unwrap.get(client.getSelectedTheme()!.getPreparedStylesBlock(block)));
   const currentInstance = getCurrentInstance()!;
 
   onMounted(() => {

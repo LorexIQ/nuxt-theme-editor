@@ -18,7 +18,7 @@ function onThemeDelete() {
 }
 
 function onBeforeMount() {
-  if (!themeId.value || !client.getThemes()[themeId.value]) {
+  if (!themeId.value || !client.getThemeById(themeId.value)) {
     router.push('index', 'tab-fade-lr');
     return;
   }

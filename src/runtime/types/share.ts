@@ -1,8 +1,10 @@
+import type { UnwrapRefSimple } from '@vue/reactivity';
 import type pagesMeta from '../assets/pagesMeta';
 import type iconsConnector from '../assets/iconsConnector';
 import type { Client } from '../classes/client/Client';
-import type { Sandbox } from '../classes/client/Sandbox';
 import type { Router } from '../classes/client/Router';
+import type { Sandbox } from '../classes/client/Sandbox';
+import type { Theme } from '../classes/client/Theme';
 import type { Server } from '../classes/server/Server';
 import type { MetaFiles } from '../classes/server/MetaFiles';
 // @ts-ignore
@@ -23,11 +25,14 @@ export type ModuleErrorMessage = {
 };
 
 export type ModuleClient = Client;
-export type ModuleClientSandbox = Sandbox;
 export type ModuleClientRouter = Router;
+export type ModuleClientSandbox = Sandbox;
 export type ModuleServer = Server;
 export type ModuleServerMetaFiles = MetaFiles;
 
-export type ModuleDefaultBlockKeys = ModuleHelpersNestedKeys<ModuleMetaBlocks>;
-export type ModuleDefaultStyleKeys = ModuleHelpersStringKeys<ModuleMetaBlocks>;
+export type ModuleTheme = UnwrapRefSimple<ModuleThemeRef>;
+export type ModuleThemeRef = Theme;
+
+export type ModuleDefaultBlockKeys = ModuleHelpersNestedKeys<ModuleMetaBlocks> | string;
+export type ModuleDefaultStyleKeys = ModuleHelpersStringKeys<ModuleMetaBlocks> | string;
 export type ModuleDefaultKeys = ModuleDefaultBlockKeys | ModuleDefaultStyleKeys;
