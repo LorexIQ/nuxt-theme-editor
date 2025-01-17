@@ -30,7 +30,7 @@ console.log('second.vue useThemeBlock =>', scopeStyles.value);
       <log-object
         v-if="themesEditor.getEditedTheme()"
         :value="themesEditor.getEditedTheme()"
-        :replaces="{ pathsCache: '...', ctx: '...', config: '...' }"
+        :replaces="{ pathsCache: '...', ctx: '...', config: '...', md5Cache: '...' }"
       />
     </div>
   </div>

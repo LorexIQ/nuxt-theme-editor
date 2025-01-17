@@ -103,6 +103,7 @@ onBeforeMount(() => {
           @inheritance-click="goToInheritance"
         />
         <ThemeStylesBlock
+          :client="client"
           :styles="themeStyles"
           :raw-styles="themeTargetStyles"
           @click="sandbox.openStyleClickMenu(...$event)"

@@ -3,7 +3,7 @@ import type { ModuleThemeRAW } from './themes';
 export type ModuleStorage = {
   isAutoThemeMode: boolean;
   localThemes: ModuleThemeRAW[];
-  selectedSelfThemeId?: string;
+  selectedMainThemeId?: string;
   selectedLightThemeId?: string;
   selectedDarkThemeId?: string;
 };

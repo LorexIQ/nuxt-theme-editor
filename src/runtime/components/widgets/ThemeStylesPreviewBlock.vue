@@ -42,6 +42,7 @@ const themePreviewTargetStyles = computed(() => unwrap.get(theme.value.getStyles
           >
             <StyleEditBlock
               :id="`${client.getRuntimePreviewId()}.${styleKey}`"
+              :client="client"
               :style-key="styleKey"
               :styles="themePreviewStyles"
               :raw-styles="themePreviewTargetStyles"

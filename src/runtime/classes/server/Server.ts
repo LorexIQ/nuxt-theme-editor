@@ -57,8 +57,9 @@ export class Server {
       themes: [],
       keys: {
         state: 'nuxt-themes-editor:state',
-        storage: 'nuxt-themes-editor:selected-theme',
+        storage: 'nuxt-themes-editor:settings',
         style: 'nuxt-themes-editor:style',
+        colorsHistory: 'nuxt-themes-editor',
         sandbox: 'nuxt-themes-editor:sandbox',
         editor: 'nuxt-themes-editor:editor'
       },

@@ -19,6 +19,7 @@ type ModuleOptionsExtendKeys = {
   state: string;
   storage: string;
   style: string;
+  colorsHistory: string;
   sandbox: string;
   editor: string;
 };

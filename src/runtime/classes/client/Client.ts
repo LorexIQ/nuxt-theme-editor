@@ -69,27 +69,22 @@ export class Client {
     return editedTheme ?? this.getThemeById(this._checkThemeAvailableAndGetActual(themeId, 'light'));
   });
 
-  private readonly savedStorage = computed<ModuleStorage>(() => {
-    const localThemes = Object
-      .values(this.themes)
-      .filter(theme => theme.type === 'local')
-      .map<ModuleThemeRAW>(theme => ({
-        id: theme.id,
-        name: theme.name,
-        description: theme.description,
-        type: theme.type,
-        styles: theme.getStyles().value
-      }));
-
-    console.log('save');
-    return {
-      isAutoThemeMode: unwrap.get(this.isAutoThemeMode),
-      localThemes: localThemes,
-      selectedSelfThemeId: unwrap.get(this.selectedMainThemeId),
-      selectedLightThemeId: unwrap.get(this.selectedLightThemeId),
-      selectedDarkThemeId: unwrap.get(this.selectedDarkThemeId)
-    };
-  });
+  private readonly storageLocalThemes = computed(() => JSON.stringify(this.themes
+    .filter(theme => theme.type === 'local')
+    .map<ModuleThemeRAW>(theme => ({
+      id: theme.id,
+      name: theme.name,
+      description: theme.description,
+      type: theme.type,
+      styles: unwrap.get(theme.getStyles())
+    }))));
+  private readonly storageSettings = computed<ModuleStorage>(() => ({
+    isAutoThemeMode: unwrap.get(this.isAutoThemeMode),
+    localThemes: JSON.parse(unwrap.get(this.storageLocalThemes)),
+    selectedMainThemeId: unwrap.get(this.selectedMainThemeId),
+    selectedLightThemeId: unwrap.get(this.selectedLightThemeId),
+    selectedDarkThemeId: unwrap.get(this.selectedDarkThemeId)
+  }));
 
   constructor() {
     this._readSystemThemes();
@@ -140,9 +135,9 @@ export class Client {
       );
     });
 
-    // watch(this.editedThemeId, themeId => this.reloadMiddleware[themeId ? 'on' : 'off']());
+    watch(this.selectedEditedThemeId, themeId => this.reloadMiddleware[themeId ? 'on' : 'off']());
 
-    watch(this.savedStorage, () => this._saveStorage());
+    watch(this.storageSettings, this._saveStorage.bind(this));
   }
 
   private _readSystemThemes(): void {
@@ -175,7 +170,10 @@ export class Client {
     this._replaceSelectedThemes(
       this.config.defaultTheme,
       this.config.defaultDarkTheme,
-      this.selectedLightThemeId
+      undefined,
+      undefined,
+      undefined,
+      this.config.defaultTheme
     );
   }
 
@@ -202,14 +200,14 @@ export class Client {
       this._replaceSelectedThemes(
         this._checkThemeAvailableAndGetActual(storage.selectedLightThemeId, 'light'),
         this._checkThemeAvailableAndGetActual(storage.selectedDarkThemeId, 'dark'),
-        this._checkThemeAvailableAndGetActual(storage.selectedSelfThemeId, unwrap.get(this.isAutoThemeMode) ? 'system' : unwrap.get(this.selectedLightThemeId))
+        this._checkThemeAvailableAndGetActual(storage.selectedMainThemeId, unwrap.get(this.isAutoThemeMode) ? 'system' : unwrap.get(this.selectedLightThemeId))
       );
       this.setAutoThemeModeStatus(storage.isAutoThemeMode);
     }
   }
 
   private _saveStorage(): void {
-    localStorage.setItem(this.config.keys.storage, JSON.stringify(unwrap.get(this.savedStorage)));
+    localStorage.setItem(this.config.keys.storage, JSON.stringify(unwrap.get(this.storageSettings)));
   }
 
   private _buildCustomTheme(themeRAW: ModuleThemeRAW, index: number): ModuleThemeRef {

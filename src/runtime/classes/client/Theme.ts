@@ -1,4 +1,5 @@
 import type { ComputedRef } from 'vue';
+import { md5 } from 'js-md5';
 import type {
   ModuleClient,
   ModuleDefaultBlockKeys, ModuleDefaultStyleKeys, ModuleDefineThemeBlockSetting,
@@ -18,7 +19,7 @@ export class Theme {
   private config!: ModuleOptionsExtend;
 
   private pathsCache!: ModulePathsCache;
-  private md5Cache: ModuleObject = {};
+  private md5Cache: ModuleObject<Uint8Array> = {};
 
   public readonly id = ref<string>('');
   public readonly type = ref<ModuleThemeType>('local');
@@ -85,32 +86,42 @@ export class Theme {
   }
 
   private _buildPreviewStyles(scope: ThemeStylesScope = 'main') {
-    const rawStyles = utils.copyObject(unwrap.get(this.getStylesPreview(scope)));
-    console.log('build preview', this.id.value);
+    const rawStyles = unwrap.get(this.getStylesPreview(scope));
+    const rawStylesCopy = utils.copyObject(rawStyles);
+
     utils.replaceObjectData(
       this.preparedPreviewStyles,
-      this._fillStylesBlock(rawStyles, scope)
+      this._fillStylesBlock(rawStylesCopy, scope)
     );
   }
 
   private _buildUIStyles(scope: ThemeStylesScope = 'main') {
-    const rawStyles = utils.copyObject(unwrap.get(this.getStylesUI(scope)));
-    console.log('build ui', this.id.value);
+    const rawStyles = unwrap.get(this.getStylesUI(scope));
+    const rawStylesCopy = utils.copyObject(rawStyles);
+
     utils.replaceObjectData(
       this.preparedUIStyles,
-      this._fillStylesBlock(rawStyles, scope)
+      this._fillStylesBlock(rawStylesCopy, scope)
     );
+  }
+
+  private _buildCustomStyles(scope: ThemeStylesScope = 'main') {
+    const rawStyles = unwrap.get(this.getStylesWithoutSystem(scope));
+
+    if (!this._validateMd5Cache('custom', rawStyles)) {
+      const rawStylesCopy = utils.copyObject(rawStyles);
+
+      utils.replaceObjectData(
+        this.preparedStyles,
+        rawStylesCopy.map(style => this._fillStylesBlock(style, scope))
+      );
+    }
   }
 
   private _buildAllStyles(scope: ThemeStylesScope = 'main') {
     this._buildPreviewStyles(scope);
     this._buildUIStyles(scope);
-    console.log('build all styles', this.id.value);
-
-    utils.replaceArrayData(
-      this.preparedStyles,
-      utils.copyObject(unwrap.get(this.getStylesWithoutSystem(scope))).map(style => this._fillStylesBlock(style, scope))
-    );
+    this._buildCustomStyles(scope);
   }
 
   private _getPathsCacheValue<Type extends 'B' | 'S'>(type: Type, blockPath: string, styles?: ModuleThemeSelectedStyles[]): (Type extends 'S' ? string : ModuleObject) | undefined {
@@ -153,13 +164,15 @@ export class Theme {
       return styleValue;
     };
     const prepareBlock = (stylesBlock: ModuleThemeCleanedSetting, parentPath: string[] = []): ModuleThemeSelectedStyles => {
-      if (stylesBlock.id) return {
-        id: stylesBlock.id,
-        styles: (stylesBlock.styles as ModuleDefineThemeBlockSetting[]).map(style => prepareBlock(style, [...parentPath, stylesBlock.id]))
-      };
+      if (stylesBlock.id) {
+        return {
+          id: stylesBlock.id,
+          styles: (stylesBlock.styles as ModuleDefineThemeBlockSetting[]).map(style => prepareBlock(style, [...parentPath, stylesBlock.id]))
+        };
+      }
 
       const stylesBlockAny = stylesBlock as any;
-      for (const styleKey of Object.keys(stylesBlockAny)) {
+      for (const styleKey in stylesBlockAny) {
         const styleValue = stylesBlockAny[styleKey] as string;
         const selfPath = [...parentPath, styleKey].join('.');
         stylesBlockAny[styleKey] = getStyleByPath(selfPath, styleValue);
@@ -169,6 +182,27 @@ export class Theme {
     };
 
     return prepareBlock(stylesBlock);
+  }
+
+  private _validateMd5Cache(key: string, obj: ModuleObject<any>): boolean {
+    const cache = this.md5Cache;
+    const cachedObj = new Uint8Array(md5.arrayBuffer(JSON.stringify(obj)));
+
+    if (!cache[key]) {
+      cache[key] = cachedObj;
+      return false;
+    } else {
+      const readCache = new Uint8Array(cache[key]);
+
+      for (let byteI = 0; byteI < cachedObj.length; byteI++) {
+        if (cachedObj[byteI] !== readCache[byteI]) {
+          cache[key] = cachedObj;
+          return false;
+        }
+      }
+
+      return true;
+    }
   }
 
   setId(id: string): void {
@@ -276,6 +310,6 @@ export class Theme {
   saveEditedStyles(): void {
     if (!unwrap.get(this.isSelectedAsEdited)) return;
 
-    this.setStyles(this.editedStyles);
+    this.setStyles(utils.copyObject(this.editedStyles));
   }
 }

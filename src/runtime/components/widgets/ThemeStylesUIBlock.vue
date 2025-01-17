@@ -40,6 +40,7 @@ const themeUITargetStyles = computed(() => unwrap.get(theme.value.getStylesUI('e
         >
           <StyleEditBlock
             :id="`${client.getRuntimeUIId()}.${styleKey}`"
+            :client="client"
             :style-key="styleKey"
             :styles="themeUIStyles"
             :raw-styles="themeUITargetStyles"
