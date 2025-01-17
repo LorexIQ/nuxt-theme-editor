@@ -84,7 +84,7 @@ defineProps<Props>();
         top: 0;
         right: 0;
         width: 50px;
-        height: 26px;
+        height: 30px;
         background: linear-gradient(90deg, transparent 0%, var(--bg) 100%);
       }
 

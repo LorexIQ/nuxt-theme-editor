@@ -30,10 +30,10 @@ export default function useBlock(block: ModuleDefaultBlockKeys) {
   onMounted(() => {
     const scopeId = getComponentId(currentInstance);
     if (client.checkScopeRegistration(scopeId, block)) console.warn(`useThemeBlock('${block}') is already used in [${currentInstance.type.__file}]. Registration will be skipped.`);
-    client.registerScopeStyles(scopeId, block, blockStyles);
+    client.createScopeStyles(scopeId, block, blockStyles);
   });
   onUnmounted(() => {
-    client.unregisterScopeStyles(getComponentId(currentInstance), block);
+    client.deleteScopeStyles(getComponentId(currentInstance), block);
   });
 
   return blockStyles;

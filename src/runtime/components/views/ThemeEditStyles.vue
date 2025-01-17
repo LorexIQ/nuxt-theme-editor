@@ -68,7 +68,7 @@ function inheritanceAnimation() {
   }, 300);
 }
 function onSave() {
-  client.saveEditedThemeStyles();
+  theme.value.saveEditedStyles();
   client.setThemeSelectedAsEdited(undefined);
   router.push('index', 'tab-fade-lr');
 }

@@ -10,6 +10,7 @@ import type { MetaFiles } from '../classes/server/MetaFiles';
 // @ts-ignore
 import type { ModuleMetaBlocks } from '../meta/themesStructure';
 import type { ModuleHelpersNestedKeys, ModuleHelpersStringKeys } from './helpers';
+import type { ModuleObject } from './index';
 
 export type ModulePage = { name: string; title: string };
 export type ModulePageAnimations = 'tab-fade-lr' | 'tab-fade-rl' | undefined;
@@ -33,6 +34,7 @@ export type ModuleServerMetaFiles = MetaFiles;
 export type ModuleTheme = UnwrapRefSimple<ModuleThemeRef>;
 export type ModuleThemeRef = Theme;
 
+export type ModulePathsCache = ModuleObject<(number | string)[]>;
 export type ModuleDefaultBlockKeys = ModuleHelpersNestedKeys<ModuleMetaBlocks> | string;
 export type ModuleDefaultStyleKeys = ModuleHelpersStringKeys<ModuleMetaBlocks> | string;
 export type ModuleDefaultKeys = ModuleDefaultBlockKeys | ModuleDefaultStyleKeys;

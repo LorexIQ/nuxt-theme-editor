@@ -3,7 +3,7 @@ import type {
   ModuleClient,
   ModuleDefaultBlockKeys, ModuleDefaultStyleKeys, ModuleDefineThemeBlockSetting,
   ModuleDefineThemeMetaPreview, ModuleDefineThemeMetaUI,
-  ModuleObject, ModuleOptionsExtend, ModuleThemeCleanedSetting,
+  ModuleObject, ModuleOptionsExtend, ModulePathsCache, ModuleThemeCleanedSetting,
   ModuleThemeSelectedStyles, ModuleThemeType
 } from '../../types';
 import useIdProtect from '../../helpers/client/useIdProtect';
@@ -17,7 +17,7 @@ export class Theme {
   private ctx: ModuleClient;
   private config!: ModuleOptionsExtend;
 
-  private pathsCache!: ModuleObject<(number | string)[]>;
+  private pathsCache!: ModulePathsCache;
   private md5Cache: ModuleObject = {};
 
   public readonly id = ref<string>('');
@@ -37,7 +37,8 @@ export class Theme {
   private styles = reactive([] as ModuleThemeCleanedSetting[]);
   private editedStyles = reactive([] as ModuleThemeCleanedSetting[]);
   private preparedStyles = reactive([] as ModuleThemeCleanedSetting[]);
-  private previewStyles = reactive({} as ModuleDefineThemeMetaPreview);
+  private preparedPreviewStyles = reactive({} as ModuleDefineThemeMetaPreview);
+  private preparedUIStyles = reactive({} as ModuleDefineThemeMetaUI);
 
   constructor(
     ctx: ModuleClient,
@@ -50,8 +51,8 @@ export class Theme {
     this.ctx = ctx;
     this.id.value = id;
     this.type.value = type;
-    this.name.value = name ?? id;
-    this.description.value = description ?? '';
+    this.name.value = name || id;
+    this.description.value = description || '';
     this.setStyles(styles);
 
     this._initCtxData();
@@ -75,18 +76,40 @@ export class Theme {
     });
 
     watch(this.editedStyles, () => {
-      console.log(123);
       this._buildAllStyles('edited');
     });
+
+    watch(this.pathsCache, () => {
+      this._buildPreviewStyles();
+    }, { immediate: !!Object.keys(this.pathsCache).length });
   }
 
-  private _buildPreviewStyles() {
+  private _buildPreviewStyles(scope: ThemeStylesScope = 'main') {
+    const rawStyles = utils.copyObject(unwrap.get(this.getStylesPreview(scope)));
+    console.log('build preview', this.id.value);
+    utils.replaceObjectData(
+      this.preparedPreviewStyles,
+      this._fillStylesBlock(rawStyles, scope)
+    );
+  }
+
+  private _buildUIStyles(scope: ThemeStylesScope = 'main') {
+    const rawStyles = utils.copyObject(unwrap.get(this.getStylesUI(scope)));
+    console.log('build ui', this.id.value);
+    utils.replaceObjectData(
+      this.preparedUIStyles,
+      this._fillStylesBlock(rawStyles, scope)
+    );
   }
 
   private _buildAllStyles(scope: ThemeStylesScope = 'main') {
+    this._buildPreviewStyles(scope);
+    this._buildUIStyles(scope);
+    console.log('build all styles', this.id.value);
+
     utils.replaceArrayData(
       this.preparedStyles,
-      utils.copyObject(this._geyStylesByScope(scope)).map(style => this._fillStylesBlock(style, scope))
+      utils.copyObject(unwrap.get(this.getStylesWithoutSystem(scope))).map(style => this._fillStylesBlock(style, scope))
     );
   }
 
@@ -234,23 +257,25 @@ export class Theme {
     return computed(() => this._getPathsCacheValue('S', stylePath, this.preparedStyles) ?? 'UNKNOWN STYLE');
   }
 
-  getPreparedStyles(): ComputedRef<ModuleThemeCleanedSetting[]> {
+  getPreparedStylesWithoutSystem(): ComputedRef<ModuleThemeCleanedSetting[]> {
     return computed(() => this.preparedStyles);
   }
 
-  getPreparedStylesWithoutSystem(): ComputedRef<ModuleThemeCleanedSetting[]> {
-    return computed(() => this.preparedStyles.filter(block => !block.id.startsWith(this.config.systemUUID.toString())) ?? []);
-  }
-
   getPrepareStylesPreview(): ComputedRef<ModuleDefineThemeMetaPreview> {
-    return this.getPreparedStylesBlock(this.runtimePreviewId);
+    return computed(() => this.preparedPreviewStyles);
   }
 
   getPrepareStylesUI(): ComputedRef<ModuleDefineThemeMetaUI> {
-    return this.getPreparedStylesBlock(this.runtimeUIId);
+    return computed(() => this.preparedUIStyles);
   }
 
   getStylesCopy(): ComputedRef<ModuleThemeCleanedSetting[]> {
     return computed(() => utils.copyObject(this.styles));
+  }
+
+  saveEditedStyles(): void {
+    if (!unwrap.get(this.isSelectedAsEdited)) return;
+
+    this.setStyles(this.editedStyles);
   }
 }

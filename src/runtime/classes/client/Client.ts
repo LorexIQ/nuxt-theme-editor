@@ -1,4 +1,4 @@
-import type { ComputedRef } from 'vue';
+import { type ComputedRef, watchEffect } from 'vue';
 import type { Ref } from '@vue/reactivity';
 import type {
   ModuleDefineThemeBlockRootReturn,
@@ -19,7 +19,7 @@ import type {
   ModulePagesNames,
   ModuleThemeScopes,
   ModuleThemeScopesStyles,
-  ModuleTheme, ModuleThemeRef, ModuleThemeRAW
+  ModuleTheme, ModuleThemeRef, ModuleThemeRAW, ModulePathsCache
 } from '../../types';
 // @ts-ignore
 import connectorMeta from '../../meta/connector';
@@ -33,7 +33,7 @@ import utils from '../../helpers/utils';
 import { Theme } from '../../classes/client/Theme';
 import { Sandbox } from './Sandbox';
 import { Router } from './Router';
-import { useRuntimeConfig, reactive, ref, computed, watch, nextTick } from '#imports';
+import { useRuntimeConfig, reactive, ref, computed, watch } from '#imports';
 
 type ThemeId = string | Ref<string | undefined>;
 type ThemeDefConfig = 'light' | 'dark' | 'system' | ThemeId | undefined;
@@ -42,7 +42,6 @@ type ThemeSelectableType = 'main' | 'light' | 'dark' | 'edited';
 export class Client {
   private readonly runtimeUIId = useIdProtect('ui');
   private readonly runtimePreviewId = useIdProtect('preview');
-  private readonly runtimeSelectedId = useIdProtect('selected');
   private readonly runtimeDefaultId = useIdProtect('default');
 
   private readonly config = useRuntimeConfig().public.themesEditor as ModuleOptionsExtend;
@@ -50,7 +49,7 @@ export class Client {
   private readonly sandbox = new Sandbox(this);
   private readonly router = new Router(this);
 
-  private readonly themesPathsCache: ModuleObject<(number | string)[]> = reactive({});
+  private readonly themesPathsCache = reactive<ModulePathsCache>({});
   private readonly errorsMessages = reactive<ModuleErrorMessage[]>([]);
   private readonly usesScopesProperties = reactive<ModuleThemeScopes>({});
 
@@ -100,40 +99,46 @@ export class Client {
     this._initWatchers();
   }
 
-  private async _initWatchers(): Promise<void> {
+  private _initWatchers(): void {
     const rootStylesKey = ':root';
     const uiStylesKey = `#${this.config.keys.sandbox.replaceAll(':', '\\:')}, #${this.config.keys.editor.replaceAll(':', '\\:')}`;
 
-    await nextTick();
-
-    watch(this.selectedTheme, (theme) => {
-      this._appendStyleToHead(`${this.config.keys.style}:root`, theme ? { [rootStylesKey]: unwrap.get(theme.getPreparedStylesBlock('global')) } : {});
-      this._appendStyleToHead(`${this.config.keys.style}:preview`, theme ? { [`[theme-${this.runtimeSelectedId}-preview]`]: unwrap.get(theme.getPrepareStylesPreview()) } : {});
-      this._appendStyleToHead(`${this.config.keys.style}:ui`, theme ? { [uiStylesKey]: unwrap.get(theme.getPrepareStylesUI()) } : {});
-    }, { immediate: true });
-
-    watch(this.usesScopesProperties, (properties) => {
+    watchEffect(() => {
       this._appendStyleToHead(
-        `${this.config.keys.style}:scope`,
-        Object.values(properties).reduce((acc, property) => ({
-          ...acc,
-          [property.scopesIds.map(scopeId => `[${scopeId}]`).join(',\n')]: property.styles
-        }), {})
-      );
-    }, { immediate: true });
-
-    watch(this.themes, (themes) => {
-      this._appendStyleToHead(
-        `${this.config.keys.style}:preview:all`,
+        `${this.config.keys.style}:preview`,
         {
           [`[theme-${this.runtimeDefaultId}-preview]`]: DEFAULT_PREVIEW_STYLES,
-          ...Object.values(themes).reduce((acc, theme) => ({
+          ...this.themes.reduce((acc, theme) => ({
             ...acc,
             [`[theme-${theme.id}-preview]`]: unwrap.get(theme.getPrepareStylesPreview())
           }), {})
         }
       );
-    }, { immediate: true });
+    });
+
+    watchEffect(() => {
+      this._appendStyleToHead(
+        `${this.config.keys.style}:ui`,
+        { [uiStylesKey]: unwrap.get(unwrap.get(this.selectedTheme)?.getPrepareStylesUI() ?? {}) }
+      );
+    });
+
+    watchEffect(() => {
+      this._appendStyleToHead(
+        `${this.config.keys.style}:root`,
+        { [rootStylesKey]: unwrap.get(unwrap.get(this.selectedTheme)?.getPreparedStylesBlock('global')) ?? {} }
+      );
+    });
+
+    watchEffect(() => {
+      this._appendStyleToHead(
+        `${this.config.keys.style}:scope`,
+        Object.values(this.usesScopesProperties).reduce((acc, property) => ({
+          ...acc,
+          [property.scopesIds.map(scopeId => `[${scopeId}]`).join(',\n')]: property.styles
+        }), {})
+      );
+    });
 
     // watch(this.editedThemeId, themeId => this.reloadMiddleware[themeId ? 'on' : 'off']());
 
@@ -220,7 +225,7 @@ export class Client {
     let themeId = theme.id.value;
     if (themeId in this.themes) {
       themeId = `${themeId}-${(Date.now() + index).toFixed().slice(-4)}`;
-      this.addError('WARN', 'index', `Used plug: ${theme.id.value} (${theme.name}) > ${themeId}`, 'ID duplicate detected!');
+      this.createError('WARN', 'index', `Used plug: ${theme.id.value} (${theme.name}) > ${themeId}`, 'ID duplicate detected!');
       theme.id.value = themeId;
     }
 
@@ -282,7 +287,16 @@ export class Client {
     else return undefined;
   }
 
-  private _appendStyleToHead(id: string, scopes: ModuleObject<ModuleThemeScopesStyles>) {
+  private _getSystemThemeAssociation(): string {
+    switch (unwrap.get(this.selectedSystemThemeId)) {
+      case 'light':
+        return this._checkThemeAvailableAndGetActual(unwrap.get(this.selectedLightThemeId), 'light')!;
+      case 'dark':
+        return this._checkThemeAvailableAndGetActual(unwrap.get(this.selectedDarkThemeId), 'dark')!;
+    }
+  }
+
+  private _appendStyleToHead(id: string, scopes: ModuleObject<ModuleThemeScopesStyles>): void {
     const styleContent = Object.keys(scopes).map((scopeId) => {
       const scopeStyles = scopes[scopeId];
       return [
@@ -298,15 +312,6 @@ export class Client {
     styleElement.type = 'text/css';
     styleElement.textContent = styleContent;
     if (!_styleElement) document.head.appendChild(styleElement);
-  }
-
-  private _getSystemThemeAssociation(): string {
-    switch (unwrap.get(this.selectedSystemThemeId)) {
-      case 'light':
-        return this._checkThemeAvailableAndGetActual(unwrap.get(this.selectedLightThemeId), 'light')!;
-      case 'dark':
-        return this._checkThemeAvailableAndGetActual(unwrap.get(this.selectedDarkThemeId), 'dark')!;
-    }
   }
 
   private _createThemesPaths(): void {
@@ -338,20 +343,12 @@ export class Client {
     Object.assign(this.themesPathsCache, finder(this.getThemeById(this.config.defaultTheme)!.getStyles().value));
   }
 
-  private _selectThemeAs(as: ThemeSelectableType, themeId?: string) {
+  private _selectThemeAs(as: ThemeSelectableType, themeId?: string): void {
     const theme = this.getThemeById(themeId);
     const functionName = `setSelectedAs${as[0].toUpperCase() + as.slice(1)}`;
 
     if (theme) (theme as any)[functionName]();
     else this.unselectAllThemesAs(as);
-  }
-
-  getThemeById(id?: string): ModuleTheme | undefined {
-    return this.themes.find(theme => theme.id === id);
-  }
-
-  private _getThemeIndexById(id: string): number {
-    return this.themes.findIndex(theme => theme.id === id);
   }
 
   getConfig(): ModuleOptionsExtend {
@@ -364,6 +361,18 @@ export class Client {
 
   getRouter(): Router {
     return this.router;
+  }
+
+  getThemes(): ModuleThemes {
+    return this.themes;
+  }
+
+  getThemeById(id?: string): ModuleTheme | undefined {
+    return this.themes.find(theme => theme.id === id);
+  }
+
+  getThemeIndexById(id: string): number {
+    return this.themes.findIndex(theme => theme.id === id);
   }
 
   getAutoThemeModeStatus(): boolean {
@@ -394,23 +403,15 @@ export class Client {
     return unwrap.get(this.editedTheme);
   }
 
-  getThemes(): ModuleThemes {
-    return this.themes;
-  }
-
-  getRuntimeUIId() {
+  getRuntimeUIId(): string {
     return this.runtimeUIId;
   }
 
-  getRuntimePreviewId() {
+  getRuntimePreviewId(): string {
     return this.runtimePreviewId;
   }
 
-  getRuntimeSelectedId() {
-    return this.runtimeSelectedId;
-  }
-
-  getThemesPathsCache() {
+  getThemesPathsCache(): ModulePathsCache {
     return this.themesPathsCache;
   }
 
@@ -424,23 +425,6 @@ export class Client {
 
   getErrors(type?: ModuleErrorType, page?: ModulePagesNames): ModuleErrorMessage[] {
     return this.errorsMessages.filter(error => (type ? error.type === type : true) && (page ? error.page === page : true));
-  }
-
-  addError(type: ModuleErrorType, page: ModulePagesNames, message: string, title?: string): number {
-    const id = Math.max(...this.errorsMessages.map(error => error.id), 0) + 1;
-    this.errorsMessages.push({
-      id,
-      type,
-      page,
-      message,
-      title
-    });
-    return id;
-  }
-
-  deleteError(id: number): void {
-    const errorIndex = this.errorsMessages.findIndex(error => error.id === id);
-    if (errorIndex !== -1) this.errorsMessages.splice(errorIndex, 1);
   }
 
   setAutoThemeModeStatus(mode: boolean): void {
@@ -473,23 +457,6 @@ export class Client {
     else theme.setSelectedAsEdited();
   }
 
-  unselectAllThemesAs(as: ThemeSelectableType) {
-    const functionName = `setSelectedAs${as[0].toUpperCase() + as.slice(1)}`;
-    this.themes.forEach((theme: any) => theme[functionName](false));
-  }
-
-  saveEditedThemeStyles(): void {
-    const editedTheme = unwrap.get(this.editedTheme);
-    const editedStyles = unwrap.get(editedTheme?.getStyles()); // getEditedStyles()
-    if (!editedTheme || !this.getThemeById(editedTheme?.id)) return;
-
-    const stylesTemplate = unwrap.get(utils.copyObject(this.getThemeById(this.config.defaultTheme)!).getStyles());
-    editedTheme.setStyles(utils.mergeObjects(
-      editedStyles!,
-      stylesTemplate
-    ));
-  }
-
   createTheme(data: ModuleThemeCreateData): void {
     const { id, name, description, parentThemeId: parentId } = data;
     if (this.getThemeById(id) || !parentId || !this.getThemeById(parentId)) return;
@@ -503,6 +470,33 @@ export class Client {
       description
     );
     this.themes.push(reactive(newTheme));
+  }
+
+  createError(type: ModuleErrorType, page: ModulePagesNames, message: string, title?: string): number {
+    const id = Math.max(...this.errorsMessages.map(error => error.id), 0) + 1;
+    this.errorsMessages.push({
+      id,
+      type,
+      page,
+      message,
+      title
+    });
+    return id;
+  }
+
+  createScopeStyles(scopeId: string, blockPath: ModuleDefaultBlockKeys, styles: ComputedRef<ModuleObject>): void {
+    const blockPathStyles = this.usesScopesProperties[blockPath];
+
+    if (blockPathStyles) {
+      if (!blockPathStyles.scopesIds.includes(scopeId)) {
+        blockPathStyles.scopesIds.push(scopeId);
+      }
+    } else {
+      this.usesScopesProperties[blockPath] = {
+        scopesIds: [scopeId],
+        styles
+      };
+    }
   }
 
   editThemeInfo(data: ModuleThemeEditData): void {
@@ -520,26 +514,16 @@ export class Client {
     const theme = this.getThemeById(id);
     if (!theme || theme.type !== 'local') return;
 
-    this.themes.splice(this._getThemeIndexById(id), 1);
+    this.themes.splice(this.getThemeIndexById(id), 1);
     this._replaceSelectedThemes();
   }
 
-  registerScopeStyles(scopeId: string, blockPath: ModuleDefaultBlockKeys, styles: ComputedRef<ModuleObject>): void {
-    const blockPathStyles = this.usesScopesProperties[blockPath];
-
-    if (blockPathStyles) {
-      if (!blockPathStyles.scopesIds.includes(scopeId)) {
-        blockPathStyles.scopesIds.push(scopeId);
-      }
-    } else {
-      this.usesScopesProperties[blockPath] = {
-        scopesIds: [scopeId],
-        styles
-      };
-    }
+  deleteError(id: number): void {
+    const errorIndex = this.errorsMessages.findIndex(error => error.id === id);
+    if (errorIndex !== -1) this.errorsMessages.splice(errorIndex, 1);
   }
 
-  unregisterScopeStyles(scopeId: string, blockPath: ModuleDefaultBlockKeys): void {
+  deleteScopeStyles(scopeId: string, blockPath: ModuleDefaultBlockKeys): void {
     const blockPathStyles = this.usesScopesProperties[blockPath];
 
     if (blockPathStyles) {
@@ -548,6 +532,11 @@ export class Client {
       if (scopeIdIndex !== -1) blockPathStyles.scopesIds.splice(scopeIdIndex, 1);
       if (blockPathStyles.scopesIds.length === 0) delete this.usesScopesProperties[blockPath];
     }
+  }
+
+  unselectAllThemesAs(as: ThemeSelectableType) {
+    const functionName = `setSelectedAs${as[0].toUpperCase() + as.slice(1)}`;
+    this.themes.forEach((theme: any) => theme[functionName](false));
   }
 
   checkScopeRegistration(scopeId: string, blockPath: ModuleDefaultBlockKeys): boolean {

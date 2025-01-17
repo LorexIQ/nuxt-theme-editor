@@ -1,3 +1,4 @@
+import { md5 } from 'js-md5';
 import type { ModuleObject } from '~/src/runtime/types';
 
 class Utils {
@@ -35,7 +36,7 @@ class Utils {
     return JSON.parse(JSON.stringify(target)) as T;
   }
 
-  replaceObjectData(target: ModuleObject, data: ModuleObject) {
+  replaceObjectData(target: ModuleObject<any>, data: ModuleObject<any>): void {
     for (const key in target) {
       delete target[key];
     }
@@ -43,9 +44,13 @@ class Utils {
     Object.assign(target, data);
   }
 
-  replaceArrayData(target: any[], data: any[]) {
+  replaceArrayData(target: any[], data: any[]): void {
     target.splice(0);
     target.push(...data);
+  }
+
+  hash(obj: ModuleObject<any>): string {
+    return md5.hex(JSON.stringify(obj));
   }
 }
 

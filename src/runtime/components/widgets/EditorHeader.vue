@@ -58,7 +58,7 @@ const isAnotherPage = computed(() => openedPage.value !== 'index');
   justify-content: center;
   background-color: var(--bgHeader);
   box-shadow: 0 0 10px var(--shadow);
-  transition: .3s;
+  transition: .3s grid-template-columns;
 
   &__title {
     font-family: 'Segoe Print', sans-serif;
