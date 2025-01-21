@@ -1,5 +1,5 @@
 import type { ComputedRef } from 'vue';
-import type { ModuleDefineThemeBlockRootReturn } from './defines';
+import type { ModuleDefineThemeBlockRootReturn, ModuleDefineThemeBlockSettings } from './defines';
 import type { ModuleObject, ModuleTheme } from './index';
 
 export type ModuleServerThemes = { [name: string]: ModuleDefineThemeBlockRootReturn };
@@ -7,10 +7,11 @@ export type ModuleThemes = ModuleTheme[];
 
 export type ModuleThemeType = 'system' | 'global' | 'local';
 
-export type ModuleThemeCleanedSetting<T = string> = ModuleObject<T> | ModuleThemeStyleBlockReturn<T>;
+export type ModuleThemeCleanedStyles<T = string> = ModuleObject<T> | ModuleThemeStyleBlockReturn<T>;
 export type ModuleThemeStyleBlockReturn<T = string> = {
   id: string;
-  styles: ModuleThemeCleanedSetting<T>[];
+  styles: ModuleThemeCleanedStyles<T>[];
+  settings: ModuleDefineThemeBlockSettings;
 };
 
 export type ModuleThemeRAW<T = string> = {
@@ -18,7 +19,7 @@ export type ModuleThemeRAW<T = string> = {
   name: string;
   description: string;
   type: ModuleThemeType;
-  styles: ModuleThemeCleanedSetting<T>[];
+  styles: ModuleThemeCleanedStyles<T>[];
 };
 
 type ThemeStyleValueType = string;

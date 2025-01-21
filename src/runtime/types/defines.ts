@@ -90,16 +90,21 @@ export type ModuleDefineThemeMeta = {
   previewStyles?: ModuleDefineThemeMetaPreview;
   uiStyles?: ModuleDefineThemeMetaUI;
 };
-export type ModuleDefineThemeBlockSetting = ModuleObject | ModuleDefineThemeBlockReturn;
+export type ModuleDefineThemeBlockSettings = {
+  name: string;
+  inheritanceParent: boolean;
+};
+export type ModuleDefineThemeBlockStyles = ModuleObject | ModuleDefineThemeBlockReturn;
 
 export type ModuleDefineThemeBlockReturn = {
   id: string;
   type: 'defineThemeBlock';
-  styles: ModuleDefineThemeBlockSetting[];
+  styles: ModuleDefineThemeBlockStyles[];
+  settings: ModuleDefineThemeBlockSettings;
 };
 export type ModuleDefineThemeBlockRootReturn = {
   id: 'global';
   type: 'defineThemeBlockRoot';
   meta: ModuleDefineThemeMeta;
-  styles: ModuleDefineThemeBlockSetting[];
+  styles: ModuleDefineThemeBlockStyles[];
 };

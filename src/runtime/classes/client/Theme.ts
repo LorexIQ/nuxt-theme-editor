@@ -2,9 +2,9 @@ import type { ComputedRef } from 'vue';
 import { md5 } from 'js-md5';
 import type {
   ModuleClient,
-  ModuleDefaultBlockKeys, ModuleDefaultStyleKeys, ModuleDefineThemeBlockSetting,
+  ModuleDefaultBlockKeys, ModuleDefaultStyleKeys, ModuleDefineThemeBlockReturn,
   ModuleDefineThemeMetaPreview, ModuleDefineThemeMetaUI,
-  ModuleObject, ModuleOptionsExtend, ModulePathsCache, ModuleThemeCleanedSetting,
+  ModuleObject, ModuleOptionsExtend, ModulePathsCache, ModuleThemeCleanedStyles,
   ModuleThemeSelectedStyles, ModuleThemeType
 } from '../../types';
 import useIdProtect from '../../helpers/client/useIdProtect';
@@ -35,9 +35,9 @@ export class Theme {
   private runtimePreviewId = useIdProtect('preview');
   private runtimeUIId = useIdProtect('ui');
 
-  private styles = reactive([] as ModuleThemeCleanedSetting[]);
-  private editedStyles = reactive([] as ModuleThemeCleanedSetting[]);
-  private preparedStyles = reactive([] as ModuleThemeCleanedSetting[]);
+  private styles = reactive([] as ModuleThemeCleanedStyles[]);
+  private editedStyles = reactive([] as ModuleThemeCleanedStyles[]);
+  private preparedStyles = reactive([] as ModuleThemeCleanedStyles[]);
   private preparedPreviewStyles = reactive({} as ModuleDefineThemeMetaPreview);
   private preparedUIStyles = reactive({} as ModuleDefineThemeMetaUI);
 
@@ -45,7 +45,7 @@ export class Theme {
     ctx: ModuleClient,
     id: string,
     type: ModuleThemeType,
-    styles: ModuleThemeCleanedSetting[],
+    styles: ModuleThemeCleanedStyles[],
     name?: string,
     description?: string
   ) {
@@ -124,11 +124,24 @@ export class Theme {
     this._buildCustomStyles(scope);
   }
 
-  private _getPathsCacheValue<Type extends 'B' | 'S'>(type: Type, blockPath: string, styles?: ModuleThemeSelectedStyles[]): (Type extends 'S' ? string : ModuleObject) | undefined {
+  private _getPathsCacheValue<Type extends 'B' | 'S'>(type: Type, blockPath: string, styles?: ModuleThemeSelectedStyles[], withInheritance?: boolean): (Type extends 'S' ? string : ModuleObject) | undefined {
     const fullBlockPath = `${type}.${blockPath}`;
 
     if (styles && fullBlockPath in this.pathsCache) {
-      return this.pathsCache[fullBlockPath].reduce((acc, index) => acc?.styles?.[index] ?? acc?.[index], { styles } as any);
+      const blockUsedInheritance = this.pathsCache[fullBlockPath][0];
+      const stylesPath = this.pathsCache[fullBlockPath].slice(1);
+
+      if (withInheritance && blockUsedInheritance) {
+        const inheritanceBlockPath = blockPath.split('.').slice(0, -1).join('.');
+        const inheritanceCache = this._getPathsCacheValue('B', inheritanceBlockPath, styles, true);
+
+        return {
+          ...inheritanceCache,
+          ...stylesPath.reduce((acc, index) => acc?.styles?.[index] ?? acc?.[index], { styles } as any)
+        };
+      } else {
+        return stylesPath.reduce((acc, index) => acc?.styles?.[index] ?? acc?.[index], { styles } as any);
+      }
     }
   }
 
@@ -136,7 +149,7 @@ export class Theme {
     return scope === 'main' ? this.styles : this.editedStyles;
   }
 
-  private _fillStylesBlock(stylesBlock: ModuleThemeCleanedSetting, scope: ThemeStylesScope = 'main') {
+  private _fillStylesBlock(stylesBlock: ModuleThemeCleanedStyles, scope: ThemeStylesScope = 'main') {
     const relationsPaths: ModuleObject = {};
 
     const isCircularRelation = (path1: string, path2: string): boolean => {
@@ -163,15 +176,16 @@ export class Theme {
 
       return styleValue;
     };
-    const prepareBlock = (stylesBlock: ModuleThemeCleanedSetting, parentPath: string[] = []): ModuleThemeSelectedStyles => {
-      if (stylesBlock.id) {
-        return {
-          id: stylesBlock.id,
-          styles: (stylesBlock.styles as ModuleDefineThemeBlockSetting[]).map(style => prepareBlock(style, [...parentPath, stylesBlock.id]))
-        };
-      }
+    const prepareBlock = (themeStyle: ModuleThemeCleanedStyles, parentPath: string[] = []): ModuleThemeSelectedStyles => {
+      const themeStyleTyped = themeStyle as ModuleDefineThemeBlockReturn;
 
-      const stylesBlockAny = stylesBlock as any;
+      if (themeStyleTyped.id) return {
+        id: themeStyleTyped.id,
+        styles: themeStyleTyped.styles.map(style => prepareBlock(style, [...parentPath, stylesBlock.id])),
+        settings: themeStyleTyped.settings
+      };
+
+      const stylesBlockAny = themeStyle as any;
       for (const styleKey in stylesBlockAny) {
         const styleValue = stylesBlockAny[styleKey] as string;
         const selfPath = [...parentPath, styleKey].join('.');
@@ -240,7 +254,7 @@ export class Theme {
     unwrap.set(this, 'isSelectedAsEdited', state);
   }
 
-  setStyles(styles: ModuleThemeCleanedSetting[], scope: ThemeStylesScope = 'main'): void {
+  setStyles(styles: ModuleThemeCleanedStyles[], scope: ThemeStylesScope = 'main'): void {
     utils.replaceArrayData(this._geyStylesByScope(scope), styles);
   }
 
@@ -267,11 +281,11 @@ export class Theme {
     return computed(() => this._getPathsCacheValue('S', stylePath, this._geyStylesByScope(scope)) ?? 'UNKNOWN STYLE');
   }
 
-  getStyles(scope: ThemeStylesScope = 'main'): ComputedRef<ModuleThemeCleanedSetting[]> {
+  getStyles(scope: ThemeStylesScope = 'main'): ComputedRef<ModuleThemeCleanedStyles[]> {
     return computed(() => this._geyStylesByScope(scope));
   }
 
-  getStylesWithoutSystem(scope: ThemeStylesScope = 'main'): ComputedRef<ModuleThemeCleanedSetting[]> {
+  getStylesWithoutSystem(scope: ThemeStylesScope = 'main'): ComputedRef<ModuleThemeCleanedStyles[]> {
     return computed(() => this._geyStylesByScope(scope).filter(block => !block.id.startsWith(this.config.systemUUID.toString())) ?? []);
   }
 
@@ -283,15 +297,15 @@ export class Theme {
     return this.getStylesBlock(this.runtimeUIId, scope);
   }
 
-  getPreparedStylesBlock(blockPath: ModuleDefaultBlockKeys): ComputedRef<ModuleObject> {
-    return computed(() => this._getPathsCacheValue('B', blockPath, this.preparedStyles) ?? {});
+  getPreparedStylesBlock(blockPath: ModuleDefaultBlockKeys, withInheritance?: boolean): ComputedRef<ModuleObject> {
+    return computed(() => this._getPathsCacheValue('B', blockPath, this.preparedStyles, withInheritance) ?? {});
   }
 
   getPreparedStyleValue(stylePath: ModuleDefaultStyleKeys): ComputedRef<string> {
     return computed(() => this._getPathsCacheValue('S', stylePath, this.preparedStyles) ?? 'UNKNOWN STYLE');
   }
 
-  getPreparedStylesWithoutSystem(): ComputedRef<ModuleThemeCleanedSetting[]> {
+  getPreparedStylesWithoutSystem(): ComputedRef<ModuleThemeCleanedStyles[]> {
     return computed(() => this.preparedStyles);
   }
 
@@ -303,7 +317,7 @@ export class Theme {
     return computed(() => this.preparedUIStyles);
   }
 
-  getStylesCopy(): ComputedRef<ModuleThemeCleanedSetting[]> {
+  getStylesCopy(): ComputedRef<ModuleThemeCleanedStyles[]> {
     return computed(() => utils.copyObject(this.styles));
   }
 

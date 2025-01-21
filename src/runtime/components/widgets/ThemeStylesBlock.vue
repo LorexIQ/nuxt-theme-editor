@@ -2,13 +2,14 @@
 import type { StyleContextMenuData } from '../features/StyleEditBlock.vue';
 import StyleEditBlock from '../features/StyleEditBlock.vue';
 import DropDownBlock from '../shared/DropDownBlock.vue';
-import type { ModuleClient } from '../../types';
+import type { ModuleClient, ModuleDefineThemeBlockSettings } from '../../types';
 import { computed } from '#imports';
 
 type Props = {
   client: ModuleClient;
   styles: Record<string, any>[];
   rawStyles: Record<string, any>[];
+  settings?: ModuleDefineThemeBlockSettings;
   id?: string;
   ctxPath?: string[];
 };
@@ -26,7 +27,8 @@ const styleCtxPathComputed = computed(() => (props.ctxPath ?? []).join('.'));
 const stylesBlocks = computed(() => props.styles.map((stylesBlock, index) => ({
   id: stylesBlock.id,
   stylesBlock,
-  rawStylesBlock: props.rawStyles[index]
+  rawStylesBlock: props.rawStyles[index],
+  settings: stylesBlock.settings
 })));
 </script>
 
@@ -39,9 +41,10 @@ const stylesBlocks = computed(() => props.styles.map((stylesBlock, index) => ({
       <ThemeStylesBlock
         v-if="block.id"
         :id="block.id"
-        :styles="block.stylesBlock.styles"
         :client="client"
+        :styles="block.stylesBlock.styles"
         :raw-styles="block.rawStylesBlock.styles"
+        :settings="block.settings"
         :ctx-path="[...ctxPath ?? [], block.id]"
         @click="emit('click', $event)"
         @context-menu-open="emit('contextMenuOpen', $event)"
@@ -49,7 +52,7 @@ const stylesBlocks = computed(() => props.styles.map((stylesBlock, index) => ({
       />
       <DropDownBlock v-else>
         <template #title>
-          {{ ctxPathComputed }}
+          {{ settings?.name || ctxPathComputed }}
         </template>
         <template #default>
           <div class="TE-theme-styles-block__styles">

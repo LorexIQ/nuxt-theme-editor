@@ -1,11 +1,12 @@
 import type {
   ModuleDefineThemeBlockReturn,
-  ModuleDefineThemeBlockSetting
+  ModuleDefineThemeBlockSettings,
+  ModuleDefineThemeBlockStyles
 } from '../types';
 import pipe from '../helpers/pipe';
 import defineChecker from '../helpers/defineChecker';
 
-function filterStyles(styles: ModuleDefineThemeBlockSetting[]) {
+function filterStyles(styles: ModuleDefineThemeBlockStyles[]) {
   return styles.filter((style) => {
     if (defineChecker(style)) {
       if (['', 'global'].includes(style.id)) {
@@ -19,7 +20,7 @@ function filterStyles(styles: ModuleDefineThemeBlockSetting[]) {
   });
 }
 
-function mergeSelfStyles(styles: ModuleDefineThemeBlockSetting[]) {
+function mergeSelfStyles(styles: ModuleDefineThemeBlockStyles[]) {
   const selfStyles = styles
     .filter(style => !defineChecker(style))
     .reduce((accum, style) => {
@@ -34,7 +35,7 @@ function mergeSelfStyles(styles: ModuleDefineThemeBlockSetting[]) {
   return [selfStyles, ...defineStyles];
 }
 
-function sortStyles(styles: ModuleDefineThemeBlockSetting[]) {
+function sortStyles(styles: ModuleDefineThemeBlockStyles[]) {
   return styles.sort((a, b) => defineChecker(a)
     ? defineChecker(b)
       ? a.id.localeCompare(b.id)
@@ -43,7 +44,7 @@ function sortStyles(styles: ModuleDefineThemeBlockSetting[]) {
   );
 }
 
-export default function (id: string, styles: ModuleDefineThemeBlockSetting[]): ModuleDefineThemeBlockReturn {
+export default function (id: string, styles: ModuleDefineThemeBlockStyles[], settings?: Partial<ModuleDefineThemeBlockSettings>): ModuleDefineThemeBlockReturn {
   return {
     id,
     type: 'defineThemeBlock',
@@ -52,6 +53,12 @@ export default function (id: string, styles: ModuleDefineThemeBlockSetting[]): M
       filterStyles,
       mergeSelfStyles,
       sortStyles
-    )
+    ),
+    settings: {
+      name: '',
+      inheritanceParent: false,
+
+      ...settings
+    }
   };
 }

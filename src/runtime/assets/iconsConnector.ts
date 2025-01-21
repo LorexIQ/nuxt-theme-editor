@@ -12,6 +12,7 @@ import Palette2 from '../components/icons/Palette2.vue';
 import PaperPen from '../components/icons/PaperPen.vue';
 import WordsPen from '../components/icons/WordsPen.vue';
 import Plus from '../components/icons/Plus.vue';
+import Publish from '../components/icons/Publish.vue';
 import Question from '../components/icons/Question.vue';
 import Save from '../components/icons/Save.vue';
 import SaveEdit from '../components/icons/SaveEdit.vue';
@@ -35,6 +36,7 @@ export default {
   PaperPen,
   WordsPen,
   Plus,
+  Publish,
   Question,
   Save,
   SaveEdit,

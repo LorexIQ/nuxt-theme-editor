@@ -2,8 +2,6 @@ import { type ComputedRef, watchEffect } from 'vue';
 import type { Ref } from '@vue/reactivity';
 import type {
   ModuleDefineThemeBlockRootReturn,
-  ModuleDefineThemeBlockSetting,
-  ModuleThemeCleanedSetting,
   ModuleObject,
   ModuleOptionsExtend,
   ModuleStorage,
@@ -19,7 +17,13 @@ import type {
   ModulePagesNames,
   ModuleThemeScopes,
   ModuleThemeScopesStyles,
-  ModuleTheme, ModuleThemeRef, ModuleThemeRAW, ModulePathsCache
+  ModuleTheme,
+  ModuleThemeRef,
+  ModuleThemeRAW,
+  ModulePathsCache,
+  ModuleDefineThemeBlockStyles,
+  ModuleThemeCleanedStyles,
+  ModuleDefineThemeBlockReturn
 } from '../../types';
 // @ts-ignore
 import connectorMeta from '../../meta/connector';
@@ -135,7 +139,7 @@ export class Client {
       );
     });
 
-    watch(this.selectedEditedThemeId, themeId => this.reloadMiddleware[themeId ? 'on' : 'off']());
+    // watch(this.selectedEditedThemeId, themeId => this.reloadMiddleware[themeId ? 'on' : 'off']());
 
     watch(this.storageSettings, this._saveStorage.bind(this));
   }
@@ -231,14 +235,18 @@ export class Client {
   }
 
   private _buildSystemTheme(file: ModuleDefineThemeBlockRootReturn, id: string, type: ModuleThemeType): ModuleThemeRef {
-    const cleanThemeStyles = (themeStyle: ModuleDefineThemeBlockSetting, selfId?: string): ModuleThemeCleanedSetting => {
+    const cleanThemeStyles = (themeStyle: ModuleDefineThemeBlockStyles, selfId?: string): ModuleThemeCleanedStyles => {
+      const themeStyleTyped = themeStyle as ModuleDefineThemeBlockReturn;
+
       if (defineChecker(themeStyle, 'block')) return {
-        id: themeStyle.id,
-        styles: (themeStyle.styles as ModuleDefineThemeBlockSetting[]).map(style => cleanThemeStyles(style))
+        id: themeStyleTyped.id,
+        styles: themeStyleTyped.styles.map(style => cleanThemeStyles(style)),
+        settings: themeStyleTyped.settings
       };
       if (selfId) return {
         id: selfId,
-        styles: [themeStyle]
+        styles: [themeStyleTyped],
+        settings: themeStyleTyped.settings ?? {}
       };
 
       return themeStyle;
@@ -255,14 +263,22 @@ export class Client {
           styles: [{
             ...DEFAULT_UI_STYLES,
             ...file.meta.uiStyles
-          }]
+          }],
+          settings: {
+            name: 'UI',
+            inheritanceParent: false
+          }
         },
         {
           id: useIdProtect('preview'),
           styles: [{
             ...DEFAULT_PREVIEW_STYLES,
             ...file.meta.previewStyles
-          }]
+          }],
+          settings: {
+            name: 'Preview',
+            inheritanceParent: false
+          }
         }
       ],
       file.meta.name,
@@ -313,23 +329,24 @@ export class Client {
   }
 
   private _createThemesPaths(): void {
-    const finder = (styles?: ModuleThemeSelectedStyles[], ctx: [string, number | string][] = []) => {
+    const finder = (styles?: ModuleThemeSelectedStyles[], ctx: [string, number | string][] = [], withInheritance = true) => {
       const results: ModuleObject<(number | string)[]> = {};
 
       if (styles) {
         for (let styleIndex = 0; styleIndex < styles.length; ++styleIndex) {
-          const stylesBlock = styles[styleIndex];
+          const themeStyle = styles[styleIndex];
 
-          if (stylesBlock.id) {
-            Object.assign(results, finder(stylesBlock.styles as any, [...ctx, [stylesBlock.id, styleIndex]]));
+          if (themeStyle.id) {
+            const themeStyleTyped = themeStyle as ModuleDefineThemeBlockReturn;
+            Object.assign(results, finder(themeStyleTyped.styles, [...ctx, [themeStyle.id, styleIndex]], themeStyleTyped.settings.inheritanceParent));
           } else {
             const ctxKeys = ctx.map(block => block[0]);
             const ctxIndexes = ctx.map(block => block[1]);
 
-            Object.assign(results, { [['B', ...ctxKeys].join('.')]: [...ctxIndexes, 0] });
-            Object.assign(results, Object.keys(stylesBlock).reduce((acc, key) => ({
+            Object.assign(results, { [['B', ...ctxKeys].join('.')]: [Number(withInheritance), ...ctxIndexes, 0] });
+            Object.assign(results, Object.keys(themeStyle).reduce((acc, key) => ({
               ...acc,
-              [['S', ...ctxKeys, key].join('.')]: [...ctxIndexes, 0, key]
+              [['S', ...ctxKeys, key].join('.')]: [0, ...ctxIndexes, 0, key]
             }), {}));
           }
         }

@@ -19,7 +19,7 @@ class Utils {
         const result: Record<string, any> = {};
 
         for (const key in _template) {
-          if (key === 'id' && level) result[key] = _template[key];
+          if (['id', 'settings'].includes(key) && level) result[key] = _template[key];
           else result[key] = merger(_target[key], _template[key], level + 1);
         }
 

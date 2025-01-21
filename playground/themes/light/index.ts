@@ -20,8 +20,8 @@ export default defineThemeBlockRoot({
   defineThemeBlock('navbar', [
     defineThemeBlock('road321312312312313123', [
       {
-        test1: '#fff', // Это navbar road test 1 описание
-        a: '#f1f1f1'
+        test12: '#fff', // Это navbar road test 1 описание
+        a2: '#f1f1f1'
       },
       defineThemeBlock('road12312321312312321', [
         {
@@ -33,10 +33,6 @@ export default defineThemeBlockRoot({
     {
       test1: '$sidebar.test.testtesttest2',
       a: '#f1f1f1'
-    },
-    {
-      test2: '#e5b7b7',
-      a: '#f1f1f1'
     }
   ]),
   defineThemeBlock('abc', [
@@ -44,7 +40,10 @@ export default defineThemeBlockRoot({
       a: '#fff',
       b: '#000'
     }
-  ]),
+  ], {
+    name: 'Лютый фонк',
+    inheritanceParent: true
+  }),
   defineThemeBlock('abcd', [
     {
       a: '#fff',

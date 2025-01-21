@@ -22,9 +22,9 @@ function getComponentId(instance: ComponentInternalInstance) {
   return scopeId;
 }
 
-export default function useBlock(block: ModuleDefaultBlockKeys) {
+export default function useBlock(block: ModuleDefaultBlockKeys, withInheritance: boolean = false) {
   const client = useClient().value;
-  const blockStyles = computed(() => unwrap.get(client.getSelectedTheme()!.getPreparedStylesBlock(block)));
+  const blockStyles = computed(() => unwrap.get(client.getSelectedTheme()!.getPreparedStylesBlock(block, withInheritance)));
   const currentInstance = getCurrentInstance()!;
 
   onMounted(() => {

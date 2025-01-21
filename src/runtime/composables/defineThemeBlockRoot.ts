@@ -1,7 +1,7 @@
-import type { ModuleDefineThemeBlockRootReturn, ModuleDefineThemeBlockSetting, ModuleDefineThemeMeta } from '../types';
+import type { ModuleDefineThemeBlockRootReturn, ModuleDefineThemeBlockStyles, ModuleDefineThemeMeta } from '../types';
 import defineThemeBlock from './defineThemeBlock';
 
-export default function (meta: ModuleDefineThemeMeta, styles: ModuleDefineThemeBlockSetting[]): ModuleDefineThemeBlockRootReturn {
+export default function (meta: ModuleDefineThemeMeta, styles: ModuleDefineThemeBlockStyles[]): ModuleDefineThemeBlockRootReturn {
   const object = defineThemeBlock('global', styles);
 
   return {

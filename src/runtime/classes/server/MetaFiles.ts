@@ -2,7 +2,7 @@ import fs from 'node:fs';
 import type { Resolver } from '@nuxt/kit';
 import { createResolver } from '@nuxt/kit';
 import type {
-  ModuleDefineThemeBlockSetting,
+  ModuleDefineThemeBlockStyles,
   ModuleObject,
   ModuleOptionsExtend,
   ModuleServer
@@ -78,10 +78,10 @@ export class MetaFiles {
   private _createThemesStyles(): void {
     const mergedStyles: ModuleObject = {};
 
-    const generateMergedStyles = (styles: ModuleDefineThemeBlockSetting[]) => {
+    const generateMergedStyles = (styles: ModuleDefineThemeBlockStyles[]) => {
       styles.forEach((block) => {
         if (defineChecker(block)) {
-          generateMergedStyles(block.styles as ModuleDefineThemeBlockSetting[]);
+          generateMergedStyles(block.styles as ModuleDefineThemeBlockStyles[]);
         } else {
           for (const key of Object.keys(block)) {
             mergedStyles[key] = (block as any)[key];

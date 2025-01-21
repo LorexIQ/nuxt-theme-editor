@@ -1,7 +1,7 @@
 <script setup lang="ts">
 const router = useRouter();
 const themesEditor = useThemesEditor();
-const scopeStyles = useThemeBlock('sidebar.test');
+const scopeStyles = useThemeBlock('sidebar.test', true);
 console.log('second.vue useThemeBlock =>', scopeStyles.value);
 </script>
 
@@ -26,6 +26,7 @@ console.log('second.vue useThemeBlock =>', scopeStyles.value);
     <button @click="themesEditor.setAutoThemeModeStatus(!themesEditor.getAutoThemeModeStatus())">
       AUTO [{{ themesEditor.getAutoThemeModeStatus() ? 'ON' : 'OFF' }}]
     </button>
+    {{ scopeStyles }}
     <div style="max-height: 700px; overflow-y: auto">
       <log-object
         v-if="themesEditor.getEditedTheme()"
