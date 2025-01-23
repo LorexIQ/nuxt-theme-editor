@@ -57,6 +57,7 @@ export class Client {
   private readonly errorsMessages = reactive<ModuleErrorMessage[]>([]);
   private readonly usesScopesProperties = reactive<ModuleThemeScopes>({});
 
+  private readonly isBlockVisible = ref(false);
   private readonly isAutoThemeMode = ref(false);
   private readonly selectedMainThemeId = computed(() => this.themes.find(theme => theme.isSelectedAsMain)?.id);
   private readonly selectedLightThemeId = computed(() => this.themes.find(theme => theme.isSelectedAsLight)?.id);
@@ -382,6 +383,10 @@ export class Client {
     return this.themes;
   }
 
+  getBlockStatus(): boolean {
+    return unwrap.get(this.isBlockVisible);
+  }
+
   getThemeById(id?: string): ModuleTheme | undefined {
     return this.themes.find(theme => theme.id === id);
   }
@@ -404,6 +409,10 @@ export class Client {
 
   getSelectedMainThemeId(): string | undefined {
     return unwrap.get(this.selectedMainThemeId);
+  }
+
+  getSelectedEditedThemeId(): string | undefined {
+    return unwrap.get(this.selectedEditedThemeId);
   }
 
   getSelectedThemeId(): string | undefined {
@@ -440,6 +449,21 @@ export class Client {
 
   getErrors(type?: ModuleErrorType, page?: ModulePagesNames): ModuleErrorMessage[] {
     return this.errorsMessages.filter(error => (type ? error.type === type : true) && (page ? error.page === page : true));
+  }
+
+  setBlockStatus(status: boolean): void {
+    if (!status) {
+      const editedThemeId = unwrap.get(this.selectedEditedThemeId);
+
+      if (editedThemeId) {
+        this.router.push(`editThemeStylesCancel?themeId=${editedThemeId}&withBlockClose=1`, 'tab-fade-lr');
+        return;
+      } else {
+        this.router.push('index', 'tab-fade-lr');
+      }
+    }
+
+    unwrap.set(this, 'isBlockVisible', status);
   }
 
   setAutoThemeModeStatus(mode: boolean): void {

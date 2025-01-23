@@ -11,12 +11,18 @@ const props = defineProps<Props>();
 const client = props.client;
 const router = client.getRouter();
 const themeId = computed(() => router.getQuery().themeId);
+const withBlockClose = computed(() => router.getQuery().withBlockClose ?? false);
 
 function onCancel() {
   router.push(`editThemeStyles?themeId=${themeId.value}`, 'tab-fade-rl');
 }
 function onApprove() {
   client.setThemeSelectedAsEdited(undefined);
+
+  if (withBlockClose.value) {
+    client.setBlockStatus(false);
+  }
+
   router.push('index', 'tab-fade-rl');
 }
 </script>

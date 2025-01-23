@@ -2,23 +2,14 @@
 </script>
 
 <template>
-  <themes-editor-layout>
+  <theme-editor-layout>
     <div class="layout-default">
       <slot />
     </div>
-  </themes-editor-layout>
+  </theme-editor-layout>
 </template>
 
 <style scoped lang="scss">
 .layout-default {
-  display: grid;
-  grid-template-columns: 1fr 400px;
-  width: 100vw;
-  height: 100vh;
-  overflow: hidden;
-
-  &__content {
-    overflow: auto;
-  }
 }
 </style>

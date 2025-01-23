@@ -19,6 +19,15 @@ const logoParts: string[] = [
 
 const openedPage = computed(() => router.getPath());
 const isAnotherPage = computed(() => openedPage.value !== 'index');
+const isEditedPage = computed(() => client.getSelectedEditedThemeId());
+
+function onGoHome() {
+  if (isEditedPage.value) {
+    router.push(`editThemeStylesCancel?themeId=${isEditedPage.value}`, 'tab-fade-lr');
+  } else {
+    router.push('index', 'tab-fade-rl');
+  }
+}
 </script>
 
 <template>
@@ -30,7 +39,7 @@ const isAnotherPage = computed(() => openedPage.value !== 'index');
       v-for="part of logoParts"
       :key="part"
       class="TE-editor-header__title TE-editor-header__title--logo"
-      @click="router.push('index', 'tab-fade-rl')"
+      @click="onGoHome"
     >
       {{ part }}
     </div>

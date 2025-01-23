@@ -1,14 +1,14 @@
 <script setup lang="ts">
-import useThemesEditor from '../composables/useThemesEditor';
-import ThemePreview from './features/ThemePreview.vue';
-import EditorHeader from './widgets/EditorHeader.vue';
-import ThemesList from './views/ThemesList.vue';
-import ThemeCreate from './views/ThemeCreate.vue';
-import ThemeDelete from './views/ThemeDelete.vue';
-import ThemeEditInfo from './views/ThemeEditInfo.vue';
-import ThemeEditStyles from './views/ThemeEditStyles.vue';
-import ThemeEditStylesCancel from './views/ThemeEditStylesCancel.vue';
-import Error404 from './views/Error404.vue';
+import useThemesEditor from '../../composables/useThemesEditor';
+import ThemePreview from '../features/ThemePreview.vue';
+import EditorHeader from '../widgets/EditorHeader.vue';
+import ThemesList from '../views/ThemesList.vue';
+import ThemeCreate from '../views/ThemeCreate.vue';
+import ThemeDelete from '../views/ThemeDelete.vue';
+import ThemeEditInfo from '../views/ThemeEditInfo.vue';
+import ThemeEditStyles from '../views/ThemeEditStyles.vue';
+import ThemeEditStylesCancel from '../views/ThemeEditStylesCancel.vue';
+import Error404 from '../views/Error404.vue';
 import { computed } from '#imports';
 
 const client = useThemesEditor();
@@ -40,12 +40,12 @@ const addStyles = computed(() => ({
 <template>
   <div
     :id="client.getConfig().keys.editor"
-    class="TE-root"
+    class="TE-block"
   >
     <EditorHeader :client="client" />
 
     <div
-      class="TE-root__content"
+      class="TE-block__content"
       :style="addStyles"
     >
       <transition :name="router.getTransitionName()">
@@ -65,7 +65,7 @@ const addStyles = computed(() => ({
 </template>
 
 <style lang="scss">
-.TE-root, .TE-sandbox {
+.TE-block, .TE-sandbox {
   & * {
     font-family: 'Roboto', sans-serif;
     box-sizing: border-box;
@@ -87,9 +87,10 @@ const addStyles = computed(() => ({
 </style>
 
 <style scoped lang="scss">
-.TE-root {
+.TE-block {
   display: grid;
   grid-template-rows: auto 1fr;
+  width: 400px;
   height: 100%;
   border-left: 1px solid var(--border);
   background-color: var(--bg);

@@ -131,7 +131,7 @@ export class Theme {
       const blockUsedInheritance = this.pathsCache[fullBlockPath][0];
       const stylesPath = this.pathsCache[fullBlockPath].slice(1);
 
-      if (withInheritance && blockUsedInheritance) {
+      if (withInheritance || blockUsedInheritance) {
         const inheritanceBlockPath = blockPath.split('.').slice(0, -1).join('.');
         const inheritanceCache = this._getPathsCacheValue('B', inheritanceBlockPath, styles, true);
 

@@ -3,8 +3,8 @@ import {
   addPlugin,
   createResolver,
   addImportsDir,
-  addComponent,
-  installModule
+  installModule,
+  addComponentsDir
 } from '@nuxt/kit';
 import defu from 'defu';
 import { name, version } from '../package.json';
@@ -45,13 +45,8 @@ export default defineNuxtModule<ModuleOptions>({
 
     await installModule('nuxt-transition-expand');
     await installModule('nuxt-color-picker');
-    await addComponent({
-      name: 'themesEditor',
-      filePath: resolver.resolve('./runtime/components/themesEditor.vue')
-    });
-    await addComponent({
-      name: 'themesEditorLayout',
-      filePath: resolver.resolve('./runtime/components/themesEditorLayout.vue')
+    await addComponentsDir({
+      path: resolver.resolve('./runtime/components/exports')
     });
   }
 });
