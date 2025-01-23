@@ -1,4 +1,5 @@
 import type { UnwrapRefSimple } from '@vue/reactivity';
+import type { Component } from 'vue';
 import type pagesMeta from '../assets/pagesMeta';
 import type iconsConnector from '../assets/iconsConnector';
 import type { Client } from '../classes/client/Client';
@@ -12,7 +13,11 @@ import type { ModuleMetaBlocks } from '../meta/themesStructure';
 import type { ModuleHelpersNestedKeys, ModuleHelpersStringKeys } from './helpers';
 import type { ModuleObject } from './index';
 
-export type ModulePage = { name: string; title: string };
+export type ModulePage = {
+  name: string;
+  title: string;
+  component: Component;
+};
 export type ModulePageAnimations = 'tab-fade-lr' | 'tab-fade-rl' | undefined;
 export type ModulePagesNames = (typeof pagesMeta extends { name: infer U }[] ? U : never) | string;
 export type ModuleIcons = keyof typeof iconsConnector;
@@ -23,6 +28,10 @@ export type ModuleErrorMessage = {
   type: ModuleErrorType;
   message: string;
   title?: string;
+};
+export type ModuleServerError = {
+  statusCode: number;
+  message: string;
 };
 
 export type ModuleClient = Client;

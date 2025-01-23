@@ -112,16 +112,28 @@ export class Sandbox {
             action: () => router.push(`newTheme?parentThemeId=${theme.id}`, 'tab-fade-lr')
           },
           {
+            title: 'Publish',
+            icon: 'Publish',
+            action: () => router.push(`publishApprove?themeId=${theme.id}`, 'tab-fade-lr'),
+            isVisible: () => theme.type === 'local'
+          },
+          {
+            title: 'Depublish',
+            icon: 'Depublish',
+            action: () => router.push(`publishApprove?themeId=${theme.id}`, 'tab-fade-lr'),
+            isVisible: () => theme.type === 'global'
+          },
+          {
             title: 'Edit info',
             icon: 'PaperPen',
             action: () => router.push(`editThemeInfo?themeId=${theme.id}`, 'tab-fade-lr'),
-            isVisible: () => theme.type === 'local'
+            isVisible: () => ['local', 'global'].includes(theme.type)
           },
           {
             title: 'Edit styles',
             icon: 'WordsPen',
             action: () => router.push(`editThemeStyles?themeId=${theme.id}`, 'tab-fade-lr'),
-            isVisible: () => theme.type === 'local'
+            isVisible: () => ['local', 'global'].includes(theme.type)
           },
           {
             title: 'Delete theme',
@@ -129,7 +141,7 @@ export class Sandbox {
             icon: 'Bin',
             iconColor: 'var(--contextMenuIconError)',
             action: () => router.push(`deleteTheme?themeId=${theme.id}`, 'tab-fade-lr'),
-            isVisible: () => theme.type === 'local'
+            isVisible: () => ['local', 'global'].includes(theme.type)
           }
         ]
       },

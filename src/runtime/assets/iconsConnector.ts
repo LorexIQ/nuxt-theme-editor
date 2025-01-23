@@ -3,8 +3,10 @@ import Asterisk from '../components/icons/Asterisk.vue';
 import Bin from '../components/icons/Bin.vue';
 import Check from '../components/icons/Check.vue';
 import Circle from '../components/icons/Circle.vue';
+import Depublish from '../components/icons/Depublish.vue';
 import Dots from '../components/icons/Dots.vue';
 import Error from '../components/icons/Error.vue';
+import I404 from '../components/icons/I404.vue';
 import Info from '../components/icons/Info.vue';
 import Moon from '../components/icons/Moon.vue';
 import Palette from '../components/icons/Palette.vue';
@@ -27,8 +29,10 @@ export default {
   Bin,
   Check,
   Circle,
+  Depublish,
   Dots,
   Error,
+  I404,
   Info,
   Moon,
   Palette,

@@ -35,6 +35,7 @@ import useReloadMiddleware from '../../helpers/client/useReloadMiddleware';
 import useIdProtect from '../../helpers/client/useIdProtect';
 import utils from '../../helpers/utils';
 import { Theme } from '../../classes/client/Theme';
+import useFetch from '../../helpers/client/useFetch';
 import { Sandbox } from './Sandbox';
 import { Router } from './Router';
 import { useRuntimeConfig, reactive, ref, computed, watch } from '#imports';
@@ -97,6 +98,8 @@ export class Client {
     this._selectDefaultThemes();
     this._readStorage();
     this._initWatchers();
+
+    this.loadGlobalThemes();
   }
 
   private _initWatchers(): void {
@@ -494,6 +497,26 @@ export class Client {
     const theme = this.getThemeById(id);
     if (!theme || unwrap.get(this.selectedEditedThemeId) === id) this.unselectAllThemesAs('edited');
     else theme.setSelectedAsEdited();
+  }
+
+  async loadGlobalThemes(): Promise<void> {
+    this.themes
+      .filter(theme => theme.type === 'global')
+      .forEach(theme => this.themes.splice(this.themes.indexOf(theme), 1));
+
+    try {
+      const loadedThemes = await useFetch('GET', '/', {});
+      const preparedThemed = loadedThemes.map((theme, index) => reactive(this._buildCustomTheme({
+        id: theme.id,
+        name: theme.name,
+        description: theme.description,
+        type: 'global',
+        styles: JSON.parse(theme.stylesJSON)
+      }, index)));
+      this.themes.push(...preparedThemed);
+    } catch {
+      this.createError('ERROR', 'index', 'Wait and try downloading again. If there is this error, it is NOT RECOMMENDED to edit topics, these actions may lead to conflicts.', 'Error downloading themes from the server');
+    }
   }
 
   createTheme(data: ModuleThemeCreateData): void {

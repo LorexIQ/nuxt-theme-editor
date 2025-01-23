@@ -1,37 +1,13 @@
 <script setup lang="ts">
 import useThemesEditor from '../../composables/useThemesEditor';
-import ThemePreview from '../features/ThemePreview.vue';
 import EditorHeader from '../widgets/EditorHeader.vue';
-import ThemesList from '../views/ThemesList.vue';
-import ThemeCreate from '../views/ThemeCreate.vue';
-import ThemeDelete from '../views/ThemeDelete.vue';
-import ThemeEditInfo from '../views/ThemeEditInfo.vue';
-import ThemeEditStyles from '../views/ThemeEditStyles.vue';
-import ThemeEditStylesCancel from '../views/ThemeEditStylesCancel.vue';
 import Error404 from '../views/Error404.vue';
 import { computed } from '#imports';
 
 const client = useThemesEditor();
 const router = client.getRouter();
 
-const pageComponent = computed(() => {
-  switch (router.getPath()) {
-    case 'index':
-      return ThemesList;
-    case 'newTheme':
-      return ThemeCreate;
-    case 'deleteTheme':
-      return ThemeDelete;
-    case 'editThemeInfo':
-      return ThemeEditInfo;
-    case 'editThemeStyles':
-      return ThemeEditStyles;
-    case 'editThemeStylesCancel':
-      return ThemeEditStylesCancel;
-    default:
-      return Error404;
-  }
-});
+const pageComponent = computed(() => router.getCurrentPage()?.component ?? Error404);
 const addStyles = computed(() => ({
   '--alpha': 'url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAAAXNSR0IArs4c6QAAAChJREFUKFNjPHP19n8GNGCspYIuxMA4FBT+//8fwzNnr93B9MwQUAgAe7I0XsEPG9EAAAAASUVORK5CYII=)'
 }));
@@ -54,9 +30,7 @@ const addStyles = computed(() => ({
           :client="client"
         >
           <template #preview>
-            <slot name="preview">
-              <ThemePreview />
-            </slot>
+            <slot name="preview" />
           </template>
         </Component>
       </transition>

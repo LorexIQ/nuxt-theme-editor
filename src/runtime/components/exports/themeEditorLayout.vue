@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import useThemesEditor from '../../composables/useThemesEditor';
+import ThemePreview from '../features/ThemePreview.vue';
 import ThemeEditorBlock from './themeEditorBlock.vue';
 import { computed } from '#imports';
 
@@ -18,7 +19,9 @@ const isBlockVisible = computed(() => client.getBlockStatus());
     <transition-expand direction="horizontal">
       <ThemeEditorBlock v-if="isBlockVisible">
         <template #preview>
-          <slot name="preview" />
+          <slot name="preview">
+            <ThemePreview />
+          </slot>
         </template>
       </ThemeEditorBlock>
     </transition-expand>

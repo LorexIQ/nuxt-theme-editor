@@ -33,6 +33,7 @@ const selectedTheme = computed(() => props.client.getSelectedTheme());
         type="global"
         :is-open="selectedTheme?.type === 'global'"
         :client="client"
+        @context-menu-open="sandbox.openThemeContextMenu(...$event)"
       >
         <template #preview>
           <slot name="preview" />

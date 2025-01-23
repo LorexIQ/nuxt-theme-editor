@@ -10,6 +10,7 @@ import defu from 'defu';
 import { name, version } from '../package.json';
 import type { ModuleOptions } from './runtime/types';
 import { Server } from './runtime/classes/server/Server';
+import api from './runtime/api';
 
 const MODULE_CONFIG_KEY = 'themesEditor';
 const meta = {
@@ -48,5 +49,9 @@ export default defineNuxtModule<ModuleOptions>({
     await addComponentsDir({
       path: resolver.resolve('./runtime/components/exports')
     });
+
+    const apiResolver = createResolver(resolver.resolve('./runtime/api'));
+    nuxt.options.runtimeConfig[MODULE_CONFIG_KEY] = { storagePath: apiResolver.resolve('../meta/storage') };
+    api(apiResolver);
   }
 });

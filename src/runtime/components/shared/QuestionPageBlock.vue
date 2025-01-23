@@ -8,8 +8,8 @@ import { onBeforeMount } from '#imports';
 type Props = {
   icon: ModuleIcons;
   questionTitle: string;
-  firstBtnTitle: string;
-  secondBtnTitle: string;
+  firstBtnTitle?: string;
+  secondBtnTitle?: string;
   firstBtnDecor?: 'default' | 'success' | 'error';
   secondBtnDecor?: 'default' | 'success' | 'error';
   beforeMount?: () => any;
@@ -40,12 +40,14 @@ onBeforeMount(() => {
       <span>{{ questionTitle }}</span>
       <div class="TE-question-page-block__actions">
         <IsButton
+          v-if="firstBtnTitle"
           :decor="firstBtnDecor"
           @click="emit('clickFirst', $event)"
         >
           {{ firstBtnTitle }}
         </IsButton>
         <IsButton
+          v-if="secondBtnTitle"
           :decor="secondBtnDecor"
           @click="emit('clickSecond', $event)"
         >
