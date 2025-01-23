@@ -24,18 +24,30 @@ const selectedTheme = computed(() => props.client.getSelectedTheme());
         :is-open="selectedTheme ? selectedTheme.type === 'system' : true"
         :client="client"
         @context-menu-open="sandbox.openThemeContextMenu(...$event)"
-      />
+      >
+        <template #preview>
+          <slot name="preview" />
+        </template>
+      </BlockThemes>
       <BlockThemes
         type="global"
         :is-open="selectedTheme?.type === 'global'"
         :client="client"
-      />
+      >
+        <template #preview>
+          <slot name="preview" />
+        </template>
+      </BlockThemes>
       <BlockThemes
         type="local"
         :is-open="selectedTheme?.type === 'local'"
         :client="client"
         @context-menu-open="sandbox.openThemeContextMenu(...$event)"
-      />
+      >
+        <template #preview>
+          <slot name="preview" />
+        </template>
+      </BlockThemes>
     </div>
     <template #messages>
       <ClientErrors

@@ -90,7 +90,11 @@ onBeforeMount(() => {});
       <div class="TE-theme-create__block">
         <IsHr>Preview Card</IsHr>
         <div class="TE-theme-create__block__row">
-          <ThemeBlock :theme="previewTheme" />
+          <ThemeBlock :theme="previewTheme">
+            <template #preview>
+              <slot name="preview" />
+            </template>
+          </ThemeBlock>
         </div>
       </div>
       <div class="TE-theme-create__block">

@@ -28,7 +28,11 @@ const themePreviewTargetStyles = computed(() => unwrap.get(theme.value.getStyles
 <template>
   <div class="TE-theme-styles-preview-block">
     <div class="TE-theme-styles-preview-block__card">
-      <ThemeBlock :theme="theme" />
+      <ThemeBlock :theme="theme">
+        <template #preview>
+          <slot name="preview" />
+        </template>
+      </ThemeBlock>
     </div>
     <DropDownBlock expand-enabled>
       <template #title>

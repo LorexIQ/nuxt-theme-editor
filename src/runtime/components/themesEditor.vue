@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import useThemesEditor from '../composables/useThemesEditor';
+import ThemePreview from './features/ThemePreview.vue';
 import EditorHeader from './widgets/EditorHeader.vue';
 import ThemesList from './views/ThemesList.vue';
 import ThemeCreate from './views/ThemeCreate.vue';
@@ -51,7 +52,13 @@ const addStyles = computed(() => ({
         <Component
           :is="pageComponent"
           :client="client"
-        />
+        >
+          <template #preview>
+            <slot name="preview">
+              <ThemePreview />
+            </slot>
+          </template>
+        </Component>
       </transition>
     </div>
   </div>

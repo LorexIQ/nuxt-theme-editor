@@ -49,5 +49,9 @@ export default defineNuxtModule<ModuleOptions>({
       name: 'themesEditor',
       filePath: resolver.resolve('./runtime/components/themesEditor.vue')
     });
+    await addComponent({
+      name: 'themesEditorLayout',
+      filePath: resolver.resolve('./runtime/components/themesEditorLayout.vue')
+    });
   }
 });

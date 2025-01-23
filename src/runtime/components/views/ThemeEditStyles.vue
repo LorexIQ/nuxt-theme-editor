@@ -95,7 +95,11 @@ onBeforeMount(() => {
           @click="sandbox.openStyleClickMenu(...$event)"
           @context-menu-open="sandbox.openStyleContextMenu(...$event)"
           @inheritance-click="goToInheritance"
-        />
+        >
+          <template #preview>
+            <slot name="preview" />
+          </template>
+        </ThemeStylesPreviewBlock>
         <ThemeStylesUIBlock
           :client="client"
           @click="sandbox.openStyleClickMenu(...$event)"

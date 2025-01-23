@@ -1,23 +1,29 @@
 <script setup lang="ts">
+
 </script>
 
 <template>
-  <themes-editor-layout>
-    <div class="layout-default">
+  <div class="TE-layout">
+    <div class="TE-layout__custom">
       <slot />
     </div>
-  </themes-editor-layout>
+    <themes-editor>
+      <template #preview>
+        <slot name="preview" />
+      </template>
+    </themes-editor>
+  </div>
 </template>
 
 <style scoped lang="scss">
-.layout-default {
+.TE-layout {
   display: grid;
   grid-template-columns: 1fr 400px;
   width: 100vw;
   height: 100vh;
   overflow: hidden;
 
-  &__content {
+  &__custom {
     overflow: auto;
   }
 }

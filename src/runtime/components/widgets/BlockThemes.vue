@@ -67,6 +67,9 @@ const title = computed(() => {
               @dblclick="client.setThemeSelectedAsMain(theme.id)"
               @contextmenu.prevent="emit('contextMenuOpen', [$event, theme])"
             >
+              <template #preview>
+                <slot name="preview" />
+              </template>
               <template #status>
                 <ThemeBlockStatus :theme="theme" />
               </template>
