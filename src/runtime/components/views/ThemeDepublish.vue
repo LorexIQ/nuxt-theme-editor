@@ -20,7 +20,7 @@ async function onApprove() {
   if (!theme.value) return;
 
   try {
-    await theme.value.publish();
+    await theme.value.depublish();
     router.push('index', 'tab-fade-rl');
   } catch (e) {
     console.error(e);
@@ -30,17 +30,17 @@ async function onApprove() {
 
 <template>
   <QuestionPageBlock
-    class="TE-theme-publish"
-    icon="Publish"
-    question-title="Are you sure you want to make the theme global?"
+    class="TE-theme-depublish"
+    icon="Depublish"
+    question-title="Are you serious about removing the topic from publication?"
     first-btn-title="Cancel"
-    second-btn-title="Publish"
-    second-btn-decor="success"
+    second-btn-title="Depublish"
+    second-btn-decor="error"
     @click-first="onCancel"
     @click-second="onApprove"
   />
 </template>
 
 <style lang="scss" scoped>
-.TE-theme-publish {}
+.TE-theme-depublish {}
 </style>

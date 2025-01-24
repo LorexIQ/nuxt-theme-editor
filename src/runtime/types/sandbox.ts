@@ -11,12 +11,13 @@ export type ModuleSandboxComponent = {
 export type ModuleSandboxComponents = ModuleSandboxComponent[];
 
 export type ModuleSandboxMousePosition = { x: number; y: number };
+export type ModuleSandboxContextMenuItemAction = (event: MouseEvent) => any;
 export type ModuleSandboxContextMenuItem = {
   title: string;
   titleColor?: string;
   icon: ModuleIcons;
   iconColor?: string;
-  action: () => void;
+  action: ModuleSandboxContextMenuItemAction;
   isDisabled?: () => boolean;
   isVisible?: () => boolean;
 };

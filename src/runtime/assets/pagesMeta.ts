@@ -5,6 +5,7 @@ import ThemeEditInfo from '../components/views/ThemeEditInfo.vue';
 import ThemeEditStyles from '../components/views/ThemeEditStyles.vue';
 import ThemeEditStylesCancel from '../components/views/ThemeEditStylesCancel.vue';
 import ThemePublish from '../components/views/ThemePublish.vue';
+import ThemeDepublish from '../components/views/ThemeDepublish.vue';
 
 export default [
   {
@@ -18,18 +19,18 @@ export default [
     component: ThemeCreate
   },
   {
+    name: 'deleteTheme',
+    title: 'Delete',
+    component: ThemeDelete
+  },
+  {
     name: 'editThemeInfo',
     title: 'Edit Info',
-    component: ThemeDelete
+    component: ThemeEditInfo
   },
   {
     name: 'editThemeStyles',
     title: 'Edit Styles',
-    component: ThemeEditInfo
-  },
-  {
-    name: 'deleteTheme',
-    title: 'Delete',
     component: ThemeEditStyles
   },
   {
@@ -41,5 +42,10 @@ export default [
     name: 'publishApprove',
     title: 'Publish Approve',
     component: ThemePublish
+  },
+  {
+    name: 'depublishApprove',
+    title: 'Depublish Approve',
+    component: ThemeDepublish
   }
 ] as const;

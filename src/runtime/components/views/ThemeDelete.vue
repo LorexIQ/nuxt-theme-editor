@@ -11,14 +11,16 @@ const props = defineProps<Props>();
 const client = props.client;
 const router = client.getRouter();
 const themeId = computed(() => router.getQuery().themeId);
+const theme = computed(() => client.getThemeById(themeId.value)!);
 
-function onThemeDelete() {
-  client.deleteTheme(themeId.value);
-  router.push('index', 'tab-fade-rl');
+async function onThemeDelete() {
+  if (await theme.value.delete()) {
+    router.push('index', 'tab-fade-rl');
+  }
 }
 
 function onBeforeMount() {
-  if (!themeId.value || !client.getThemeById(themeId.value)) {
+  if (!themeId.value || !theme.value) {
     router.push('index', 'tab-fade-lr');
     return;
   }

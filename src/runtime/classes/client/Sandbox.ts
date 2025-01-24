@@ -3,7 +3,7 @@ import type {
   ModuleClient, ModuleDefaultStyleKeys,
   ModuleOptionsExtend,
   ModuleSandboxComponents,
-  ModuleSandboxContextMenuItem,
+  ModuleSandboxContextMenuItem, ModuleSandboxContextMenuItemAction,
   ModuleSandboxMousePosition,
   ModuleSandboxSize,
   ModuleTheme
@@ -11,6 +11,7 @@ import type {
 import ContextMenu from '../../components/shared/ContextMenu.vue';
 import ModuleSandbox from '../../components/views/ModuleSandbox.vue';
 import type { StylePickerData } from '../../components/features/StyleEditBlock.vue';
+import useSwitch from '../../helpers/client/useSwitch';
 import { markRaw, reactive } from '#imports';
 
 const CONTEXT_MENU_ID = 'context-menu';
@@ -120,7 +121,7 @@ export class Sandbox {
           {
             title: 'Depublish',
             icon: 'Depublish',
-            action: () => router.push(`publishApprove?themeId=${theme.id}`, 'tab-fade-lr'),
+            action: () => router.push(`depublishApprove?themeId=${theme.id}`, 'tab-fade-lr'),
             isVisible: () => theme.type === 'global'
           },
           {
@@ -247,6 +248,44 @@ export class Sandbox {
         maxWidth: 'min(100%, 300px)',
         maxHeight: 'min(100%, 400px)',
         items
+      },
+      emits: {
+        close: () => this.closeContextMenu()
+      }
+    });
+  }
+
+  openApproveContextMenu(oldEvent: MouseEvent, event: MouseEvent, tip: string, approveAction: ModuleSandboxContextMenuItemAction, cancelAction: ModuleSandboxContextMenuItemAction): void {
+    this.closeContextMenu();
+    const clickPosition: ModuleSandboxMousePosition = { x: event.pageX, y: event.pageY };
+    const loader = useSwitch();
+
+    this.components.push({
+      id: UUID(),
+      component: markRaw(ContextMenu),
+      transitionName: 'fade',
+      props: {
+        clickPosition,
+        sandboxSize: this.boxSize,
+        tipText: tip,
+        maxWidth: 'min(100%, 300px)',
+        maxHeight: 'min(100%, 400px)',
+        items: <ModuleSandboxContextMenuItem[]>[
+          {
+            title: 'Approve',
+            icon: 'Check',
+            iconColor: 'var(--contextMenuIconSuccess)',
+            isDisabled: () => loader.status.value,
+            action: approveAction.bind(this, oldEvent)
+          },
+          {
+            title: 'Cancel',
+            icon: 'Times',
+            iconColor: 'var(--contextMenuIconError)',
+            isDisabled: () => loader.status.value,
+            action: cancelAction.bind(this, oldEvent)
+          }
+        ]
       },
       emits: {
         close: () => this.closeContextMenu()

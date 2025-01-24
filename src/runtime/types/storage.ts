@@ -4,9 +4,10 @@ export type ModuleLocalStorageThemeFull = {
   id: string;
   name: string;
   description: string;
+  previewJSON: string;
   stylesJSON: string;
 };
-export type ModuleLocalStorageThemeEdit = Omit<ModuleLocalStorageThemeFull, 'id'>;
+export type ModuleLocalStorageThemeEdit = Partial<ModuleLocalStorageThemeFull>;
 
 export type ModuleStorage = {
   isAutoThemeMode: boolean;

@@ -52,6 +52,19 @@ class Utils {
   hash(obj: ModuleObject<any>): string {
     return md5.hex(JSON.stringify(obj));
   }
+
+  trimStr(str: string, trim: string): string {
+    if (trim === '')
+      return str;
+    return str.replace(new RegExp(`^${trim}+|(${trim}+)$`, 'g'), '');
+  }
+
+  buildQuery(obj: Record<string, string>, visible?: Record<string, boolean>): string {
+    return Object.keys(obj)
+      .filter(key => visible?.[key] ?? true)
+      .map(key => `${key}=${obj[key]}`)
+      .join('&');
+  }
 }
 
 export default new Utils();

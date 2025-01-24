@@ -11,7 +11,6 @@ import type {
   ModuleDefaultStyleKeys,
   ModuleDefaultBlockKeys,
   ModuleThemeCreateData,
-  ModuleThemeEditData,
   ModuleErrorMessage,
   ModuleErrorType,
   ModulePagesNames,
@@ -35,7 +34,7 @@ import useReloadMiddleware from '../../helpers/client/useReloadMiddleware';
 import useIdProtect from '../../helpers/client/useIdProtect';
 import utils from '../../helpers/utils';
 import { Theme } from '../../classes/client/Theme';
-import useFetch from '../../helpers/client/useFetch';
+import useAPIFetch from '../../helpers/client/useAPIFetch';
 import { Sandbox } from './Sandbox';
 import { Router } from './Router';
 import { useRuntimeConfig, reactive, ref, computed, watch } from '#imports';
@@ -216,6 +215,7 @@ export class Client {
 
   private _saveStorage(): void {
     localStorage.setItem(this.config.keys.storage, JSON.stringify(unwrap.get(this.storageSettings)));
+    console.log('Save');
   }
 
   private _buildCustomTheme(themeRAW: ModuleThemeRAW, index: number): ModuleThemeRef {
@@ -505,7 +505,7 @@ export class Client {
       .forEach(theme => this.themes.splice(this.themes.indexOf(theme), 1));
 
     try {
-      const loadedThemes = await useFetch('GET', '/', {});
+      const loadedThemes = await useAPIFetch('GET', '/', {});
       const preparedThemed = loadedThemes.map((theme, index) => reactive(this._buildCustomTheme({
         id: theme.id,
         name: theme.name,
@@ -561,23 +561,13 @@ export class Client {
     }
   }
 
-  editThemeInfo(data: ModuleThemeEditData): void {
-    const { id, name, description, oldThemeId } = data;
-    const theme = this.getThemeById(oldThemeId);
-    if (!theme || theme.type !== 'local') return;
-
-    theme.setId(id);
-    theme.setName(name);
-    theme.setDescription(description);
-    this._replaceSelectedThemes(undefined, undefined, undefined, id, id, id);
-  }
-
-  deleteTheme(id: string): void {
+  deleteTheme(id: string): boolean {
     const theme = this.getThemeById(id);
-    if (!theme || theme.type !== 'local') return;
+    if (!theme || theme.type !== 'local') return false;
 
     this.themes.splice(this.getThemeIndexById(id), 1);
     this._replaceSelectedThemes();
+    return true;
   }
 
   deleteError(id: number): void {

@@ -20,11 +20,12 @@ const themes = client.getThemes();
 
 const activeErrors = useErrorMessages();
 const themeId = computed(() => router.getQuery().themeId);
-const theme = client.getThemeById(themeId.value)!;
+const theme = computed(() => client.getThemeById(themeId.value)!);
+
 const themeEditData = reactive({
-  id: theme.id,
-  name: theme.name === theme.id ? '' : theme.name,
-  description: theme.description,
+  id: theme.value.id,
+  name: theme.value.name === theme.value.id ? '' : theme.value.name,
+  description: theme.value.description,
   oldThemeId: themeId.value
 } as ModuleThemeEditData);
 const previewTheme = computed(() => ({
@@ -42,7 +43,7 @@ function editTheme() {
   if (themeId.value !== id && id in themes) activeErrors.add(2, { id });
 
   if (!activeErrors.isError.value) {
-    client.editThemeInfo(themeEditData);
+    theme.value.editInfo(themeEditData);
     router.push('index', 'tab-fade-rl');
   }
 }

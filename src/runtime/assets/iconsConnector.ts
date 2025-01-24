@@ -18,6 +18,7 @@ import Publish from '../components/icons/Publish.vue';
 import Question from '../components/icons/Question.vue';
 import Save from '../components/icons/Save.vue';
 import SaveEdit from '../components/icons/SaveEdit.vue';
+import Spinner from '../components/icons/Spinner.vue';
 import Sun from '../components/icons/Sun.vue';
 import Times from '../components/icons/Times.vue';
 import Tip from '../components/icons/Tip.vue';
@@ -44,6 +45,7 @@ export default {
   Question,
   Save,
   SaveEdit,
+  Spinner,
   Sun,
   Times,
   Tip,

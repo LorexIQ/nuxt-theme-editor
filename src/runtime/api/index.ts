@@ -1,6 +1,8 @@
 import type { Resolver } from '@nuxt/kit';
 import { addServerHandler } from '@nuxt/kit';
 
+export * from './swagger';
+
 export default function (resolver: Resolver) {
   addServerHandler({
     route: '/te-api/themes',

@@ -4,12 +4,13 @@ import type {
   ModuleClient,
   ModuleDefaultBlockKeys, ModuleDefaultStyleKeys, ModuleDefineThemeBlockReturn,
   ModuleDefineThemeMetaPreview, ModuleDefineThemeMetaUI,
-  ModuleObject, ModuleOptionsExtend, ModulePathsCache, ModuleThemeCleanedStyles,
+  ModuleObject, ModuleOptionsExtend, ModulePathsCache, ModuleThemeCleanedStyles, ModuleThemeEditData,
   ModuleThemeSelectedStyles, ModuleThemeType
 } from '../../types';
 import useIdProtect from '../../helpers/client/useIdProtect';
 import utils from '../../helpers/utils';
 import unwrap from '../../helpers/client/unwrap';
+import useAPIFetch from '../../helpers/client/useAPIFetch';
 import { computed, reactive, ref, watch } from '#imports';
 
 type ThemeStylesScope = 'main' | 'edited';
@@ -224,7 +225,7 @@ export class Theme {
   }
 
   setName(name: string): void {
-    unwrap.set(this, 'name', name);
+    unwrap.set(this, 'name', name || unwrap.get(this.id));
   }
 
   setDescription(description: string): void {
@@ -262,8 +263,9 @@ export class Theme {
     const cache = this.pathsCache[`S.${stylePath}`];
 
     if (cache) {
-      cache.reduce((acc, index, i) => {
-        if (cache.length > i + 1) {
+      const cacheSliced = cache.slice(1);
+      cacheSliced.reduce((acc, index, i) => {
+        if (cacheSliced.length > i + 1) {
           return acc?.styles?.[index];
         } else {
           acc[index] = newValue;
@@ -325,5 +327,103 @@ export class Theme {
     if (!unwrap.get(this.isSelectedAsEdited)) return;
 
     this.setStyles(utils.copyObject(this.editedStyles));
+  }
+
+  async publish(): Promise<boolean> {
+    if (unwrap.get(this.type) !== 'local') return false;
+
+    try {
+      await useAPIFetch('POST', '/', {
+        body: {
+          id: unwrap.get(this.id),
+          name: unwrap.get(this.name),
+          description: unwrap.get(this.description),
+          previewJSON: JSON.stringify(unwrap.get(this.getStylesPreview())),
+          stylesJSON: JSON.stringify(unwrap.get(this.getStyles()))
+        }
+      });
+
+      this.ctx.deleteTheme(unwrap.get(this.id));
+      await this.ctx.loadGlobalThemes();
+      return true;
+    } catch {
+      this.ctx.createError('ERROR', 'publishApprove', 'Error theme publishing', 'Error uploading the theme to the server. Please try again later.');
+      return false;
+    }
+  }
+
+  async depublish(): Promise<boolean> {
+    if (unwrap.get(this.type) !== 'global') return false;
+
+    try {
+      await useAPIFetch('DELETE', '/{id}', {
+        params: {
+          id: unwrap.get(this.id)
+        }
+      });
+
+      unwrap.set(this, 'type', 'local');
+      await this.ctx.loadGlobalThemes();
+      return true;
+    } catch {
+      this.ctx.createError('ERROR', 'depublishApprove', 'Error theme depublishing', 'The error of removing a topic from publication. Please try again later.');
+      return false;
+    }
+  }
+
+  async editInfo(data: ModuleThemeEditData): Promise<boolean> {
+    switch (unwrap.get(this.type)) {
+      case 'system':
+        return false;
+      case 'global': {
+        try {
+          await useAPIFetch('PUT', '/{id}', {
+            params: {
+              id: unwrap.get(this.id)
+            },
+            body: {
+              id: unwrap.get(data.id),
+              name: unwrap.get(data.name),
+              description: unwrap.get(data.description)
+            }
+          });
+
+          await this.ctx.loadGlobalThemes();
+          return true;
+        } catch {
+          this.ctx.createError('ERROR', 'editThemeInfo', 'Information modification error', 'An error occurred on the server when saving the information. Please try again later.');
+          return false;
+        }
+      }
+      case 'local':
+        this.setId(data.id);
+        this.setName(data.name);
+        this.setDescription(data.description);
+        return true;
+    }
+  }
+
+  async delete(): Promise<boolean> {
+    switch (unwrap.get(this.type)) {
+      case 'system':
+        return false;
+      case 'global': {
+        try {
+          await useAPIFetch('DELETE', '/{id}', {
+            params: {
+              id: unwrap.get(this.id)
+            }
+          });
+
+          await this.ctx.loadGlobalThemes();
+          return true;
+        } catch {
+          this.ctx.createError('ERROR', 'deleteTheme', 'Error theme deleting', 'An error occurred while deleting the theme. Please try again later.');
+          return false;
+        }
+      }
+      case 'local':
+        return this.ctx.deleteTheme(unwrap.get(this.id));
+    }
   }
 }

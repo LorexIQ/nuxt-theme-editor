@@ -45,9 +45,9 @@ const menuPosition = computed(() => {
   };
 });
 
-function selectItem(item: ModuleSandboxContextMenuItem) {
+function selectItem(event: MouseEvent, item: ModuleSandboxContextMenuItem) {
   closeContextMenu();
-  item.action();
+  item.action(event);
 }
 function closeContextMenu() {
   emit('close');
@@ -91,7 +91,7 @@ onMounted(() => {
               'TE-context-menu__menu__items__item--disabled': item.isDisabled?.(),
               'TE-context-menu__menu__items__item--with-icon': item.icon,
             }"
-            @click="selectItem(item)"
+            @click="selectItem($event, item)"
           >
             <div
               v-if="item.icon"
