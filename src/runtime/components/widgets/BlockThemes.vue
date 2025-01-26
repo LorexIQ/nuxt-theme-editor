@@ -9,41 +9,35 @@ import { computed } from '#imports';
 type Props = {
   type: ModuleThemeType;
   client: ModuleClient;
-  isOpen?: boolean;
+  expandAction?: () => any;
 };
 type Emits = {
   (e: 'contextMenuOpen', v: [MouseEvent, ModuleTheme]): void;
 };
 
-const props = withDefaults(defineProps<Props>(), {
-  isOpen: false
-});
+const props = defineProps<Props>();
 const emit = defineEmits<Emits>();
 
 const isAddActive = computed(() => props.type === 'local');
 const themes = computed(() => Object.values(props.client.getThemes()).filter(theme => theme.type === props.type));
-const title = computed(() => {
-  switch (props.type) {
-    case 'system':
-      return 'System';
-    case 'global':
-      return 'Global';
-    case 'local':
-      return 'Local';
-    default:
-      return 'Unsupported';
-  }
-});
+const typeUpper = computed(() => `${props.type[0].toUpperCase()}${props.type.slice(1)}`);
+const isExpanded = computed(() => (props.client as any)[`getThemesBlock${typeUpper.value}Status`]());
+
+function onChangeStatus(status: boolean) {
+  (props.client as any)[`setThemesBlock${typeUpper.value}Status`](status);
+}
 </script>
 
 <template>
   <DropDownBlock
     class="TE-block-themes"
     expand-enabled
-    :expand-default="isOpen"
+    :expand-default="isExpanded"
+    :expand-action="expandAction"
+    @change-status="onChangeStatus"
   >
     <template #title>
-      {{ title }}
+      {{ typeUpper }}
     </template>
     <template #default>
       <transition-expand>

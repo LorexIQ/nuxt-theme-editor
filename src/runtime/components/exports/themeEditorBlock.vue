@@ -57,6 +57,18 @@ const addStyles = computed(() => ({
       background-color: var(--border);
     }
   }
+
+  .fade {
+    &-enter-active, &-leave-active {
+      transition: .3s opacity;
+    }
+    &-enter-to, &-leave-from {
+      opacity: 1;
+    }
+    &-leave-to, &-enter-from {
+      opacity: 0;
+    }
+  }
 }
 </style>
 

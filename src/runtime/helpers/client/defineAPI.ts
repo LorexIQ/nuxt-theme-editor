@@ -61,6 +61,7 @@ export default function<MapOfMethods extends APIStruct>(url: string, defaultConf
     const typedPath = path as string;
 
     const authToken = _config.authorization ? _config.authorization : null;
+    const preparedPath = preparePath(typedPath, typedOptions.params);
 
     if (Array.isArray(_config.loader)) {
       _config.loader.map(loader => loader.show(!_config.onlyOffLoader));
@@ -70,7 +71,7 @@ export default function<MapOfMethods extends APIStruct>(url: string, defaultConf
 
     return new Promise((resolve, reject) => {
       $fetch<Res>(
-        `${url}/${preparePath(typedPath, typedOptions.params)}${_config.addSlash ? '/' : ''}`,
+        `${url}/${preparedPath}${_config.addSlash && preparedPath.length ? '/' : ''}`,
         {
           method: method as string,
           query: typedOptions.query ?? {},

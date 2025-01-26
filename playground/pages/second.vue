@@ -34,9 +34,21 @@ console.log('second.vue useThemeBlock =>', scopeStyles.value);
     {{ scopeStyles }}
     <div style="max-height: 700px; overflow-y: auto">
       <log-object
-        v-if="themesEditor.getEditedTheme()"
-        :value="themesEditor.getEditedTheme()"
-        :replaces="{ pathsCache: '...', ctx: '...', config: '...', md5Cache: '...' }"
+        :value="themesEditor"
+        :replaces="[
+          'themesPathsCache',
+          'pathsCache',
+          'ctx',
+          'config',
+          'md5Cache',
+          'styles',
+          'preparedUIStyles',
+          'preparedStyles',
+          'preparedPreviewStyles',
+          'pages',
+          'currentPage',
+          'storageLocalThemes',
+        ]"
       />
     </div>
   </div>

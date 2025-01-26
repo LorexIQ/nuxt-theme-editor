@@ -344,7 +344,6 @@ export class Theme {
       });
 
       this.ctx.deleteTheme(unwrap.get(this.id));
-      await this.ctx.loadGlobalThemes();
       return true;
     } catch {
       this.ctx.createError('ERROR', 'publishApprove', 'Error theme publishing', 'Error uploading the theme to the server. Please try again later.');
@@ -363,7 +362,6 @@ export class Theme {
       });
 
       unwrap.set(this, 'type', 'local');
-      await this.ctx.loadGlobalThemes();
       return true;
     } catch {
       this.ctx.createError('ERROR', 'depublishApprove', 'Error theme depublishing', 'The error of removing a topic from publication. Please try again later.');
@@ -388,7 +386,6 @@ export class Theme {
             }
           });
 
-          await this.ctx.loadGlobalThemes();
           return true;
         } catch {
           this.ctx.createError('ERROR', 'editThemeInfo', 'Information modification error', 'An error occurred on the server when saving the information. Please try again later.');
@@ -415,7 +412,6 @@ export class Theme {
             }
           });
 
-          await this.ctx.loadGlobalThemes();
           return true;
         } catch {
           this.ctx.createError('ERROR', 'deleteTheme', 'Error theme deleting', 'An error occurred while deleting the theme. Please try again later.');

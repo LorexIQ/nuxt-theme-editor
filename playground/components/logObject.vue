@@ -1,25 +1,22 @@
 <script setup lang="ts">
-type UtilsStructLogAdvanceConfig = { [name: string]: string | ((data: any) => string) };
-
 type Props = {
   value: any;
-  replaces?: UtilsStructLogAdvanceConfig;
+  replaces?: string[];
 };
 
 const props = withDefaults(defineProps<Props>(), {
-  replaces: () => ({})
+  replaces: () => []
 });
 
 const htmlJSON = computed(() => logAdvance(props.value, props.replaces, true));
 
-function logAdvance(obj: any, replaces?: UtilsStructLogAdvanceConfig, convertToHTML: boolean = false): string {
+function logAdvance(obj: any, replaces?: string[], convertToHTML: boolean = false): string {
   function getReplacer() {
     const ancestors: any[] = [];
 
     return function (key: string, value: any) {
-      if (replaces && key in replaces) {
-        const textToReplace = replaces[key];
-        return `${typeof textToReplace === 'function' ? textToReplace(value) : textToReplace}`;
+      if (replaces && replaces.includes(key)) {
+        return '...';
       }
 
       if (typeof value !== 'object' || value === null) return value;

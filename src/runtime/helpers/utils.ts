@@ -54,8 +54,7 @@ class Utils {
   }
 
   trimStr(str: string, trim: string): string {
-    if (trim === '')
-      return str;
+    if (trim === '') return str;
     return str.replace(new RegExp(`^${trim}+|(${trim}+)$`, 'g'), '');
   }
 

@@ -4,7 +4,6 @@ import BlockThemes from '../widgets/BlockThemes.vue';
 import ViewPage from '../widgets/ViewPage.vue';
 import IsSwitch from '../shared/IsSwitch.vue';
 import ClientErrors from '../features/ClientErrors.vue';
-import { computed } from '#imports';
 
 type Props = {
   client: ModuleClient;
@@ -12,8 +11,6 @@ type Props = {
 
 const props = defineProps<Props>();
 const sandbox = props.client.getSandbox();
-
-const selectedTheme = computed(() => props.client.getSelectedTheme());
 </script>
 
 <template>
@@ -21,7 +18,6 @@ const selectedTheme = computed(() => props.client.getSelectedTheme());
     <div class="TE-themes-list">
       <BlockThemes
         type="system"
-        :is-open="selectedTheme ? selectedTheme.type === 'system' : true"
         :client="client"
         @context-menu-open="sandbox.openThemeContextMenu(...$event)"
       >
@@ -31,8 +27,8 @@ const selectedTheme = computed(() => props.client.getSelectedTheme());
       </BlockThemes>
       <BlockThemes
         type="global"
-        :is-open="selectedTheme?.type === 'global'"
         :client="client"
+        :expand-action="() => client.loadGlobalThemes()"
         @context-menu-open="sandbox.openThemeContextMenu(...$event)"
       >
         <template #preview>
@@ -41,7 +37,6 @@ const selectedTheme = computed(() => props.client.getSelectedTheme());
       </BlockThemes>
       <BlockThemes
         type="local"
-        :is-open="selectedTheme?.type === 'local'"
         :client="client"
         @context-menu-open="sandbox.openThemeContextMenu(...$event)"
       >

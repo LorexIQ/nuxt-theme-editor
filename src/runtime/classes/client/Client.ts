@@ -48,6 +48,10 @@ export class Client {
   private readonly runtimePreviewId = useIdProtect('preview');
   private readonly runtimeDefaultId = useIdProtect('default');
 
+  private readonly isThemesBlockSystemOpen = ref(false);
+  private readonly isThemesBlockGlobalOpen = ref(false);
+  private readonly isThemesBlockLocalOpen = ref(false);
+
   private readonly config = useRuntimeConfig().public.themesEditor as ModuleOptionsExtend;
   private readonly reloadMiddleware = useReloadMiddleware();
   private readonly sandbox = new Sandbox(this);
@@ -97,8 +101,7 @@ export class Client {
     this._selectDefaultThemes();
     this._readStorage();
     this._initWatchers();
-
-    this.loadGlobalThemes();
+    this._openOnlySelectedThemeBlock();
   }
 
   private _initWatchers(): void {
@@ -182,6 +185,12 @@ export class Client {
       undefined,
       this.config.defaultTheme
     );
+  }
+
+  private _openOnlySelectedThemeBlock(): void {
+    this.setThemesBlockSystemStatus(unwrap.get(this.selectedTheme)?.type === 'system');
+    this.setThemesBlockGlobalStatus(unwrap.get(this.selectedTheme)?.type === 'global');
+    this.setThemesBlockLocalStatus(unwrap.get(this.selectedTheme)?.type === 'local');
   }
 
   private _replaceSelectedThemes(light?: ThemeId, dark?: ThemeId, main?: ThemeId, lightDef?: ThemeId, darkDef?: ThemeId, mainDef?: ThemeId): void {
@@ -454,6 +463,18 @@ export class Client {
     return this.errorsMessages.filter(error => (type ? error.type === type : true) && (page ? error.page === page : true));
   }
 
+  getThemesBlockSystemStatus(): boolean {
+    return unwrap.get(this.isThemesBlockSystemOpen);
+  }
+
+  getThemesBlockGlobalStatus(): boolean {
+    return unwrap.get(this.isThemesBlockGlobalOpen);
+  }
+
+  getThemesBlockLocalStatus(): boolean {
+    return unwrap.get(this.isThemesBlockLocalOpen);
+  }
+
   setBlockStatus(status: boolean): void {
     if (!status) {
       const editedThemeId = unwrap.get(this.selectedEditedThemeId);
@@ -497,6 +518,18 @@ export class Client {
     const theme = this.getThemeById(id);
     if (!theme || unwrap.get(this.selectedEditedThemeId) === id) this.unselectAllThemesAs('edited');
     else theme.setSelectedAsEdited();
+  }
+
+  setThemesBlockSystemStatus(status: boolean): void {
+    unwrap.set(this, 'isThemesBlockSystemOpen', status);
+  }
+
+  setThemesBlockGlobalStatus(status: boolean): void {
+    unwrap.set(this, 'isThemesBlockGlobalOpen', status);
+  }
+
+  setThemesBlockLocalStatus(status: boolean): void {
+    unwrap.set(this, 'isThemesBlockLocalOpen', status);
   }
 
   async loadGlobalThemes(): Promise<void> {

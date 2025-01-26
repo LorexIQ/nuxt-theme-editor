@@ -16,6 +16,7 @@ import WordsPen from '../components/icons/WordsPen.vue';
 import Plus from '../components/icons/Plus.vue';
 import Publish from '../components/icons/Publish.vue';
 import Question from '../components/icons/Question.vue';
+import Refresh from '../components/icons/Refresh.vue';
 import Save from '../components/icons/Save.vue';
 import SaveEdit from '../components/icons/SaveEdit.vue';
 import Spinner from '../components/icons/Spinner.vue';
@@ -43,6 +44,7 @@ export default {
   Plus,
   Publish,
   Question,
+  Refresh,
   Save,
   SaveEdit,
   Spinner,
