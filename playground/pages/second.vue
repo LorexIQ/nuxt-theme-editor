@@ -36,14 +36,12 @@ console.log('second.vue useThemeBlock =>', scopeStyles.value);
       <log-object
         :value="themesEditor"
         :replaces="[
-          'themesPathsCache',
           'pathsCache',
           'ctx',
           'config',
           'md5Cache',
-          'styles',
           'preparedUIStyles',
-          'preparedStyles',
+          'styles',
           'preparedPreviewStyles',
           'pages',
           'currentPage',

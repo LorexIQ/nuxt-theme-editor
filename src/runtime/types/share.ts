@@ -28,6 +28,7 @@ export type ModuleErrorMessage = {
   type: ModuleErrorType;
   message: string;
   title?: string;
+  uuid?: string;
 };
 export type ModuleServerError = {
   statusCode: number;

@@ -22,7 +22,9 @@ import type {
   ModulePathsCache,
   ModuleDefineThemeBlockStyles,
   ModuleThemeCleanedStyles,
-  ModuleDefineThemeBlockReturn
+  ModuleDefineThemeBlockReturn,
+  ModuleLocalStorageThemeMini,
+  ModuleDefineThemeBlockSettings
 } from '../../types';
 // @ts-ignore
 import connectorMeta from '../../meta/connector';
@@ -31,7 +33,7 @@ import unwrap from '../../helpers/client/unwrap';
 import useSystemTheme from '../../helpers/client/useSystemTheme';
 import defineChecker from '../../helpers/defineChecker';
 import useReloadMiddleware from '../../helpers/client/useReloadMiddleware';
-import useIdProtect from '../../helpers/client/useIdProtect';
+import useIdProtect from '../../helpers/useIdProtect';
 import utils from '../../helpers/utils';
 import { Theme } from '../../classes/client/Theme';
 import useAPIFetch from '../../helpers/client/useAPIFetch';
@@ -87,9 +89,22 @@ export class Client {
       type: theme.type,
       styles: unwrap.get(theme.getStyles())
     }))));
+  private readonly storageGlobalThemeCache = computed(() => {
+    const theme = unwrap.get(this.selectedTheme);
+    if (!theme || theme.type !== 'global') return 'null';
+
+    return JSON.stringify(<ModuleThemeRAW>{
+      id: theme.id,
+      name: theme.name,
+      description: theme.description,
+      type: theme.type,
+      styles: unwrap.get(theme.getStyles())
+    });
+  });
   private readonly storageSettings = computed<ModuleStorage>(() => ({
     isAutoThemeMode: unwrap.get(this.isAutoThemeMode),
     localThemes: JSON.parse(unwrap.get(this.storageLocalThemes)),
+    globalThemeCache: JSON.parse(unwrap.get(this.storageGlobalThemeCache)),
     selectedMainThemeId: unwrap.get(this.selectedMainThemeId),
     selectedLightThemeId: unwrap.get(this.selectedLightThemeId),
     selectedDarkThemeId: unwrap.get(this.selectedDarkThemeId)
@@ -209,10 +224,12 @@ export class Client {
     if (storage) {
       const localThemes = storage.localThemes
         .filter(theme => !this.themes.find(loadedTheme => theme.id === loadedTheme.id))
-        .map(this._buildCustomTheme.bind(this))
+        .map((theme, index) => this._buildCustomTheme(theme, index))
         .map(theme => reactive(theme));
 
       this.themes.push(...localThemes);
+      if (storage.globalThemeCache) this.themes.push(reactive(this._buildCustomTheme(storage.globalThemeCache, 0)));
+
       this._replaceSelectedThemes(
         this._checkThemeAvailableAndGetActual(storage.selectedLightThemeId, 'light'),
         this._checkThemeAvailableAndGetActual(storage.selectedDarkThemeId, 'dark'),
@@ -227,12 +244,16 @@ export class Client {
     console.log('Save');
   }
 
-  private _buildCustomTheme(themeRAW: ModuleThemeRAW, index: number): ModuleThemeRef {
+  private _buildCustomTheme(themeRAW: ModuleThemeRAW, index: number, previewMode = false): ModuleThemeRef {
+    const mainThemeStyles = unwrap.get(this.getThemeById(this.config.defaultTheme)!.getStyles());
+
     const theme = new Theme(
       this,
       themeRAW.id,
       themeRAW.type,
-      utils.mergeObjects(themeRAW.styles, utils.copyObject(unwrap.get(this.getThemeById(this.config.defaultTheme)!.getStyles().value))),
+      previewMode
+        ? themeRAW.styles
+        : utils.mergeObjects(themeRAW.styles, mainThemeStyles),
       themeRAW.name,
       themeRAW.description
     );
@@ -532,26 +553,6 @@ export class Client {
     unwrap.set(this, 'isThemesBlockLocalOpen', status);
   }
 
-  async loadGlobalThemes(): Promise<void> {
-    this.themes
-      .filter(theme => theme.type === 'global')
-      .forEach(theme => this.themes.splice(this.themes.indexOf(theme), 1));
-
-    try {
-      const loadedThemes = await useAPIFetch('GET', '/', {});
-      const preparedThemed = loadedThemes.map((theme, index) => reactive(this._buildCustomTheme({
-        id: theme.id,
-        name: theme.name,
-        description: theme.description,
-        type: 'global',
-        styles: JSON.parse(theme.stylesJSON)
-      }, index)));
-      this.themes.push(...preparedThemed);
-    } catch {
-      this.createError('ERROR', 'index', 'Wait and try downloading again. If there is this error, it is NOT RECOMMENDED to edit topics, these actions may lead to conflicts.', 'Error downloading themes from the server');
-    }
-  }
-
   createTheme(data: ModuleThemeCreateData): void {
     const { id, name, description, parentThemeId: parentId } = data;
     if (this.getThemeById(id) || !parentId || !this.getThemeById(parentId)) return;
@@ -567,16 +568,27 @@ export class Client {
     this.themes.push(reactive(newTheme));
   }
 
-  createError(type: ModuleErrorType, page: ModulePagesNames, message: string, title?: string): number {
-    const id = Math.max(...this.errorsMessages.map(error => error.id), 0) + 1;
-    this.errorsMessages.push({
-      id,
-      type,
-      page,
-      message,
-      title
-    });
-    return id;
+  createError(type: ModuleErrorType, page: ModulePagesNames, message: string, title?: string, uuid?: string): number {
+    const uuidMessage = this.errorsMessages.find(message => message.uuid === uuid);
+
+    if (uuidMessage) {
+      uuidMessage.type = type;
+      uuidMessage.page = page;
+      uuidMessage.message = message;
+      uuidMessage.title = title;
+      return uuidMessage.id;
+    } else {
+      const id = Math.max(...this.errorsMessages.map(error => error.id), 0) + 1;
+      this.errorsMessages.push({
+        id,
+        type,
+        page,
+        message,
+        title,
+        uuid
+      });
+      return id;
+    }
   }
 
   createScopeStyles(scopeId: string, blockPath: ModuleDefaultBlockKeys, styles: ComputedRef<ModuleObject>): void {
@@ -603,8 +615,8 @@ export class Client {
     return true;
   }
 
-  deleteError(id: number): void {
-    const errorIndex = this.errorsMessages.findIndex(error => error.id === id);
+  deleteError(id: number | string): void {
+    const errorIndex = this.errorsMessages.findIndex(error => (typeof id === 'number' ? error.id : error.uuid) === id);
     if (errorIndex !== -1) this.errorsMessages.splice(errorIndex, 1);
   }
 
@@ -626,5 +638,80 @@ export class Client {
 
   checkScopeRegistration(scopeId: string, blockPath: ModuleDefaultBlockKeys): boolean {
     return !!this.usesScopesProperties[blockPath]?.scopesIds.includes(scopeId);
+  }
+
+  async loadGlobalThemes(): Promise<void> {
+    const ctx = this;
+
+    function getOnlyPreviewBlock(theme: ModuleLocalStorageThemeMini): ModuleThemeCleanedStyles[] {
+      const defaultThemeStyles = unwrap.get(ctx.getThemeById(ctx.config.defaultTheme)!.getStyles());
+
+      return [
+        ...defaultThemeStyles.slice(0, -1).map(block => ({
+          id: block.id,
+          styles: [{}],
+          settings: block.settings as ModuleDefineThemeBlockSettings
+        })),
+        {
+          id: ctx.runtimePreviewId,
+          styles: [JSON.parse(theme.previewStylesJSON)],
+          settings: defaultThemeStyles.at(-1)!.settings as ModuleDefineThemeBlockSettings
+        }
+      ];
+    }
+    function deleteTheme(theme: ModuleTheme): void {
+      ctx.themes.splice(ctx.themes.indexOf(theme), 1);
+    }
+    function addTheme(theme: ModuleLocalStorageThemeMini, index: number): void {
+      ctx.themes.push(reactive(ctx._buildCustomTheme({
+        id: theme.id,
+        name: theme.name,
+        description: theme.description,
+        type: 'global',
+        styles: getOnlyPreviewBlock(theme)
+      }, index, true)));
+    }
+    function editTheme(theme: ModuleLocalStorageThemeMini, index: number): void {
+      const localTheme = ctx.getThemeById(theme.id)!;
+
+      if (localTheme.type === 'system') {
+        return;
+      } else if (localTheme.type === 'global') {
+        localTheme.setName(theme.name);
+        localTheme.setDescription(theme.description);
+        localTheme.setStyles(getOnlyPreviewBlock(theme));
+      } else if (localTheme.type === 'local') {
+        const themeId = localTheme.id;
+        localTheme.setId(`${themeId}-${(Date.now() + index).toFixed().slice(-4)}`);
+        ctx.createError('WARN', 'index', `Used plug: ${localTheme.id} (${theme.name}) > ${themeId}`, 'Local theme id conflict with global theme id.');
+        addTheme(theme, index);
+      }
+    }
+
+    try {
+      const loadedThemes = await useAPIFetch('GET', '/', {});
+
+      const remoteThemesIds = loadedThemes.map(theme => theme.id);
+      const currentThemesIds = this.themes.map(theme => theme.id);
+
+      const themesForDelete = this.themes.filter(theme => theme.type === 'global' && !remoteThemesIds.includes(theme.id));
+      const themesForAdd = loadedThemes.filter(theme => !currentThemesIds.includes(theme.id));
+      const themesForEdit = loadedThemes.filter(theme => currentThemesIds.includes(theme.id));
+
+      themesForDelete.forEach(deleteTheme);
+      themesForAdd.forEach(addTheme);
+      themesForEdit.forEach(editTheme);
+
+      this._replaceSelectedThemes(undefined, undefined, undefined, this.config.defaultTheme, this.config.defaultTheme, this.config.defaultTheme);
+    } catch (e) {
+      console.error(e);
+      this.createError(
+        'ERROR',
+        'index',
+        'Wait and try downloading again. If there is this error, it is NOT RECOMMENDED to edit topics, these actions may lead to conflicts.',
+        'Error downloading themes from the server',
+        'err_load_global'
+      );
+    }
   }
 }

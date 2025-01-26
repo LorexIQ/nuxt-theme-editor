@@ -7,7 +7,7 @@ import type {
   ModuleObject, ModuleOptionsExtend, ModulePathsCache, ModuleThemeCleanedStyles, ModuleThemeEditData,
   ModuleThemeSelectedStyles, ModuleThemeType
 } from '../../types';
-import useIdProtect from '../../helpers/client/useIdProtect';
+import useIdProtect from '../../helpers/useIdProtect';
 import utils from '../../helpers/utils';
 import unwrap from '../../helpers/client/unwrap';
 import useAPIFetch from '../../helpers/client/useAPIFetch';
@@ -27,6 +27,7 @@ export class Theme {
   public readonly name = ref<string>('');
   public readonly description = ref<string>('');
 
+  public readonly isInit = ref(false);
   public readonly isSelected = computed(() => unwrap.get(this.ctx.getSelectedThemeId()) === unwrap.get(this.id));
   public readonly isSelectedAsMain = ref(false);
   public readonly isSelectedAsLight = ref(false);
@@ -55,6 +56,7 @@ export class Theme {
     this.type.value = type;
     this.name.value = name || id;
     this.description.value = description || '';
+    this.isInit.value = type !== 'global';
     this.setStyles(styles);
 
     this._initCtxData();
@@ -232,7 +234,8 @@ export class Theme {
     unwrap.set(this, 'description', description);
   }
 
-  setSelectedAsMain(state = true) {
+  async setSelectedAsMain(state = true) {
+    if (!unwrap.get(this.isInit)) await this.loadStyles();
     if (state) this.ctx.unselectAllThemesAs('main');
     unwrap.set(this, 'isSelectedAsMain', state);
   }
@@ -329,6 +332,32 @@ export class Theme {
     this.setStyles(utils.copyObject(this.editedStyles));
   }
 
+  async loadStyles(): Promise<boolean> {
+    if (unwrap.get(this.type) !== 'global') return false;
+
+    try {
+      const theme = await useAPIFetch('GET', '/{id}', {
+        params: {
+          id: unwrap.get(this.id)
+        }
+      });
+
+      this.setStyles(JSON.parse(theme.stylesJSON));
+      // TODO
+      unwrap.set(this, 'isInit', true);
+      return true;
+    } catch {
+      this.ctx.createError(
+        'ERROR',
+        'index',
+        'Error theme styles loading',
+        'Error loading theme styles from the server. Please try again later.',
+        'err_self_load_global'
+      );
+      return false;
+    }
+  }
+
   async publish(): Promise<boolean> {
     if (unwrap.get(this.type) !== 'local') return false;
 
@@ -338,15 +367,21 @@ export class Theme {
           id: unwrap.get(this.id),
           name: unwrap.get(this.name),
           description: unwrap.get(this.description),
-          previewJSON: JSON.stringify(unwrap.get(this.getStylesPreview())),
+          previewStylesJSON: JSON.stringify(unwrap.get(this.getPrepareStylesPreview())),
           stylesJSON: JSON.stringify(unwrap.get(this.getStyles()))
         }
       });
 
-      this.ctx.deleteTheme(unwrap.get(this.id));
+      unwrap.set(this, 'type', 'global');
       return true;
     } catch {
-      this.ctx.createError('ERROR', 'publishApprove', 'Error theme publishing', 'Error uploading the theme to the server. Please try again later.');
+      this.ctx.createError(
+        'ERROR',
+        'publishApprove',
+        'Error theme publishing',
+        'Error uploading the theme to the server. Please try again later.',
+        'err_publish_global'
+      );
       return false;
     }
   }
@@ -364,7 +399,13 @@ export class Theme {
       unwrap.set(this, 'type', 'local');
       return true;
     } catch {
-      this.ctx.createError('ERROR', 'depublishApprove', 'Error theme depublishing', 'The error of removing a topic from publication. Please try again later.');
+      this.ctx.createError(
+        'ERROR',
+        'depublishApprove',
+        'Error theme depublishing',
+        'The error of removing a topic from publication. Please try again later.',
+        'err_depublish_global'
+      );
       return false;
     }
   }
@@ -388,7 +429,13 @@ export class Theme {
 
           return true;
         } catch {
-          this.ctx.createError('ERROR', 'editThemeInfo', 'Information modification error', 'An error occurred on the server when saving the information. Please try again later.');
+          this.ctx.createError(
+            'ERROR',
+            'editThemeInfo',
+            'Information modification error',
+            'An error occurred on the server when saving the information. Please try again later.',
+            'err_edit_global'
+          );
           return false;
         }
       }
@@ -414,7 +461,13 @@ export class Theme {
 
           return true;
         } catch {
-          this.ctx.createError('ERROR', 'deleteTheme', 'Error theme deleting', 'An error occurred while deleting the theme. Please try again later.');
+          this.ctx.createError(
+            'ERROR',
+            'deleteTheme',
+            'Error theme deleting',
+            'An error occurred while deleting the theme. Please try again later.',
+            'err_delete_global'
+          );
           return false;
         }
       }

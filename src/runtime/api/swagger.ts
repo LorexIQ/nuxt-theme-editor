@@ -1,12 +1,12 @@
-import type { ModuleLocalStorageThemeEdit, ModuleLocalStorageThemeFull } from '..//types';
+import type { ModuleLocalStorageTheme, ModuleLocalStorageThemeEdit, ModuleLocalStorageThemeMini } from '..//types';
 
 export type ModuleAPISwagger = {
   GET: {
     '/': {
-      response: ModuleLocalStorageThemeFull[];
+      response: ModuleLocalStorageThemeMini[];
     };
     '/{id}': {
-      response: ModuleLocalStorageThemeFull;
+      response: ModuleLocalStorageTheme;
       params: {
         id: string | number;
       };
@@ -14,13 +14,13 @@ export type ModuleAPISwagger = {
   };
   POST: {
     '/': {
-      response: ModuleLocalStorageThemeFull;
-      body: ModuleLocalStorageThemeFull;
+      response: ModuleLocalStorageTheme;
+      body: ModuleLocalStorageTheme;
     };
   };
   PUT: {
     '/{id}': {
-      response: ModuleLocalStorageThemeFull;
+      response: ModuleLocalStorageTheme;
       body: ModuleLocalStorageThemeEdit;
       params: {
         id: string | number;
@@ -29,7 +29,7 @@ export type ModuleAPISwagger = {
   };
   DELETE: {
     '/{id}': {
-      response: ModuleLocalStorageThemeFull;
+      response: ModuleLocalStorageTheme;
       params: {
         id: string | number;
       };

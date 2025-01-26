@@ -1,9 +1,9 @@
 import { defineEventHandler, readBody, createError, getRouterParam } from 'h3';
-import type { ModuleLocalStorageThemeFull } from '../../types';
+import type { ModuleLocalStorageTheme } from '../../types';
 import validator from './helpers/validator';
 import db from './helpers/db';
 
-export default defineEventHandler<Promise<ModuleLocalStorageThemeFull>>(async (event) => {
+export default defineEventHandler<Promise<ModuleLocalStorageTheme>>(async (event) => {
   const themeId = getRouterParam(event, 'id');
   const body = await readBody(event);
 

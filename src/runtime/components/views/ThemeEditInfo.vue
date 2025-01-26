@@ -16,7 +16,6 @@ type Props = {
 const props = defineProps<Props>();
 const client = props.client;
 const router = client.getRouter();
-const themes = client.getThemes();
 
 const activeErrors = useErrorMessages();
 const themeId = computed(() => router.getQuery().themeId);
@@ -40,7 +39,7 @@ function editTheme() {
 
   if (!id.length) activeErrors.add(0);
   if (!/^[\w-]+$/.test(id)) activeErrors.add(1);
-  if (themeId.value !== id && id in themes) activeErrors.add(2, { id });
+  if (themeId.value !== id && client.getThemeById(id)) activeErrors.add(2, { id });
 
   if (!activeErrors.isError.value) {
     theme.value.editInfo(themeEditData);

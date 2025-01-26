@@ -20,7 +20,7 @@ function goMain() {
     icon="I404"
     question-title="Page not found"
     first-btn-title="Go main"
-    @click-first="goMain"
+    :first-on-click="goMain"
   />
 </template>
 

@@ -1,17 +1,20 @@
 import type { ModuleThemeRAW } from './themes';
 
-export type ModuleLocalStorageThemeFull = {
+export type ModuleLocalStorageThemeMini = {
   id: string;
   name: string;
   description: string;
-  previewJSON: string;
+  previewStylesJSON: string;
+};
+export type ModuleLocalStorageTheme = ModuleLocalStorageThemeMini & {
   stylesJSON: string;
 };
-export type ModuleLocalStorageThemeEdit = Partial<ModuleLocalStorageThemeFull>;
+export type ModuleLocalStorageThemeEdit = Partial<ModuleLocalStorageTheme>;
 
 export type ModuleStorage = {
   isAutoThemeMode: boolean;
   localThemes: ModuleThemeRAW[];
+  globalThemeCache: ModuleThemeRAW | null;
   selectedMainThemeId?: string;
   selectedLightThemeId?: string;
   selectedDarkThemeId?: string;

@@ -33,9 +33,9 @@ function onApprove() {
     icon="Warn"
     question-title="The changes you have made may not be saved"
     first-btn-title="Cancel"
+    :first-on-click="onCancel"
     second-btn-title="Approve"
-    @click-first="onCancel"
-    @click-second="onApprove"
+    :second-on-click="onApprove"
   />
 </template>
 

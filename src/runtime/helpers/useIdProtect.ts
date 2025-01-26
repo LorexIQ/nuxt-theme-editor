@@ -1,4 +1,4 @@
-import type { ModuleOptionsExtend } from '../../types';
+import type { ModuleOptionsExtend } from '../types';
 import { useRuntimeConfig } from '#imports';
 
 export default function (id: string | number) {

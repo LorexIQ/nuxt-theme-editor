@@ -81,6 +81,7 @@ function openItemsMenu(event: MouseEvent) {
     letter-spacing: 1px;
     font-size: 16px;
     font-weight: 600;
+    height: 100%;
     padding: 6px 15px;
     white-space: nowrap;
   }

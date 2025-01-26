@@ -26,6 +26,7 @@ export default createConfigForNuxt({
         '@typescript-eslint/no-use-before-define': 'off',
         '@typescript-eslint/no-unused-expressions': 'off',
         '@typescript-eslint/ban-ts-comment': 'off',
+        '@typescript-eslint/no-this-alias': 'off',
         '@typescript-eslint/consistent-type-definitions': ['error', 'type'],
         '@typescript-eslint/no-dynamic-delete': 'off',
         'antfu/if-newline': 'off',

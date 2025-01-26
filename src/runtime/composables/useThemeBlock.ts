@@ -24,7 +24,7 @@ function getComponentId(instance: ComponentInternalInstance) {
 
 export default function useBlock(block: ModuleDefaultBlockKeys, withInheritance: boolean = false) {
   const client = useClient().value;
-  const blockStyles = computed(() => unwrap.get(client.getSelectedTheme()!.getPreparedStylesBlock(block, withInheritance)));
+  const blockStyles = computed(() => unwrap.get(client.getSelectedTheme()?.getPreparedStylesBlock(block, withInheritance)) ?? {});
   const currentInstance = getCurrentInstance()!;
 
   onMounted(() => {

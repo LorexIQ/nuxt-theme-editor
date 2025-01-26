@@ -1,16 +1,16 @@
-export default function (data: any, type: 'ModuleLocalStorageThemeFull' | 'ModuleLocalStorageThemeEdit') {
+export default function (data: any, type: 'ModuleLocalStorageTheme' | 'ModuleLocalStorageThemeEdit') {
   const requiredKeys = [
     'id',
     'name',
     'description',
-    'previewJSON',
+    'previewStylesJSON',
     'stylesJSON'
   ];
 
   if (
     typeof data !== 'object'
     || (
-      type === 'ModuleLocalStorageThemeFull'
+      type === 'ModuleLocalStorageTheme'
       && !requiredKeys.map(key => key in data && typeof data[key] === 'string').every(Boolean)
     )
   ) throw new Error(`The data type does not match the type ${type}`);

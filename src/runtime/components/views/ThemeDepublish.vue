@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import type { ModuleClient } from '../../types';
 import QuestionPageBlock from '../shared/QuestionPageBlock.vue';
+import ClientErrors from '../features/ClientErrors.vue';
 import { computed } from '#imports';
 
 type Props = {
@@ -19,12 +20,12 @@ function onCancel() {
 async function onApprove() {
   if (!theme.value) return;
 
-  try {
-    await theme.value.depublish();
-    router.push('index', 'tab-fade-rl');
-  } catch (e) {
-    console.error(e);
+  if (!await theme.value.depublish()) {
+    throw new Error('.');
   }
+}
+async function onApproveSuccess() {
+  router.push('index', 'tab-fade-rl');
 }
 </script>
 
@@ -34,11 +35,19 @@ async function onApprove() {
     icon="Depublish"
     question-title="Are you serious about removing the topic from publication?"
     first-btn-title="Cancel"
+    :first-on-click="onCancel"
     second-btn-title="Depublish"
     second-btn-decor="error"
-    @click-first="onCancel"
-    @click-second="onApprove"
-  />
+    :second-on-click="onApprove"
+    :second-on-success="onApproveSuccess"
+  >
+    <template #messages>
+      <ClientErrors
+        :client="client"
+        page="depublishApprove"
+      />
+    </template>
+  </QuestionPageBlock>
 </template>
 
 <style lang="scss" scoped>

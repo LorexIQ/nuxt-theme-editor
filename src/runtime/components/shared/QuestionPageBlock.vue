@@ -3,6 +3,7 @@ import type { ModuleIcons } from '../../types';
 import IsButton from '../shared/IsButton.vue';
 import ViewPage from '../widgets/ViewPage.vue';
 import IconsStore from '../shared/IconsStore.vue';
+import useSwitch from '../../helpers/client/useSwitch';
 import { onBeforeMount } from '#imports';
 
 type Props = {
@@ -12,18 +13,45 @@ type Props = {
   secondBtnTitle?: string;
   firstBtnDecor?: 'default' | 'success' | 'error';
   secondBtnDecor?: 'default' | 'success' | 'error';
+  firstOnClick?: () => any;
+  secondOnClick?: () => any;
+  firstOnSuccess?: () => any;
+  secondOnSuccess?: () => any;
+  firstOnError?: () => any;
+  secondOnError?: () => any;
   beforeMount?: () => any;
 };
-type Emits = {
-  (e: 'clickFirst', v: MouseEvent): void;
-  (e: 'clickSecond', v: MouseEvent): void;
-};
 
+const firstBtnLoader = useSwitch();
+const secondBtnLoader = useSwitch();
 const props = withDefaults(defineProps<Props>(), {
   firstBtnDecor: 'default',
   secondBtnDecor: 'error'
 });
-const emit = defineEmits<Emits>();
+
+async function onFirstClick() {
+  if (firstBtnLoader.status) return;
+
+  firstBtnLoader.funcExec(async () => {
+    await props.firstOnClick?.();
+  }).then(() => {
+    props.firstOnSuccess?.();
+  }).catch(() => {
+    props.firstOnError?.();
+  });
+}
+
+async function onSecondClick() {
+  if (secondBtnLoader.status) return;
+
+  secondBtnLoader.funcExec(async () => {
+    await props.secondOnClick?.();
+  }).then(() => {
+    props.secondOnSuccess?.();
+  }).catch(() => {
+    props.secondOnError?.();
+  });
+}
 
 onBeforeMount(() => {
   props.beforeMount?.();
@@ -42,19 +70,44 @@ onBeforeMount(() => {
         <IsButton
           v-if="firstBtnTitle"
           :decor="firstBtnDecor"
-          @click="emit('clickFirst', $event)"
+          @click="onFirstClick"
         >
-          {{ firstBtnTitle }}
+          <div
+            v-if="firstBtnLoader.status"
+            class="TE-question-page-block__actions__loader"
+          >
+            <IconsStore
+              icon="Spinner"
+              size="15"
+            />
+          </div>
+          <template v-else>
+            {{ firstBtnTitle }}
+          </template>
         </IsButton>
         <IsButton
           v-if="secondBtnTitle"
           :decor="secondBtnDecor"
-          @click="emit('clickSecond', $event)"
+          @click="onSecondClick"
         >
-          {{ secondBtnTitle }}
+          <div
+            v-if="secondBtnLoader.status"
+            class="TE-question-page-block__actions__loader"
+          >
+            <IconsStore
+              icon="Spinner"
+              size="15"
+            />
+          </div>
+          <template v-else>
+            {{ secondBtnTitle }}
+          </template>
         </IsButton>
       </div>
     </div>
+    <template #messages>
+      <slot name="messages" />
+    </template>
   </ViewPage>
 </template>
 
@@ -87,6 +140,12 @@ onBeforeMount(() => {
   &__actions {
     display: flex;
     gap: 5px;
+
+    &__loader {
+      display: flex;
+      align-items: center;
+      height: 100%;
+    }
   }
 }
 </style>

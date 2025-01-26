@@ -2,7 +2,7 @@
 import useSwitch from '../../helpers/client/useSwitch';
 import TextRunner from './TextRunner.vue';
 import IconsStore from './IconsStore.vue';
-import { computed, onMounted, ref, watch } from '#imports';
+import { computed, onBeforeMount, ref, watch } from '#imports';
 
 type Props = {
   expandEnabled?: boolean;
@@ -26,13 +26,13 @@ const loader = useSwitch({
 const isError = ref(false);
 const isInit = ref(false);
 const isExpanded = ref(props.expandEnabled ? props.expandDefault : true);
-const isRefreshVisible = computed(() => props.expandAction && !loader.status.value && isInit.value && !isError.value);
+const isRefreshVisible = computed(() => props.expandAction && !loader.status && isInit.value && !isError.value);
 
 watch(isExpanded, status => emit('changeStatus', status));
 
 async function openContent(newStatus: boolean) {
   if (!props.expandEnabled) return;
-  if (loader.status.value) return;
+  if (loader.status) return;
 
   if (newStatus) {
     try {
@@ -62,7 +62,7 @@ async function onClickRefresh(event: Event) {
   await openContent(true);
 }
 
-onMounted(() => {
+onBeforeMount(() => {
   if (props.expandEnabled && isExpanded.value) {
     openContent(true);
   }
@@ -114,7 +114,7 @@ onMounted(() => {
     <transition-expand class="TE-drop-down-block__content">
       <template v-if="isExpanded">
         <div
-          v-if="loader.status.value"
+          v-if="loader.status"
           class="TE-drop-down-block__content__loader"
         >
           <IconsStore

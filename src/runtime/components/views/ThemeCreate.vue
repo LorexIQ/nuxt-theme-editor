@@ -8,7 +8,7 @@ import ViewPage from '../widgets/ViewPage.vue';
 import IsHr from '../shared/IsHr.vue';
 import BlockRadioThemes from '../widgets/BlockRadioThemes.vue';
 import useErrorMessages from '../../helpers/client/useErrorMessages';
-import useIdProtect from '../../helpers/client/useIdProtect';
+import useIdProtect from '../../helpers/useIdProtect';
 import { computed, onBeforeMount, reactive } from '#imports';
 
 type Props = {
@@ -18,7 +18,6 @@ type Props = {
 const props = defineProps<Props>();
 const client = props.client;
 const router = client.getRouter();
-const themes = client.getThemes();
 
 const activeErrors = useErrorMessages();
 const themeCreateData = reactive<ModuleThemeCreateData>({
@@ -39,7 +38,7 @@ function createTheme() {
 
   if (!id.length) activeErrors.add(0);
   if (!/^[\w-]+$/.test(id)) activeErrors.add(1);
-  if (id in themes) activeErrors.add(2, { id });
+  if (client.getThemeById(id)) activeErrors.add(2, { id });
   if (!themeCreateData.parentThemeId) activeErrors.add(3);
 
   if (!activeErrors.isError.value) {

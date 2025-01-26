@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import type { ModuleClient } from '../../types';
 import QuestionPageBlock from '../shared/QuestionPageBlock.vue';
+import ClientErrors from '../features/ClientErrors.vue';
 import { computed } from '#imports';
 
 type Props = {
@@ -19,12 +20,12 @@ function onCancel() {
 async function onApprove() {
   if (!theme.value) return;
 
-  try {
-    await theme.value.publish();
-    router.push('index', 'tab-fade-rl');
-  } catch (e) {
-    console.error(e);
+  if (!await theme.value.publish()) {
+    throw new Error('.');
   }
+}
+async function onApproveSuccess() {
+  router.push('index', 'tab-fade-rl');
 }
 </script>
 
@@ -34,11 +35,20 @@ async function onApprove() {
     icon="Publish"
     question-title="Are you sure you want to make the theme global?"
     first-btn-title="Cancel"
+    :first-on-click="onCancel"
     second-btn-title="Publish"
     second-btn-decor="success"
-    @click-first="onCancel"
-    @click-second="onApprove"
-  />
+    :second-btn-loader="theme?.loader"
+    :second-on-click="onApprove"
+    :second-on-success="onApproveSuccess"
+  >
+    <template #messages>
+      <ClientErrors
+        :client="client"
+        page="publishApprove"
+      />
+    </template>
+  </QuestionPageBlock>
 </template>
 
 <style lang="scss" scoped>

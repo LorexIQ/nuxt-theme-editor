@@ -1,6 +1,7 @@
-import type { Reactive, Ref, WatchHandle } from 'vue';
+import type { Reactive, Ref } from 'vue';
+import type { UnwrapRefSimple } from '@vue/reactivity';
 import unwrap from './unwrap';
-import { reactive, ref, watch } from '#imports';
+import { reactive, ref } from '#imports';
 
 export type UseSwitchConfig = {
   maxQueue?: number;
@@ -15,7 +16,6 @@ class UseSwitch {
 
   private minHideDelay: number;
   private showTimeStamp: number;
-  private watcherForSync: WatchHandle | undefined;
   private hideDelay: NodeJS.Timeout | undefined;
 
   constructor(config?: UseSwitchConfig) {
@@ -25,13 +25,11 @@ class UseSwitch {
 
     this.minHideDelay = this.config.minSwitchStatusDelay;
     this.showTimeStamp = 0;
-
-    this._initWatchers();
   }
 
   private _initConfig(config?: UseSwitchConfig): Required<UseSwitchConfig> {
     return {
-      maxQueue: 100,
+      maxQueue: 1,
       defaultStatus: false,
       minSwitchStatusDelay: 500,
 
@@ -39,44 +37,40 @@ class UseSwitch {
     };
   }
 
-  private _initWatchers(): void {
-    watch(this.queue, this.calculateComputedStatus.bind(this));
-  }
-
   show(isAddInQueue: boolean = true) {
     if (isAddInQueue && this.queue.length < this.config.maxQueue)
       this.queue.push(true);
     this.showTimeStamp = !this.showTimeStamp ? Date.now() : this.showTimeStamp;
     clearTimeout(this.hideDelay);
-    this.calculateComputedStatus.bind(this, this.queue)();
+    this.calculateComputedStatus(this.queue);
   }
 
-  hide() {
+  async hide() {
     this.queue.splice(0, 1);
+    await this.calculateComputedStatus(this.queue);
   }
 
-  sync(obj: UseSwitchClass, delay?: number) {
-    this.unSync.bind(this)();
-    this.watcherForSync = watch(obj.status, (value) => {
-      if (delay) this.minHideDelay = delay;
-      if (value) {
-        this.show();
-      } else {
-        this.hide();
-      }
-    }, { immediate: true });
+  async funcExec(func: () => any) {
+    this.show();
+
+    try {
+      await func();
+    } catch (e: any) {
+      throw new Error(e.message);
+    } finally {
+      await this.hide();
+    }
   }
 
-  unSync() {
-    if (this.watcherForSync) this.watcherForSync();
-  }
-
-  private calculateComputedStatus(status: true[]) {
+  private async calculateComputedStatus(status: true[]) {
     if (!status.length) {
-      this.hideDelay = setTimeout(() => {
-        unwrap.set(this, 'status', false);
-        this.showTimeStamp = 0;
-      }, this.minHideDelay - (Date.now() - this.showTimeStamp));
+      await new Promise((resolve) => {
+        this.hideDelay = setTimeout(() => {
+          unwrap.set(this, 'status', false);
+          this.showTimeStamp = 0;
+          resolve(undefined);
+        }, this.minHideDelay - (Date.now() - this.showTimeStamp));
+      });
     } else {
       unwrap.set(this, 'status', true);
     }
@@ -86,8 +80,8 @@ class UseSwitch {
 }
 
 export class _UseSwitch extends UseSwitch {}
-export type UseSwitchClass = UseSwitch;
+export type UseSwitchClass = UnwrapRefSimple<UseSwitch>;
 
 export default function (config?: UseSwitchConfig): UseSwitchClass {
-  return new UseSwitch(config);
+  return reactive(new UseSwitch(config));
 }

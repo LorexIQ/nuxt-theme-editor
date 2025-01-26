@@ -1,8 +1,8 @@
 import { defineEventHandler, createError } from 'h3';
-import type { ModuleLocalStorageThemeFull } from '../../types';
+import type { ModuleLocalStorageThemeMini } from '../../types';
 import db from './helpers/db';
 
-export default defineEventHandler<Promise<ModuleLocalStorageThemeFull[]>>(async () => {
+export default defineEventHandler<Promise<ModuleLocalStorageThemeMini[]>>(async () => {
   try {
     return db.getAll();
   } catch (e: any) {
