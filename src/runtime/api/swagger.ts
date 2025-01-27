@@ -1,4 +1,9 @@
-import type { ModuleLocalStorageTheme, ModuleLocalStorageThemeEdit, ModuleLocalStorageThemeMini } from '..//types';
+import type {
+  ModuleLocalStorageTheme,
+  ModuleLocalStorageThemeCreate,
+  ModuleLocalStorageThemeEdit,
+  ModuleLocalStorageThemeMini
+} from '../types';
 
 export type ModuleAPISwagger = {
   GET: {
@@ -15,7 +20,7 @@ export type ModuleAPISwagger = {
   POST: {
     '/': {
       response: ModuleLocalStorageTheme;
-      body: ModuleLocalStorageTheme;
+      body: ModuleLocalStorageThemeCreate;
     };
   };
   PUT: {

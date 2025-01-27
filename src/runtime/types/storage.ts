@@ -5,11 +5,13 @@ export type ModuleLocalStorageThemeMini = {
   name: string;
   description: string;
   previewStylesJSON: string;
+  updatedAt: number;
 };
 export type ModuleLocalStorageTheme = ModuleLocalStorageThemeMini & {
   stylesJSON: string;
 };
-export type ModuleLocalStorageThemeEdit = Partial<ModuleLocalStorageTheme>;
+export type ModuleLocalStorageThemeCreate = Omit<ModuleLocalStorageTheme, 'updatedAt'>;
+export type ModuleLocalStorageThemeEdit = Partial<ModuleLocalStorageThemeCreate>;
 
 export type ModuleStorage = {
   isAutoThemeMode: boolean;

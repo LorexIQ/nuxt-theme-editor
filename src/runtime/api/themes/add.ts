@@ -7,7 +7,7 @@ export default defineEventHandler<Promise<ModuleLocalStorageTheme>>(async (event
   const body = await readBody(event);
 
   try {
-    validator(body, 'ModuleLocalStorageTheme');
+    validator(body, 'ModuleLocalStorageThemeCreate');
     return db.addTheme(body);
   } catch (e: any) {
     throw createError({

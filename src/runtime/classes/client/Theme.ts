@@ -248,13 +248,19 @@ export class Theme {
     unwrap.set(this, 'isSelectedAsMain', state);
   }
 
-  setSelectedAsLight(state = true): void {
-    if (state) this.ctx.unselectAllThemesAs('light');
+  async setSelectedAsLight(state = true): Promise<void> {
+    if (state) {
+      await this.loadInfo();
+      this.ctx.unselectAllThemesAs('light');
+    }
     unwrap.set(this, 'isSelectedAsLight', state);
   }
 
-  setSelectedAsDark(state = true): void {
-    if (state) this.ctx.unselectAllThemesAs('dark');
+  async setSelectedAsDark(state = true): Promise<void> {
+    if (state) {
+      await this.loadInfo();
+      this.ctx.unselectAllThemesAs('dark');
+    }
     unwrap.set(this, 'isSelectedAsDark', state);
   }
 

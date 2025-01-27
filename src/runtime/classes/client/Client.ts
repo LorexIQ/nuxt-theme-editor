@@ -212,11 +212,12 @@ export class Client {
 
   private _replaceSelectedThemes(light?: ThemeId, dark?: ThemeId, main?: ThemeId, lightDef?: ThemeId, darkDef?: ThemeId, mainDef?: ThemeId): void {
     const lightId = this._checkThemeAvailableAndGetActual(unwrap.get(light ?? this.selectedLightThemeId), lightDef, 'light');
-    const darkId = this._checkThemeAvailableAndGetActual(unwrap.get(dark ?? this.selectedDarkThemeId), darkDef, 'dark');
-    const mainId = this._checkThemeAvailableAndGetActual(unwrap.get(main ?? this.selectedMainThemeId), mainDef, unwrap.get(this.isAutoThemeMode) ? 'system' : unwrap.get(this.selectedLightThemeId));
-
     this._selectThemeAs('light', lightId);
+
+    const darkId = this._checkThemeAvailableAndGetActual(unwrap.get(dark ?? this.selectedDarkThemeId), darkDef, 'dark');
     this._selectThemeAs('dark', darkId);
+
+    const mainId = this._checkThemeAvailableAndGetActual(unwrap.get(main ?? this.selectedMainThemeId), mainDef, unwrap.get(this.isAutoThemeMode) ? 'system' : unwrap.get(this.selectedLightThemeId));
     this._selectThemeAs('main', mainId);
   }
 

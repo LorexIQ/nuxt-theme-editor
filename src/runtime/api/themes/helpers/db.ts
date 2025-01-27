@@ -1,6 +1,6 @@
 import getLocalStorage from '../../../helpers/server/getLocalStorage';
 import type {
-  ModuleLocalStorageTheme,
+  ModuleLocalStorageTheme, ModuleLocalStorageThemeCreate,
   ModuleLocalStorageThemeEdit,
   ModuleLocalStorageThemeMini
 } from '../../../types';
@@ -40,7 +40,8 @@ class FakeDB {
       id: theme.id,
       name: theme.name,
       description: theme.description,
-      previewStylesJSON: theme.previewStylesJSON
+      previewStylesJSON: theme.previewStylesJSON,
+      updatedAt: theme.updatedAt
     }));
   }
 
@@ -50,10 +51,13 @@ class FakeDB {
     return this.data[themeIndex];
   }
 
-  addTheme(data: ModuleLocalStorageTheme): ModuleLocalStorageTheme {
+  addTheme(data: ModuleLocalStorageThemeCreate): ModuleLocalStorageTheme {
     const themeIndex = this.data.findIndex(theme => theme.id === data.id);
     if (themeIndex !== -1) throw new Error('Theme with this id is already exists!');
-    this.data.push(data);
+    this.data.push({
+      ...data,
+      updatedAt: Date.now()
+    });
     this.save();
     return this.data.at(-1)!;
   }
