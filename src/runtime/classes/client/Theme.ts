@@ -3,14 +3,15 @@ import { md5 } from 'js-md5';
 import type {
   ModuleClient,
   ModuleDefaultBlockKeys, ModuleDefaultStyleKeys, ModuleDefineThemeBlockReturn,
-  ModuleDefineThemeMetaPreview, ModuleDefineThemeMetaUI,
+  ModuleDefineThemeMetaPreview, ModuleDefineThemeMetaUI, ModuleLocalStorageTheme,
   ModuleObject, ModuleOptionsExtend, ModulePathsCache, ModuleThemeCleanedStyles, ModuleThemeEditData,
   ModuleThemeSelectedStyles, ModuleThemeType
 } from '../../types';
-import useIdProtect from '../../helpers/useIdProtect';
 import utils from '../../helpers/utils';
 import unwrap from '../../helpers/client/unwrap';
 import useAPIFetch from '../../helpers/client/useAPIFetch';
+import useSwitch from '../../helpers/client/useSwitch';
+import useIdProtect from '../../helpers/useIdProtect';
 import { computed, reactive, ref, watch } from '#imports';
 
 type ThemeStylesScope = 'main' | 'edited';
@@ -26,8 +27,10 @@ export class Theme {
   public readonly type = ref<ModuleThemeType>('local');
   public readonly name = ref<string>('');
   public readonly description = ref<string>('');
-
   public readonly isInit = ref(false);
+  public readonly isInCache = computed(() => unwrap.get(this.type) === 'global' && (unwrap.get(this.isSelectedAsMain) || unwrap.get(this.isSelectedAsLight) || unwrap.get(this.isSelectedAsDark)));
+  public readonly loader = useSwitch();
+
   public readonly isSelected = computed(() => unwrap.get(this.ctx.getSelectedThemeId()) === unwrap.get(this.id));
   public readonly isSelectedAsMain = ref(false);
   public readonly isSelectedAsLight = ref(false);
@@ -56,7 +59,6 @@ export class Theme {
     this.type.value = type;
     this.name.value = name || id;
     this.description.value = description || '';
-    this.isInit.value = type !== 'global';
     this.setStyles(styles);
 
     this._initCtxData();
@@ -234,24 +236,31 @@ export class Theme {
     unwrap.set(this, 'description', description);
   }
 
-  async setSelectedAsMain(state = true) {
-    if (!unwrap.get(this.isInit)) await this.loadStyles();
-    if (state) this.ctx.unselectAllThemesAs('main');
+  setInitStatus(status: boolean): void {
+    unwrap.set(this, 'isInit', status);
+  }
+
+  async setSelectedAsMain(state = true): Promise<void> {
+    if (state) {
+      await this.loadInfo();
+      this.ctx.unselectAllThemesAs('main');
+    }
     unwrap.set(this, 'isSelectedAsMain', state);
   }
 
-  setSelectedAsLight(state = true) {
+  setSelectedAsLight(state = true): void {
     if (state) this.ctx.unselectAllThemesAs('light');
     unwrap.set(this, 'isSelectedAsLight', state);
   }
 
-  setSelectedAsDark(state = true) {
+  setSelectedAsDark(state = true): void {
     if (state) this.ctx.unselectAllThemesAs('dark');
     unwrap.set(this, 'isSelectedAsDark', state);
   }
 
-  setSelectedAsEdited(state = true) {
+  async setSelectedAsEdited(state = true): Promise<void> {
     if (state) {
+      await this.loadInfo();
       this.ctx.unselectAllThemesAs('edited');
       utils.replaceArrayData(this.editedStyles, utils.copyObject(this.styles));
     }
@@ -332,19 +341,24 @@ export class Theme {
     this.setStyles(utils.copyObject(this.editedStyles));
   }
 
-  async loadStyles(): Promise<boolean> {
+  async loadInfo(theme?: ModuleLocalStorageTheme): Promise<boolean> {
     if (unwrap.get(this.type) !== 'global') return false;
 
     try {
-      const theme = await useAPIFetch('GET', '/{id}', {
-        params: {
-          id: unwrap.get(this.id)
-        }
-      });
+      if (!theme && !unwrap.get(this.isInit) && !this.loader.status) {
+        theme = await useAPIFetch('GET', '/{id}', {
+          params: {
+            id: unwrap.get(this.id)
+          }
+        }, { loader: this.loader });
+      }
 
-      this.setStyles(JSON.parse(theme.stylesJSON));
-      // TODO
-      unwrap.set(this, 'isInit', true);
+      if (theme) {
+        this.setName(theme.name);
+        this.setDescription(theme.description);
+        this.setStyles(JSON.parse(theme.stylesJSON));
+        this.setInitStatus(true);
+      }
       return true;
     } catch {
       this.ctx.createError(
@@ -370,7 +384,7 @@ export class Theme {
           previewStylesJSON: JSON.stringify(unwrap.get(this.getPrepareStylesPreview())),
           stylesJSON: JSON.stringify(unwrap.get(this.getStyles()))
         }
-      });
+      }, { loader: this.loader });
 
       unwrap.set(this, 'type', 'global');
       return true;
@@ -390,11 +404,12 @@ export class Theme {
     if (unwrap.get(this.type) !== 'global') return false;
 
     try {
-      await useAPIFetch('DELETE', '/{id}', {
+      const theme = await useAPIFetch('DELETE', '/{id}', {
         params: {
           id: unwrap.get(this.id)
         }
-      });
+      }, { loader: this.loader });
+      await this.loadInfo(theme);
 
       unwrap.set(this, 'type', 'local');
       return true;
@@ -425,7 +440,7 @@ export class Theme {
               name: unwrap.get(data.name),
               description: unwrap.get(data.description)
             }
-          });
+          }, { loader: this.loader });
 
           return true;
         } catch {
@@ -457,7 +472,7 @@ export class Theme {
             params: {
               id: unwrap.get(this.id)
             }
-          });
+          }, { loader: this.loader });
 
           return true;
         } catch {

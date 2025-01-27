@@ -89,22 +89,21 @@ export class Client {
       type: theme.type,
       styles: unwrap.get(theme.getStyles())
     }))));
-  private readonly storageGlobalThemeCache = computed(() => {
-    const theme = unwrap.get(this.selectedTheme);
-    if (!theme || theme.type !== 'global') return 'null';
-
-    return JSON.stringify(<ModuleThemeRAW>{
-      id: theme.id,
-      name: theme.name,
-      description: theme.description,
-      type: theme.type,
-      styles: unwrap.get(theme.getStyles())
-    });
+  private readonly storageGlobalThemesCache = computed(() => {
+    return JSON.stringify(this.themes
+      .filter(theme => theme.isInCache)
+      .map<ModuleThemeRAW>(theme => ({
+        id: theme.id,
+        name: theme.name,
+        description: theme.description,
+        type: theme.type,
+        styles: unwrap.get(theme.getStyles())
+      })));
   });
   private readonly storageSettings = computed<ModuleStorage>(() => ({
     isAutoThemeMode: unwrap.get(this.isAutoThemeMode),
     localThemes: JSON.parse(unwrap.get(this.storageLocalThemes)),
-    globalThemeCache: JSON.parse(unwrap.get(this.storageGlobalThemeCache)),
+    globalThemesCache: JSON.parse(unwrap.get(this.storageGlobalThemesCache)),
     selectedMainThemeId: unwrap.get(this.selectedMainThemeId),
     selectedLightThemeId: unwrap.get(this.selectedLightThemeId),
     selectedDarkThemeId: unwrap.get(this.selectedDarkThemeId)
@@ -223,12 +222,15 @@ export class Client {
 
     if (storage) {
       const localThemes = storage.localThemes
-        .filter(theme => !this.themes.find(loadedTheme => theme.id === loadedTheme.id))
-        .map((theme, index) => this._buildCustomTheme(theme, index))
+        .map(theme => this._buildCustomTheme(theme))
+        .map(theme => reactive(theme));
+      const globalThemes = storage.globalThemesCache
+        .map(theme => this._buildCustomTheme(theme))
         .map(theme => reactive(theme));
 
-      this.themes.push(...localThemes);
-      if (storage.globalThemeCache) this.themes.push(reactive(this._buildCustomTheme(storage.globalThemeCache, 0)));
+      globalThemes.forEach(theme => theme.loadInfo());
+
+      this.themes.push(...localThemes, ...globalThemes);
 
       this._replaceSelectedThemes(
         this._checkThemeAvailableAndGetActual(storage.selectedLightThemeId, 'light'),
@@ -244,26 +246,19 @@ export class Client {
     console.log('Save');
   }
 
-  private _buildCustomTheme(themeRAW: ModuleThemeRAW, index: number, previewMode = false): ModuleThemeRef {
-    const mainThemeStyles = unwrap.get(this.getThemeById(this.config.defaultTheme)!.getStyles());
-
+  private _buildCustomTheme(themeRAW: ModuleThemeRAW, previewMode = false): ModuleThemeRef {
     const theme = new Theme(
       this,
       themeRAW.id,
       themeRAW.type,
       previewMode
         ? themeRAW.styles
-        : utils.mergeObjects(themeRAW.styles, mainThemeStyles),
+        : utils.mergeObjects(themeRAW.styles, unwrap.get(this.getThemeById(this.config.defaultTheme)!.getStyles())),
       themeRAW.name,
       themeRAW.description
     );
 
-    let themeId = theme.id.value;
-    if (themeId in this.themes) {
-      themeId = `${themeId}-${(Date.now() + index).toFixed().slice(-4)}`;
-      this.createError('WARN', 'index', `Used plug: ${theme.id.value} (${theme.name}) > ${themeId}`, 'ID duplicate detected!');
-      theme.id.value = themeId;
-    }
+    this._checkAndFixIdsThemesConflict(theme, 'self', 'ID duplicate detected');
 
     return theme;
   }
@@ -398,6 +393,17 @@ export class Client {
 
     if (theme) (theme as any)[functionName]();
     else this.unselectAllThemesAs(as);
+  }
+
+  private _checkAndFixIdsThemesConflict(theme: ModuleTheme | ModuleThemeRef, replace: 'self' | 'him', message: string): void {
+    const initThemeId = unwrap.get(theme.id);
+    const storageTheme = this.getThemeById(initThemeId);
+
+    if (storageTheme) {
+      const fixedTheme = replace === 'self' ? theme : storageTheme;
+      fixedTheme.setId(`${initThemeId}-${utils.getUUID().slice(-4)}`);
+      this.createError('WARN', 'index', `Used plug: ${initThemeId} (${unwrap.get(fixedTheme.name)}) > ${unwrap.get(fixedTheme.id)}`, message);
+    }
   }
 
   getConfig(): ModuleOptionsExtend {
@@ -662,16 +668,16 @@ export class Client {
     function deleteTheme(theme: ModuleTheme): void {
       ctx.themes.splice(ctx.themes.indexOf(theme), 1);
     }
-    function addTheme(theme: ModuleLocalStorageThemeMini, index: number): void {
+    function addTheme(theme: ModuleLocalStorageThemeMini): void {
       ctx.themes.push(reactive(ctx._buildCustomTheme({
         id: theme.id,
         name: theme.name,
         description: theme.description,
         type: 'global',
         styles: getOnlyPreviewBlock(theme)
-      }, index, true)));
+      }, true)));
     }
-    function editTheme(theme: ModuleLocalStorageThemeMini, index: number): void {
+    function editTheme(theme: ModuleLocalStorageThemeMini): void {
       const localTheme = ctx.getThemeById(theme.id)!;
 
       if (localTheme.type === 'system') {
@@ -679,12 +685,13 @@ export class Client {
       } else if (localTheme.type === 'global') {
         localTheme.setName(theme.name);
         localTheme.setDescription(theme.description);
-        localTheme.setStyles(getOnlyPreviewBlock(theme));
+        localTheme.setInitStatus(false);
+
+        if (localTheme.isInCache) localTheme.loadInfo();
+        else localTheme.setStyles(getOnlyPreviewBlock(theme));
       } else if (localTheme.type === 'local') {
-        const themeId = localTheme.id;
-        localTheme.setId(`${themeId}-${(Date.now() + index).toFixed().slice(-4)}`);
-        ctx.createError('WARN', 'index', `Used plug: ${localTheme.id} (${theme.name}) > ${themeId}`, 'Local theme id conflict with global theme id.');
-        addTheme(theme, index);
+        ctx._checkAndFixIdsThemesConflict(localTheme, 'self', 'Local theme id conflict with global theme id');
+        addTheme(theme);
       }
     }
 
@@ -702,7 +709,7 @@ export class Client {
       themesForAdd.forEach(addTheme);
       themesForEdit.forEach(editTheme);
 
-      this._replaceSelectedThemes(undefined, undefined, undefined, this.config.defaultTheme, this.config.defaultTheme, this.config.defaultTheme);
+      this._replaceSelectedThemes();
     } catch (e) {
       console.error(e);
       this.createError(

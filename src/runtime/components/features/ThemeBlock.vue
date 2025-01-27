@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type { ModuleTheme } from '../../types';
+import IconsStore from '../shared/IconsStore.vue';
 
 type Props = {
   theme: ModuleTheme;
@@ -31,11 +32,20 @@ defineProps<Props>();
       </div>
     </div>
     <slot name="status" />
+    <transition name="fade">
+      <div
+        v-if="theme.loader?.status"
+        class="TE-theme-block__loader"
+      >
+        <IconsStore icon="Spinner" />
+      </div>
+    </transition>
   </div>
 </template>
 
 <style scoped lang="scss">
 .TE-theme-block {
+  position: relative;
   display: grid;
   grid-template-columns: 90px 1fr auto;
   align-items: center;
@@ -112,51 +122,21 @@ defineProps<Props>();
       }
     }
   }
-  &__status {
-    position: relative;
-    font-size: 12px;
-    height: 100%;
-    writing-mode: vertical-rl;
-    overflow: hidden;
+  &__loader {
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    z-index: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: var(--bgGlass);
 
-    & > div {
-      position: absolute;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      width: 100%;
-      height: 100%;
+    & svg {
+      color: var(--titleTransparent)
     }
-    &__active {
-      color: var(--statusActiveTitle);
-      background-color: var(--statusActiveBg);
-      z-index: 1;
-    }
-    &__light_dark {
-      font-size: 10px;
-      color: var(--statusLightDarkTitle);
-      background-color: var(--statusLightDarkBg);
-    }
-    &__light {
-      color: var(--statusLightTitle);
-      background-color: var(--statusLightBg);
-    }
-    &__dark {
-      color: var(--statusDarkTitle);
-      background-color: var(--statusDarkBg);
-    }
-  }
-}
-
-.fade {
-  &-enter-active, &-leave-active {
-    transition: .3s;
-  }
-  &-enter-to, &-leave-from {
-    opacity: 1;
-  }
-  &-leave-to, &-enter-from {
-    opacity: 0;
   }
 }
 </style>

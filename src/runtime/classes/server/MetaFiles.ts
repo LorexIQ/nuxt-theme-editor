@@ -116,7 +116,6 @@ export class MetaFiles {
   }
 
   create(): void {
-    this._remove();
     this._mkDir();
     this._createConnector();
     this._createThemesStructure();

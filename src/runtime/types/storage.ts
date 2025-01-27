@@ -14,7 +14,7 @@ export type ModuleLocalStorageThemeEdit = Partial<ModuleLocalStorageTheme>;
 export type ModuleStorage = {
   isAutoThemeMode: boolean;
   localThemes: ModuleThemeRAW[];
-  globalThemeCache: ModuleThemeRAW | null;
+  globalThemesCache: ModuleThemeRAW[];
   selectedMainThemeId?: string;
   selectedLightThemeId?: string;
   selectedDarkThemeId?: string;

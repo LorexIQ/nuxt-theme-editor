@@ -2,6 +2,8 @@ import { md5 } from 'js-md5';
 import type { ModuleObject } from '~/src/runtime/types';
 
 class Utils {
+  private lastUUID = md5(Date.now().toString());
+
   mergeObjects<T>(target: Record<any, any>, template: T): T {
     const merger = <TR>(_target: Record<any, any>, _template: TR, level = 0): TR => {
       if (Array.isArray(_template)) {
@@ -63,6 +65,11 @@ class Utils {
       .filter(key => visible?.[key] ?? true)
       .map(key => `${key}=${obj[key]}`)
       .join('&');
+  }
+
+  getUUID(): string {
+    this.lastUUID = md5(this.lastUUID);
+    return this.lastUUID;
   }
 }
 

@@ -6,6 +6,7 @@ export default defineEventHandler<Promise<ModuleLocalStorageTheme>>(async (event
   const themeId = getRouterParam(event, 'id');
 
   try {
+    await new Promise(resolve => setTimeout(() => resolve(''), 1000));
     return db.getThemeById(themeId!);
   } catch (e: any) {
     throw createError({

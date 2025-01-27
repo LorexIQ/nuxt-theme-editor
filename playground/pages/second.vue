@@ -42,6 +42,8 @@ console.log('second.vue useThemeBlock =>', scopeStyles.value);
           'md5Cache',
           'preparedUIStyles',
           'styles',
+          'themesPathsCache',
+          'preparedStyles',
           'preparedPreviewStyles',
           'pages',
           'currentPage',
