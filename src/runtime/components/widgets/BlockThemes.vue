@@ -21,10 +21,10 @@ const emit = defineEmits<Emits>();
 const isAddActive = computed(() => props.type === 'local');
 const themes = computed(() => Object.values(props.client.getThemes()).filter(theme => theme.type === props.type));
 const typeUpper = computed(() => `${props.type[0].toUpperCase()}${props.type.slice(1)}`);
-const isExpanded = computed(() => (props.client as any)[`getThemesBlock${typeUpper.value}Status`]());
+const expandStatus = computed(() => (props.client as any)[`getThemesBlock${typeUpper.value}Status`]());
 
 function onChangeStatus(status: boolean) {
-  (props.client as any)[`setThemesBlock${typeUpper.value}Status`](status);
+  (props.client as any)[`setThemesBlock${typeUpper.value}Status`](Number(status));
 }
 </script>
 
@@ -32,8 +32,9 @@ function onChangeStatus(status: boolean) {
   <DropDownBlock
     class="TE-block-themes"
     expand-enabled
-    :expand-default="isExpanded"
+    :expand-default="!!expandStatus"
     :expand-action="expandAction"
+    :expand-is-init="expandStatus === 1"
     @change-status="onChangeStatus"
   >
     <template #title>

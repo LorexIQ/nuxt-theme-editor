@@ -19,8 +19,8 @@ const sandbox = client.getSandbox();
 
 const viewPageRef = ref();
 const alertInheritance = ref<HTMLElement>();
-const themeId = computed(() => router.getQuery().themeId);
-const theme = computed(() => client.getEditedTheme()!);
+const themeId = computed(() => router.route.query.themeId);
+const theme = computed(() => client.getThemeById(themeId.value)!);
 const themeStyles = computed(() => unwrap.get(theme.value.getPreparedStylesWithoutSystem()));
 const themeTargetStyles = computed(() => unwrap.get(theme.value.getStylesWithoutSystem('edited')));
 
@@ -74,24 +74,25 @@ function onSave() {
 }
 
 onBeforeMount(() => {
-  if (!themeId.value || !client.getThemeById(themeId.value)) {
+  if (!themeId.value || !theme.value || theme.value.type === 'system') {
     router.push('index', 'tab-fade-lr');
     return;
   }
 
-  if (!client.getEditedTheme()) client.setThemeSelectedAsEdited(themeId.value);
+  if (!theme.value.isSelectedAsEdited) client.setThemeSelectedAsEdited(themeId.value);
 });
 </script>
 
 <template>
   <ViewPage
     ref="viewPageRef"
+    :loader="theme.loader"
     @scrollend="inheritanceAnimation"
   >
     <template #default>
       <div class="TE-theme-edit-styles">
         <ThemeStylesPreviewBlock
-          :client="client"
+          :theme="theme"
           @click="sandbox.openStyleClickMenu(...$event)"
           @context-menu-open="sandbox.openStyleContextMenu(...$event)"
           @inheritance-click="goToInheritance"
@@ -101,13 +102,13 @@ onBeforeMount(() => {
           </template>
         </ThemeStylesPreviewBlock>
         <ThemeStylesUIBlock
-          :client="client"
+          :theme="theme"
           @click="sandbox.openStyleClickMenu(...$event)"
           @context-menu-open="sandbox.openStyleContextMenu(...$event)"
           @inheritance-click="goToInheritance"
         />
         <ThemeStylesBlock
-          :client="client"
+          :theme="theme"
           :styles="themeStyles"
           :raw-styles="themeTargetStyles"
           @click="sandbox.openStyleClickMenu(...$event)"

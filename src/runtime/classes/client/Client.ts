@@ -39,20 +39,21 @@ import { Theme } from '../../classes/client/Theme';
 import useAPIFetch from '../../helpers/client/useAPIFetch';
 import { Sandbox } from './Sandbox';
 import { Router } from './Router';
-import { useRuntimeConfig, reactive, ref, computed, watch } from '#imports';
+import { useRuntimeConfig, reactive, ref, computed, watch, nextTick } from '#imports';
 
 type ThemeId = string | Ref<string | undefined>;
 type ThemeDefConfig = 'light' | 'dark' | 'system' | ThemeId | undefined;
 type ThemeSelectableType = 'main' | 'light' | 'dark' | 'edited';
+type ThemeBlockStatus = 0 | 1 | 2;
 
 export class Client {
   private readonly runtimeUIId = useIdProtect('ui');
   private readonly runtimePreviewId = useIdProtect('preview');
   private readonly runtimeDefaultId = useIdProtect('default');
 
-  private readonly isThemesBlockSystemOpen = ref(false);
-  private readonly isThemesBlockGlobalOpen = ref(false);
-  private readonly isThemesBlockLocalOpen = ref(false);
+  private readonly themesBlockSystemStatus = ref<ThemeBlockStatus>(0);
+  private readonly themesBlockGlobalStatus = ref<ThemeBlockStatus>(0);
+  private readonly themesBlockLocalStatus = ref<ThemeBlockStatus>(0);
 
   private readonly config = useRuntimeConfig().public.themesEditor as ModuleOptionsExtend;
   private readonly reloadMiddleware = useReloadMiddleware();
@@ -202,9 +203,11 @@ export class Client {
   }
 
   private _openOnlySelectedThemeBlock(): void {
-    this.setThemesBlockSystemStatus(unwrap.get(this.selectedTheme)?.type === 'system');
-    this.setThemesBlockGlobalStatus(unwrap.get(this.selectedTheme)?.type === 'global');
-    this.setThemesBlockLocalStatus(unwrap.get(this.selectedTheme)?.type === 'local');
+    nextTick(() => {
+      this.setThemesBlockSystemStatus(unwrap.get(this.selectedTheme)?.type === 'system' ? 1 : 0);
+      this.setThemesBlockGlobalStatus(unwrap.get(this.selectedTheme)?.type === 'global' ? 2 : 0);
+      this.setThemesBlockLocalStatus(unwrap.get(this.selectedTheme)?.type === 'local' ? 1 : 0);
+    });
   }
 
   private _replaceSelectedThemes(light?: ThemeId, dark?: ThemeId, main?: ThemeId, lightDef?: ThemeId, darkDef?: ThemeId, mainDef?: ThemeId): void {
@@ -490,16 +493,16 @@ export class Client {
     return this.errorsMessages.filter(error => (type ? error.type === type : true) && (page ? error.page === page : true));
   }
 
-  getThemesBlockSystemStatus(): boolean {
-    return unwrap.get(this.isThemesBlockSystemOpen);
+  getThemesBlockSystemStatus(): ThemeBlockStatus {
+    return unwrap.get(this.themesBlockSystemStatus);
   }
 
-  getThemesBlockGlobalStatus(): boolean {
-    return unwrap.get(this.isThemesBlockGlobalOpen);
+  getThemesBlockGlobalStatus(): ThemeBlockStatus {
+    return unwrap.get(this.themesBlockGlobalStatus);
   }
 
-  getThemesBlockLocalStatus(): boolean {
-    return unwrap.get(this.isThemesBlockLocalOpen);
+  getThemesBlockLocalStatus(): ThemeBlockStatus {
+    return unwrap.get(this.themesBlockLocalStatus);
   }
 
   setBlockStatus(status: boolean): void {
@@ -547,16 +550,16 @@ export class Client {
     else theme.setSelectedAsEdited();
   }
 
-  setThemesBlockSystemStatus(status: boolean): void {
-    unwrap.set(this, 'isThemesBlockSystemOpen', status);
+  setThemesBlockSystemStatus(status: ThemeBlockStatus): void {
+    unwrap.set(this, 'themesBlockSystemStatus', status);
   }
 
-  setThemesBlockGlobalStatus(status: boolean): void {
-    unwrap.set(this, 'isThemesBlockGlobalOpen', status);
+  setThemesBlockGlobalStatus(status: ThemeBlockStatus): void {
+    unwrap.set(this, 'themesBlockGlobalStatus', status);
   }
 
-  setThemesBlockLocalStatus(status: boolean): void {
-    unwrap.set(this, 'isThemesBlockLocalOpen', status);
+  setThemesBlockLocalStatus(status: ThemeBlockStatus): void {
+    unwrap.set(this, 'themesBlockLocalStatus', status);
   }
 
   createTheme(data: ModuleThemeCreateData): void {
@@ -708,6 +711,8 @@ export class Client {
       themesForDelete.forEach(deleteTheme);
       themesForAdd.forEach(addTheme);
       themesForEdit.forEach(editTheme);
+
+      this.setThemesBlockGlobalStatus(1);
 
       this._replaceSelectedThemes();
     } catch (e) {

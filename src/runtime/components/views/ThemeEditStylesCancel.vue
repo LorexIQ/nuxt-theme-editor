@@ -10,8 +10,8 @@ type Props = {
 const props = defineProps<Props>();
 const client = props.client;
 const router = client.getRouter();
-const themeId = computed(() => router.getQuery().themeId);
-const withBlockClose = computed(() => router.getQuery().withBlockClose ?? false);
+const themeId = computed(() => router.route.query.themeId);
+const withBlockClose = computed(() => router.route.query.withBlockClose ?? false);
 
 function onCancel() {
   router.push(`editThemeStyles?themeId=${themeId.value}`, 'tab-fade-rl');

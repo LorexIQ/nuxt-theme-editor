@@ -18,7 +18,7 @@ const client = props.client;
 const router = client.getRouter();
 
 const activeErrors = useErrorMessages();
-const themeId = computed(() => router.getQuery().themeId);
+const themeId = computed(() => router.route.query.themeId);
 const theme = computed(() => client.getThemeById(themeId.value)!);
 
 const themeEditData = reactive({

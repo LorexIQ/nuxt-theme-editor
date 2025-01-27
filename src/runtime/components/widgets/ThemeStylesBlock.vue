@@ -2,11 +2,11 @@
 import type { StyleContextMenuData } from '../features/StyleEditBlock.vue';
 import StyleEditBlock from '../features/StyleEditBlock.vue';
 import DropDownBlock from '../shared/DropDownBlock.vue';
-import type { ModuleClient, ModuleDefineThemeBlockSettings } from '../../types';
+import type { ModuleDefineThemeBlockSettings, ModuleTheme } from '../../types';
 import { computed } from '#imports';
 
 type Props = {
-  client: ModuleClient;
+  theme: ModuleTheme;
   styles: Record<string, any>[];
   rawStyles: Record<string, any>[];
   settings?: ModuleDefineThemeBlockSettings;
@@ -41,7 +41,7 @@ const stylesBlocks = computed(() => props.styles.map((stylesBlock, index) => ({
       <ThemeStylesBlock
         v-if="block.id"
         :id="block.id"
-        :client="client"
+        :theme="theme"
         :styles="block.stylesBlock.styles"
         :raw-styles="block.rawStylesBlock.styles"
         :settings="block.settings"
@@ -63,7 +63,7 @@ const stylesBlocks = computed(() => props.styles.map((stylesBlock, index) => ({
               <StyleEditBlock
                 :id="`${styleCtxPathComputed}.${styleKey}`"
                 :style-key="styleKey"
-                :client="client"
+                :theme="theme"
                 :styles="block.stylesBlock"
                 :raw-styles="block.rawStylesBlock"
                 @click="emit('click', $event)"

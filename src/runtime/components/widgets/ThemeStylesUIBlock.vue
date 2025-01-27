@@ -2,12 +2,12 @@
 import type { StyleContextMenuData } from '../features/StyleEditBlock.vue';
 import StyleEditBlock from '../features/StyleEditBlock.vue';
 import DropDownBlock from '../shared/DropDownBlock.vue';
-import type { ModuleClient } from '../../types';
+import type { ModuleTheme } from '../../types';
 import unwrap from '../../helpers/client/unwrap';
 import { computed } from '#imports';
 
 type Props = {
-  client: ModuleClient;
+  theme: ModuleTheme;
 };
 type Emits = {
   (e: 'contextMenuOpen', v: StyleContextMenuData): void;
@@ -18,8 +18,7 @@ type Emits = {
 const props = defineProps<Props>();
 const emit = defineEmits<Emits>();
 
-const client = props.client;
-const theme = computed(() => client.getEditedTheme()!);
+const theme = computed(() => props.theme);
 const themeUIStyles = computed(() => unwrap.get(theme.value.getPrepareStylesUI()));
 const themeUITargetStyles = computed(() => unwrap.get(theme.value.getStylesUI('edited')));
 </script>
@@ -36,11 +35,11 @@ const themeUITargetStyles = computed(() => unwrap.get(theme.value.getStylesUI('e
       <div class="TE-theme-styles-ui-block__styles">
         <template
           v-for="styleKey of Object.keys(themeUIStyles)"
-          :key="`${client.getRuntimeUIId()}.${styleKey}`"
+          :key="`${theme.runtimePreviewId}.${styleKey}`"
         >
           <StyleEditBlock
-            :id="`${client.getRuntimeUIId()}.${styleKey}`"
-            :client="client"
+            :id="`${theme.runtimePreviewId}.${styleKey}`"
+            :theme="theme"
             :style-key="styleKey"
             :styles="themeUIStyles"
             :raw-styles="themeUITargetStyles"

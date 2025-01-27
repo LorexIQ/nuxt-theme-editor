@@ -37,6 +37,7 @@ console.log('second.vue useThemeBlock =>', scopeStyles.value);
         :value="themesEditor"
         :replaces="[
           'pathsCache',
+          'component',
           'ctx',
           'config',
           'md5Cache',

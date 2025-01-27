@@ -7,7 +7,7 @@ import { computed } from '#imports';
 const client = useThemesEditor();
 const router = client.getRouter();
 
-const pageComponent = computed(() => router.getCurrentPage()?.component ?? Error404);
+const pageComponent = computed(() => router.route.page?.component ?? Error404);
 const addStyles = computed(() => ({
   '--alpha': 'url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAAAXNSR0IArs4c6QAAAChJREFUKFNjPHP19n8GNGCspYIuxMA4FBT+//8fwzNnr93B9MwQUAgAe7I0XsEPG9EAAAAASUVORK5CYII=)'
 }));

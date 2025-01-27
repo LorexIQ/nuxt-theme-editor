@@ -7,6 +7,7 @@ import { computed, onBeforeMount, ref, watch } from '#imports';
 type Props = {
   expandEnabled?: boolean;
   expandDefault?: boolean;
+  expandIsInit?: boolean;
   expandAction?: () => any;
 };
 type Emits = {
@@ -24,7 +25,7 @@ const loader = useSwitch({
   maxQueue: 1
 });
 const isError = ref(false);
-const isInit = ref(false);
+const isInit = ref(props.expandIsInit ?? false);
 const isExpanded = ref(props.expandEnabled ? props.expandDefault : true);
 const isRefreshVisible = computed(() => props.expandAction && !loader.status && isInit.value && !isError.value);
 

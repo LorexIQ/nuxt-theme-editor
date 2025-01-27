@@ -24,7 +24,7 @@ const themeCreateData = reactive<ModuleThemeCreateData>({
   id: '',
   name: '',
   description: '',
-  parentThemeId: router.getQuery()['parentThemeId']
+  parentThemeId: router.route.query.parentThemeId
 });
 const previewTheme = computed<any>(() => ({
   id: themeCreateData.parentThemeId ?? useIdProtect('default'),

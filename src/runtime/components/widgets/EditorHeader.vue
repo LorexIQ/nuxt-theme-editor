@@ -17,7 +17,7 @@ const logoParts: string[] = [
   'ditor'
 ];
 
-const openedPage = computed(() => router.getPath());
+const openedPage = computed(() => router.route.path);
 const isAnotherPage = computed(() => openedPage.value !== 'index');
 const isEditedPage = computed(() => client.getSelectedEditedThemeId());
 
@@ -51,7 +51,7 @@ function onGoHome() {
         v-if="isAnotherPage"
         class="TE-editor-header__title"
       >
-        &nbsp;&nbsp;&nbsp; > {{ router.getCurrentPage()?.title ?? router.getPath() }}
+        &nbsp;&nbsp;&nbsp; > {{ router.route?.title ?? router.route.path }}
       </div>
     </transition-expand>
   </div>

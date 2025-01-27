@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { Ref } from 'vue';
 import TextRunner from '../shared/TextRunner.vue';
-import type { ModuleClient, ModuleDefaultStyleKeys } from '../../types';
+import type { ModuleDefaultStyleKeys, ModuleTheme } from '../../types';
 import { computed, ref } from '#imports';
 
 export type StylePickerData = {
@@ -14,7 +14,7 @@ export type StyleContextMenuData = [MouseEvent, StylePickerData, ModuleDefaultSt
 type Props = {
   id: string;
   styleKey: string;
-  client: ModuleClient;
+  theme: ModuleTheme;
   styles: Record<string, string>;
   rawStyles: Record<string, string>;
 };
@@ -45,7 +45,7 @@ const isCircular = computed(() => currentValue.value === 'CIRCULAR');
   >
     <color-picker
       ref="pickerRef"
-      :storage-key="client.getConfig().keys.colorsHistory"
+      :storage-key="theme.getConfig().keys.colorsHistory"
       :model-value="currentValue"
       with-alpha
       with-initial-color

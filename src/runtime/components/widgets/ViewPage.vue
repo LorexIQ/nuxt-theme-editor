@@ -1,10 +1,16 @@
 <script lang="ts" setup>
+import IconsStore from '../shared/IconsStore.vue';
+import type { UseSwitchClass } from '../../helpers/client/useSwitch';
 import { ref } from '#imports';
 
+type Props = {
+  loader?: UseSwitchClass;
+};
 type Emits = {
   (e: 'scrollend', v: Event): void;
 };
 
+defineProps<Props>();
 const emit = defineEmits<Emits>();
 
 const templateRef = ref<HTMLDivElement>();
@@ -19,48 +25,81 @@ defineExpose({
 </script>
 
 <template>
-  <div
-    class="TE-view-page"
-  >
-    <div
-      ref="templateRef"
-      class="TE-view-page__template"
-      @scrollend="emit('scrollend', $event)"
-    >
-      <slot />
-    </div>
-    <div
-      ref="messagesRef"
-      class="TE-view-page__messages"
-    >
-      <slot name="messages" />
-    </div>
-    <div
-      ref="footerRef"
-      class="TE-view-page__footer"
-    >
-      <slot name="footer" />
-    </div>
+  <div class="TE-view-page">
+    <transition name="fade">
+      <div
+        v-if="loader?.status"
+        class="TE-view-page__loader"
+      >
+        <IconsStore
+          icon="Spinner"
+          size="40"
+        />
+      </div>
+      <div
+        v-else
+        class="TE-view-page__content"
+      >
+        <div
+          ref="templateRef"
+          class="TE-view-page__content__template"
+          @scrollend="emit('scrollend', $event)"
+        >
+          <slot />
+        </div>
+        <div
+          ref="messagesRef"
+          class="TE-view-page__content__messages"
+        >
+          <slot name="messages" />
+        </div>
+        <div
+          ref="footerRef"
+          class="TE-view-page__content__footer"
+        >
+          <slot name="footer" />
+        </div>
+      </div>
+    </transition>
   </div>
 </template>
 
 <style scoped lang="scss">
 .TE-view-page {
-  display: grid;
-  grid-template-rows: 1fr auto auto;
+  position: relative;
   height: 100%;
-  margin-left: -1px;
-  border-left: 1px solid var(--border);
 
-  &__template {
+  &__loader {
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
     display: flex;
-    flex-direction: column;
-    overflow-x: hidden;
-    overflow-y: auto;
+    justify-content: center;
+    align-items: center;
+
+    & svg {
+      color: var(--titleTransparent)
+    }
   }
-  &__footer {
-    background-color: var(--bgFooter);
-    box-shadow: 0 0 10px var(--shadow);
+  &__content {
+    display: grid;
+    grid-template-rows: 1fr auto auto;
+    height: inherit;
+    margin-left: -1px;
+    border-left: 1px solid var(--border);
+
+    &__template {
+      display: flex;
+      flex-direction: column;
+      overflow-x: hidden;
+      overflow-y: auto;
+    }
+    &__footer {
+      background-color: var(--bgFooter);
+      box-shadow: 0 0 10px var(--shadow);
+    }
   }
 }
 

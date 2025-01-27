@@ -37,8 +37,8 @@ export class Theme {
   public readonly isSelectedAsDark = ref(false);
   public readonly isSelectedAsEdited = ref(false);
 
-  private runtimePreviewId = useIdProtect('preview');
-  private runtimeUIId = useIdProtect('ui');
+  public readonly runtimePreviewId = useIdProtect('preview');
+  public readonly runtimeUIId = useIdProtect('ui');
 
   private styles = reactive([] as ModuleThemeCleanedStyles[]);
   private editedStyles = reactive([] as ModuleThemeCleanedStyles[]);
@@ -287,6 +287,10 @@ export class Theme {
     }
   }
 
+  getConfig(): ModuleOptionsExtend {
+    return this.config;
+  }
+
   getStylesBlock(blockPath: ModuleDefaultBlockKeys, scope: ThemeStylesScope = 'main'): ComputedRef<ModuleObject> {
     return computed(() => this._getPathsCacheValue('B', blockPath, this._geyStylesByScope(scope)) ?? {});
   }
@@ -387,6 +391,7 @@ export class Theme {
       }, { loader: this.loader });
 
       unwrap.set(this, 'type', 'global');
+      this.ctx.setThemesBlockGlobalStatus(2);
       return true;
     } catch {
       this.ctx.createError(
@@ -412,6 +417,7 @@ export class Theme {
       await this.loadInfo(theme);
 
       unwrap.set(this, 'type', 'local');
+      this.ctx.setThemesBlockGlobalStatus(2);
       return true;
     } catch {
       this.ctx.createError(
@@ -442,6 +448,7 @@ export class Theme {
             }
           }, { loader: this.loader });
 
+          this.ctx.setThemesBlockGlobalStatus(2);
           return true;
         } catch {
           this.ctx.createError(
@@ -474,6 +481,7 @@ export class Theme {
             }
           }, { loader: this.loader });
 
+          this.ctx.setThemesBlockGlobalStatus(2);
           return true;
         } catch {
           this.ctx.createError(
