@@ -448,6 +448,7 @@ export class Theme {
               description: unwrap.get(data.description)
             }
           }, { loader: this.loader });
+          await this.loader.promiseStatus();
 
           this.ctx.setThemesBlockGlobalStatus(2);
           return true;

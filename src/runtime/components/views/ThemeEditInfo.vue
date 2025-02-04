@@ -33,7 +33,7 @@ const previewTheme = computed(() => ({
   description: themeEditData.description
 }) as any);
 
-function editTheme() {
+async function editTheme() {
   const id = themeEditData.id;
   activeErrors.clear();
 
@@ -42,8 +42,9 @@ function editTheme() {
   if (themeId.value !== id && client.getThemeById(id)) activeErrors.add(2, { id });
 
   if (!activeErrors.isError.value) {
-    theme.value.editInfo(themeEditData);
-    router.push('index', 'tab-fade-rl');
+    if (await theme.value.editInfo(themeEditData)) {
+      router.push('index', 'tab-fade-rl');
+    }
   }
 }
 
@@ -56,7 +57,10 @@ onBeforeMount(() => {
 </script>
 
 <template>
-  <ViewPage page="editThemeInfo">
+  <ViewPage
+    page="editThemeInfo"
+    :loader="theme.loader"
+  >
     <div
       class="TE-theme-edit-info"
       @keyup.enter="editTheme"

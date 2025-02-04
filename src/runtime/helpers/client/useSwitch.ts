@@ -1,7 +1,7 @@
 import type { Reactive, Ref } from 'vue';
 import type { UnwrapRefSimple } from '@vue/reactivity';
 import unwrap from './unwrap';
-import { reactive, ref } from '#imports';
+import { reactive, ref, watch } from '#imports';
 
 export type UseSwitchConfig = {
   maxQueue?: number;
@@ -60,6 +60,15 @@ class UseSwitch {
     } finally {
       await this.hide();
     }
+  }
+
+  async promiseStatus(): Promise<boolean> {
+    return new Promise((resolve) => {
+      const watchStopper = watch(() => this.status, (status) => {
+        watchStopper();
+        resolve(unwrap.get(status));
+      });
+    });
   }
 
   private async calculateComputedStatus(status: true[]) {

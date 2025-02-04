@@ -39,7 +39,7 @@ import { Theme } from '../../classes/client/Theme';
 import useAPIFetch from '../../helpers/client/useAPIFetch';
 import { Sandbox } from './Sandbox';
 import { Router } from './Router';
-import { useRuntimeConfig, reactive, ref, computed, watch, nextTick } from '#imports';
+import { useRuntimeConfig, reactive, ref, computed, watch } from '#imports';
 
 type ThemeId = string | Ref<string | undefined>;
 type ThemeDefConfig = 'light' | 'dark' | 'system' | ThemeId | undefined;
@@ -116,7 +116,6 @@ export class Client {
     this._selectDefaultThemes();
     this._readStorage();
     this._initWatchers();
-    this._openOnlySelectedThemeBlock();
   }
 
   private _initWatchers(): void {
@@ -163,6 +162,10 @@ export class Client {
     // watch(this.selectedEditedThemeId, themeId => this.reloadMiddleware[themeId ? 'on' : 'off']());
 
     watch(this.storageSettings, this._saveStorage.bind(this));
+
+    watch(this.isBlockVisible, (status) => {
+      if (status) this._openOnlySelectedThemeBlock();
+    }, { immediate: true });
   }
 
   private _readSystemThemes(): void {
@@ -203,11 +206,9 @@ export class Client {
   }
 
   private _openOnlySelectedThemeBlock(): void {
-    nextTick(() => {
-      this.setThemesBlockSystemStatus(unwrap.get(this.selectedTheme)?.type === 'system' ? 1 : 0);
-      this.setThemesBlockGlobalStatus(unwrap.get(this.selectedTheme)?.type === 'global' ? 2 : 0);
-      this.setThemesBlockLocalStatus(unwrap.get(this.selectedTheme)?.type === 'local' ? 1 : 0);
-    });
+    this.setThemesBlockSystemStatus(unwrap.get(this.selectedTheme)?.type === 'system' ? 1 : 0);
+    this.setThemesBlockGlobalStatus(unwrap.get(this.selectedTheme)?.type === 'global' ? 2 : 0);
+    this.setThemesBlockLocalStatus(unwrap.get(this.selectedTheme)?.type === 'local' ? 1 : 0);
   }
 
   private _replaceSelectedThemes(light?: ThemeId, dark?: ThemeId, main?: ThemeId, lightDef?: ThemeId, darkDef?: ThemeId, mainDef?: ThemeId): void {
@@ -241,7 +242,7 @@ export class Client {
         this._checkThemeAvailableAndGetActual(storage.selectedDarkThemeId, 'dark'),
         this._checkThemeAvailableAndGetActual(storage.selectedMainThemeId, unwrap.get(this.isAutoThemeMode) ? 'system' : unwrap.get(this.selectedLightThemeId))
       );
-      this.setAutoThemeModeStatus(storage.isAutoThemeMode);
+      setTimeout(() => this.setAutoThemeModeStatus(storage.isAutoThemeMode));
     }
   }
 
