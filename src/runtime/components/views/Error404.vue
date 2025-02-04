@@ -16,6 +16,7 @@ function goMain() {
 
 <template>
   <QuestionPageBlock
+    page="Error404"
     class="TE-error-404"
     icon="I404"
     question-title="Page not found"

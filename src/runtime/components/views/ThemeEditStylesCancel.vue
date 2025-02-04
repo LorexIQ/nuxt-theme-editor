@@ -29,6 +29,7 @@ function onApprove() {
 
 <template>
   <QuestionPageBlock
+    page="editThemeStylesCancel"
     class="TE-theme-edit-styles-cancel"
     icon="Warn"
     question-title="The changes you have made may not be saved"

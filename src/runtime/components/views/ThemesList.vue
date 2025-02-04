@@ -1,9 +1,8 @@
 <script setup lang="ts">
-import type { ModuleClient } from '../../types';
+import type { ModuleClient, ModuleTheme } from '../../types';
 import BlockThemes from '../widgets/BlockThemes.vue';
 import ViewPage from '../widgets/ViewPage.vue';
 import IsSwitch from '../shared/IsSwitch.vue';
-import ClientErrors from '../features/ClientErrors.vue';
 
 type Props = {
   client: ModuleClient;
@@ -11,15 +10,30 @@ type Props = {
 
 const props = defineProps<Props>();
 const sandbox = props.client.getSandbox();
+
+function validateThemeAvailability(theme: ModuleTheme) {
+  return !theme.loader.status;
+}
+function selectThemeAsMain([_, theme]: [MouseEvent, ModuleTheme]) {
+  if (validateThemeAvailability(theme)) {
+    theme.setSelectedAsMain();
+  }
+}
+function openThemeContextMenu([event, theme]: [MouseEvent, ModuleTheme]) {
+  if (validateThemeAvailability(theme)) {
+    sandbox.openThemeContextMenu(event, theme);
+  }
+}
 </script>
 
 <template>
-  <ViewPage>
+  <ViewPage page="index">
     <div class="TE-themes-list">
       <BlockThemes
         type="system"
         :client="client"
-        @context-menu-open="sandbox.openThemeContextMenu(...$event)"
+        @double-click="selectThemeAsMain"
+        @context-menu-open="openThemeContextMenu"
       >
         <template #preview>
           <slot name="preview" />
@@ -29,7 +43,8 @@ const sandbox = props.client.getSandbox();
         type="global"
         :client="client"
         :expand-action="() => client.loadGlobalThemes()"
-        @context-menu-open="sandbox.openThemeContextMenu(...$event)"
+        @double-click="selectThemeAsMain"
+        @context-menu-open="openThemeContextMenu"
       >
         <template #preview>
           <slot name="preview" />
@@ -38,19 +53,14 @@ const sandbox = props.client.getSandbox();
       <BlockThemes
         type="local"
         :client="client"
-        @context-menu-open="sandbox.openThemeContextMenu(...$event)"
+        @double-click="selectThemeAsMain"
+        @context-menu-open="openThemeContextMenu"
       >
         <template #preview>
           <slot name="preview" />
         </template>
       </BlockThemes>
     </div>
-    <template #messages>
-      <ClientErrors
-        :client="client"
-        page="index"
-      />
-    </template>
     <template #footer>
       <div class="TE-themes-list-footer">
         <IsSwitch

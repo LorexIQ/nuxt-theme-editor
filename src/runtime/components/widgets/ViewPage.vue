@@ -1,9 +1,13 @@
 <script lang="ts" setup>
 import IconsStore from '../shared/IconsStore.vue';
 import type { UseSwitchClass } from '../../helpers/client/useSwitch';
+import ClientErrors from '../features/ClientErrors.vue';
+import useClient from '../../helpers/client/useClient';
+import type { ModulePagesNames } from '../../types';
 import { ref } from '#imports';
 
 type Props = {
+  page: ModulePagesNames;
   loader?: UseSwitchClass;
 };
 type Emits = {
@@ -12,6 +16,7 @@ type Emits = {
 
 defineProps<Props>();
 const emit = defineEmits<Emits>();
+const client = useClient();
 
 const templateRef = ref<HTMLDivElement>();
 const messagesRef = ref<HTMLDivElement>();
@@ -52,6 +57,10 @@ defineExpose({
           class="TE-view-page__content__messages"
         >
           <slot name="messages" />
+          <ClientErrors
+            :client="client"
+            :page="page"
+          />
         </div>
         <div
           ref="footerRef"

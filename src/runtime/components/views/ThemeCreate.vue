@@ -51,7 +51,7 @@ onBeforeMount(() => {});
 </script>
 
 <template>
-  <ViewPage>
+  <ViewPage page="newTheme">
     <div
       class="TE-theme-create"
       @keyup.enter="createTheme"

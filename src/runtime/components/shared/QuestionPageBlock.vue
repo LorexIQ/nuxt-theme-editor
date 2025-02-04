@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { ModuleIcons } from '../../types';
+import type { ModuleIcons, ModulePagesNames } from '../../types';
 import IsButton from '../shared/IsButton.vue';
 import ViewPage from '../widgets/ViewPage.vue';
 import IconsStore from '../shared/IconsStore.vue';
@@ -8,6 +8,7 @@ import { onBeforeMount } from '#imports';
 
 type Props = {
   icon: ModuleIcons;
+  page: ModulePagesNames;
   questionTitle: string;
   firstBtnTitle?: string;
   secondBtnTitle?: string;
@@ -59,7 +60,7 @@ onBeforeMount(() => {
 </script>
 
 <template>
-  <ViewPage>
+  <ViewPage :page="page">
     <div class="TE-question-page-block">
       <IconsStore
         :icon="icon"

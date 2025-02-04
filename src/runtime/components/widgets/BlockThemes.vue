@@ -12,6 +12,7 @@ type Props = {
   expandAction?: () => any;
 };
 type Emits = {
+  (e: 'doubleClick', v: [MouseEvent, ModuleTheme]): void;
   (e: 'contextMenuOpen', v: [MouseEvent, ModuleTheme]): void;
 };
 
@@ -59,7 +60,7 @@ function onChangeStatus(status: boolean) {
               :key="theme.id"
               :client="client"
               :theme="theme"
-              @dblclick="client.setThemeSelectedAsMain(theme.id)"
+              @dblclick="emit('doubleClick', [$event, theme])"
               @contextmenu.prevent="emit('contextMenuOpen', [$event, theme])"
             >
               <template #preview>

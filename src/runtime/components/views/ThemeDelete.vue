@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import type { ModuleClient } from '../../types';
 import QuestionPageBlock from '../shared/QuestionPageBlock.vue';
-import ClientErrors from '../features/ClientErrors.vue';
 import { computed } from '#imports';
 
 type Props = {
@@ -36,6 +35,7 @@ function onBeforeMount() {
 
 <template>
   <QuestionPageBlock
+    page="deleteTheme"
     class="TE-theme-delete"
     icon="Question"
     question-title="Are you sure you want to delete the theme"
@@ -45,14 +45,7 @@ function onBeforeMount() {
     :second-on-click="onApprove"
     :second-on-success="onApproveSuccess"
     :before-mount="onBeforeMount"
-  >
-    <template #messages>
-      <ClientErrors
-        :client="client"
-        page="deleteTheme"
-      />
-    </template>
-  </QuestionPageBlock>
+  />
 </template>
 
 <style lang="scss" scoped>

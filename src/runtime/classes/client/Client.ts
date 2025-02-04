@@ -691,8 +691,8 @@ export class Client {
         localTheme.setDescription(theme.description);
         localTheme.setInitStatus(false);
 
-        if (localTheme.isInCache) localTheme.loadInfo();
-        else localTheme.setStyles(getOnlyPreviewBlock(theme));
+        if (localTheme.isInCache) localTheme.loadInfo(undefined, true);
+        else localTheme.setStyles(getOnlyPreviewBlock(theme), undefined, true);
       } else if (localTheme.type === 'local') {
         ctx._checkAndFixIdsThemesConflict(localTheme, 'self', 'Local theme id conflict with global theme id');
         addTheme(theme);

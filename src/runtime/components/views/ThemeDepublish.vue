@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import type { ModuleClient } from '../../types';
 import QuestionPageBlock from '../shared/QuestionPageBlock.vue';
-import ClientErrors from '../features/ClientErrors.vue';
 import { computed } from '#imports';
 
 type Props = {
@@ -31,6 +30,7 @@ async function onApproveSuccess() {
 
 <template>
   <QuestionPageBlock
+    page="depublishApprove"
     class="TE-theme-depublish"
     icon="Depublish"
     question-title="Are you serious about removing the topic from publication?"
@@ -40,14 +40,7 @@ async function onApproveSuccess() {
     second-btn-decor="error"
     :second-on-click="onApprove"
     :second-on-success="onApproveSuccess"
-  >
-    <template #messages>
-      <ClientErrors
-        :client="client"
-        page="depublishApprove"
-      />
-    </template>
-  </QuestionPageBlock>
+  />
 </template>
 
 <style lang="scss" scoped>

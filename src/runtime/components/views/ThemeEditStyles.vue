@@ -20,9 +20,9 @@ const sandbox = client.getSandbox();
 const viewPageRef = ref();
 const alertInheritance = ref<HTMLElement>();
 const themeId = computed(() => router.route.query.themeId);
-const theme = computed(() => client.getThemeById(themeId.value)!);
-const themeStyles = computed(() => unwrap.get(theme.value.getPreparedStylesWithoutSystem()));
-const themeTargetStyles = computed(() => unwrap.get(theme.value.getStylesWithoutSystem('edited')));
+const theme = computed(() => client.getThemeById(themeId.value));
+const themeStyles = computed(() => unwrap.get(theme.value?.getPreparedStylesWithoutSystem()));
+const themeTargetStyles = computed(() => unwrap.get(theme.value?.getStylesWithoutSystem('edited')));
 
 function goBack() {
   router.push(`editThemeStylesCancel?themeId=${themeId.value}`, 'tab-fade-lr');
@@ -67,10 +67,13 @@ function inheritanceAnimation() {
     alertInheritance.value = undefined;
   }, 300);
 }
-function onSave() {
-  theme.value.saveEditedStyles();
-  client.setThemeSelectedAsEdited(undefined);
-  router.push('index', 'tab-fade-lr');
+async function onSave() {
+  if (!theme.value) return;
+
+  if (await theme.value.saveEditedStyles()) {
+    client.unselectAllThemesAs('edited');
+    router.push('index', 'tab-fade-lr');
+  }
 }
 
 onBeforeMount(() => {
@@ -79,17 +82,22 @@ onBeforeMount(() => {
     return;
   }
 
-  if (!theme.value.isSelectedAsEdited) client.setThemeSelectedAsEdited(themeId.value);
+  if (!theme.value.isSelectedAsEdited) theme.value.setSelectedAsEdited();
 });
 </script>
 
 <template>
   <ViewPage
+    v-if="theme"
     ref="viewPageRef"
+    page="editThemeStyles"
     :loader="theme.loader"
     @scrollend="inheritanceAnimation"
   >
-    <template #default>
+    <template
+      v-if="themeTargetStyles?.length && themeStyles?.length"
+      #default
+    >
       <div class="TE-theme-edit-styles">
         <ThemeStylesPreviewBlock
           :theme="theme"

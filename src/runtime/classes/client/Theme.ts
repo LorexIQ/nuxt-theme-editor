@@ -150,7 +150,7 @@ export class Theme {
     }
   }
 
-  private _geyStylesByScope(scope: ThemeStylesScope) {
+  private _getStylesByScope(scope: ThemeStylesScope) {
     return scope === 'main' ? this.styles : this.editedStyles;
   }
 
@@ -273,8 +273,9 @@ export class Theme {
     unwrap.set(this, 'isSelectedAsEdited', state);
   }
 
-  setStyles(styles: ModuleThemeCleanedStyles[], scope: ThemeStylesScope = 'main'): void {
-    utils.replaceArrayData(this._geyStylesByScope(scope), styles);
+  setStyles(styles: ModuleThemeCleanedStyles[], scope: ThemeStylesScope = 'main', force = false): void {
+    utils.replaceArrayData(this._getStylesByScope(scope), styles);
+    if (force) this._buildAllStyles(scope);
   }
 
   setStyleValue(stylePath: ModuleDefaultStyleKeys, newValue: string, scope: ThemeStylesScope = 'main'): void {
@@ -289,7 +290,7 @@ export class Theme {
           acc[index] = newValue;
           return acc;
         }
-      }, { styles: this._geyStylesByScope(scope) } as any);
+      }, { styles: this._getStylesByScope(scope) } as any);
     }
   }
 
@@ -298,19 +299,19 @@ export class Theme {
   }
 
   getStylesBlock(blockPath: ModuleDefaultBlockKeys, scope: ThemeStylesScope = 'main'): ComputedRef<ModuleObject> {
-    return computed(() => this._getPathsCacheValue('B', blockPath, this._geyStylesByScope(scope)) ?? {});
+    return computed(() => this._getPathsCacheValue('B', blockPath, this._getStylesByScope(scope)) ?? {});
   }
 
   getStyleValue(stylePath: ModuleDefaultStyleKeys, scope: ThemeStylesScope = 'main'): ComputedRef<string> {
-    return computed(() => this._getPathsCacheValue('S', stylePath, this._geyStylesByScope(scope)) ?? 'UNKNOWN STYLE');
+    return computed(() => this._getPathsCacheValue('S', stylePath, this._getStylesByScope(scope)) ?? 'UNKNOWN STYLE');
   }
 
   getStyles(scope: ThemeStylesScope = 'main'): ComputedRef<ModuleThemeCleanedStyles[]> {
-    return computed(() => this._geyStylesByScope(scope));
+    return computed(() => this._getStylesByScope(scope));
   }
 
   getStylesWithoutSystem(scope: ThemeStylesScope = 'main'): ComputedRef<ModuleThemeCleanedStyles[]> {
-    return computed(() => this._geyStylesByScope(scope).filter(block => !block.id.startsWith(this.config.systemUUID.toString())) ?? []);
+    return computed(() => this._getStylesByScope(scope).filter(block => !block.id.startsWith(this.config.systemUUID.toString())) ?? []);
   }
 
   getStylesPreview(scope: ThemeStylesScope = 'main'): ComputedRef<ModuleDefineThemeMetaPreview> {
@@ -345,17 +346,11 @@ export class Theme {
     return computed(() => utils.copyObject(this.styles));
   }
 
-  saveEditedStyles(): void {
-    if (!unwrap.get(this.isSelectedAsEdited)) return;
-
-    this.setStyles(utils.copyObject(this.editedStyles));
-  }
-
-  async loadInfo(theme?: ModuleLocalStorageTheme): Promise<boolean> {
+  async loadInfo(theme?: ModuleLocalStorageTheme, force = false): Promise<boolean> {
     if (unwrap.get(this.type) !== 'global') return false;
 
     try {
-      if (!theme && !unwrap.get(this.isInit) && !this.loader.status) {
+      if (force || (!theme && !unwrap.get(this.isInit) && !this.loader.status)) {
         theme = await useAPIFetch('GET', '/{id}', {
           params: {
             id: unwrap.get(this.id)
@@ -366,7 +361,7 @@ export class Theme {
       if (theme) {
         this.setName(theme.name);
         this.setDescription(theme.description);
-        this.setStyles(JSON.parse(theme.stylesJSON));
+        this.setStyles(JSON.parse(theme.stylesJSON), undefined, true);
         this.setInitStatus(true);
       }
       return true;
@@ -374,8 +369,8 @@ export class Theme {
       this.ctx.createError(
         'ERROR',
         'index',
-        'Error theme styles loading',
         'Error loading theme styles from the server. Please try again later.',
+        'Error theme styles loading',
         'err_self_load_global'
       );
       return false;
@@ -403,8 +398,8 @@ export class Theme {
       this.ctx.createError(
         'ERROR',
         'publishApprove',
-        'Error theme publishing',
         'Error uploading the theme to the server. Please try again later.',
+        'Error theme publishing',
         'err_publish_global'
       );
       return false;
@@ -429,8 +424,8 @@ export class Theme {
       this.ctx.createError(
         'ERROR',
         'depublishApprove',
-        'Error theme depublishing',
         'The error of removing a topic from publication. Please try again later.',
+        'Error theme depublishing',
         'err_depublish_global'
       );
       return false;
@@ -460,8 +455,8 @@ export class Theme {
           this.ctx.createError(
             'ERROR',
             'editThemeInfo',
-            'Information modification error',
             'An error occurred on the server when saving the information. Please try again later.',
+            'Information modification error',
             'err_edit_global'
           );
           return false;
@@ -493,8 +488,8 @@ export class Theme {
           this.ctx.createError(
             'ERROR',
             'deleteTheme',
-            'Error theme deleting',
             'An error occurred while deleting the theme. Please try again later.',
+            'Error theme deleting',
             'err_delete_global'
           );
           return false;
@@ -502,6 +497,44 @@ export class Theme {
       }
       case 'local':
         return this.ctx.deleteTheme(unwrap.get(this.id));
+    }
+  }
+
+  async saveEditedStyles(): Promise<boolean> {
+    if (!unwrap.get(this.isSelectedAsEdited)) return false;
+
+    switch (unwrap.get(this.type)) {
+      case 'system':
+        return false;
+      case 'global': {
+        try {
+          await useAPIFetch('PUT', '/{id}', {
+            params: {
+              id: unwrap.get(this.id)
+            },
+            body: {
+              previewStylesJSON: JSON.stringify(unwrap.get(this.getPrepareStylesPreview())),
+              stylesJSON: JSON.stringify(unwrap.get(this.getStyles('edited')))
+            }
+          }, { loader: this.loader });
+
+          this.setStyles(utils.copyObject(unwrap.get(this.getStyles('edited'))));
+          this.ctx.setThemesBlockGlobalStatus(2);
+          return true;
+        } catch {
+          this.ctx.createError(
+            'ERROR',
+            'editThemeStyles',
+            'An error occurred on the server when saving the information. Please try again later.',
+            'Styles modification error',
+            'err_edit_styles_global'
+          );
+          return false;
+        }
+      }
+      case 'local':
+        this.setStyles(utils.copyObject(unwrap.get(this.getStyles('edited'))));
+        return true;
     }
   }
 }
