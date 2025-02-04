@@ -9,14 +9,15 @@ type Props = {
 };
 
 const props = defineProps<Props>();
-const sandbox = props.client.getSandbox();
+const client = props.client;
+const sandbox = client.getSandbox();
 
 function validateThemeAvailability(theme: ModuleTheme) {
   return !theme.loader.status;
 }
 function selectThemeAsMain([_, theme]: [MouseEvent, ModuleTheme]) {
   if (validateThemeAvailability(theme)) {
-    theme.setSelectedAsMain();
+    client.setThemeSelectedAsMain(theme.id);
   }
 }
 function openThemeContextMenu([event, theme]: [MouseEvent, ModuleTheme]) {
