@@ -115,7 +115,7 @@ export class Sandbox {
             title: 'Publish',
             icon: 'Publish',
             action: () => router.push(`publishApprove?themeId=${theme.id}`, 'tab-fade-lr'),
-            isVisible: () => theme.type === 'local'
+            isVisible: () => theme.type === 'local' && this.ctx.getGlobalBlockEnabledStatus()
           },
           {
             title: 'Depublish',

@@ -41,6 +41,7 @@ function openThemeContextMenu([event, theme]: [MouseEvent, ModuleTheme]) {
         </template>
       </BlockThemes>
       <BlockThemes
+        v-if="client.getGlobalBlockEnabledStatus()"
         type="global"
         :client="client"
         :expand-action="() => client.loadGlobalThemes()"
@@ -52,6 +53,7 @@ function openThemeContextMenu([event, theme]: [MouseEvent, ModuleTheme]) {
         </template>
       </BlockThemes>
       <BlockThemes
+        v-if="client.getLocalBlockEnabledStatus()"
         type="local"
         :client="client"
         @double-click="selectThemeAsMain"

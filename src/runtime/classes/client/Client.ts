@@ -55,7 +55,12 @@ export class Client {
   private readonly themesBlockGlobalStatus = ref<ThemeBlockStatus>(0);
   private readonly themesBlockLocalStatus = ref<ThemeBlockStatus>(0);
 
-  private readonly config = useRuntimeConfig().public.themesEditor as ModuleOptionsExtend;
+  private readonly config = useRuntimeConfig().public.themesEditor as unknown as ModuleOptionsExtend;
+  private readonly configDefaultTheme = this.config.themesConfig.system.default;
+  private readonly configDefaultDarkTheme = this.config.themesConfig.system.defaultDark;
+  private readonly isGlobalThemesEnabled = this.config.themesConfig.global.enabled;
+  private readonly isLocalThemesEnabled = this.config.themesConfig.local.enabled;
+
   private readonly reloadMiddleware = useReloadMiddleware();
   private readonly sandbox = new Sandbox(this);
   private readonly router = new Router(this);
@@ -172,12 +177,12 @@ export class Client {
     const getConnectorTheme = (themeName: string) => (connectorMeta as any)[`THEME_${themeName}`] as ModuleDefineThemeBlockRootReturn;
     this.themes.splice(0);
 
-    const defaultThemeName = this.config.defaultTheme;
+    const defaultThemeName = this.configDefaultTheme;
     const defaultTheme = this._buildSystemTheme(getConnectorTheme(defaultThemeName), defaultThemeName, 'system');
 
     this.themes.push(
       reactive(defaultTheme),
-      ...this.config.themes
+      ...this.config.themesNames
         .filter(themeName => themeName !== defaultThemeName)
         .reduce<ModuleTheme[]>((accum, themeName) => {
           const buildTheme = this._buildSystemTheme(getConnectorTheme(themeName), themeName, 'system');
@@ -196,12 +201,12 @@ export class Client {
 
   private _selectDefaultThemes(): void {
     this._replaceSelectedThemes(
-      this.config.defaultTheme,
-      this.config.defaultDarkTheme,
+      this.configDefaultTheme,
+      this.configDefaultDarkTheme,
       undefined,
       undefined,
       undefined,
-      this.config.defaultTheme
+      this.configDefaultTheme
     );
   }
 
@@ -228,10 +233,12 @@ export class Client {
     if (storage) {
       const localThemes = storage.localThemes
         .map(theme => this._buildCustomTheme(theme))
-        .map(theme => reactive(theme));
+        .filter(Boolean)
+        .map(theme => reactive(theme!));
       const globalThemes = storage.globalThemesCache
         .map(theme => this._buildCustomTheme(theme))
-        .map(theme => reactive(theme));
+        .filter(Boolean)
+        .map(theme => reactive(theme!));
 
       globalThemes.forEach(theme => theme.loadInfo());
 
@@ -251,14 +258,19 @@ export class Client {
     console.log('Save');
   }
 
-  private _buildCustomTheme(themeRAW: ModuleThemeRAW, previewMode = false): ModuleThemeRef {
+  private _buildCustomTheme(themeRAW: ModuleThemeRAW, previewMode = false): ModuleThemeRef | undefined {
+    if (
+      (!this.isGlobalThemesEnabled && themeRAW.type === 'global')
+      || (!this.isLocalThemesEnabled && themeRAW.type === 'local')
+    ) return;
+
     const theme = new Theme(
       this,
       themeRAW.id,
       themeRAW.type,
       previewMode
         ? themeRAW.styles
-        : utils.mergeObjects(themeRAW.styles, unwrap.get(this.getThemeById(this.config.defaultTheme)!.getStyles())),
+        : utils.mergeObjects(themeRAW.styles, unwrap.get(this.getThemeById(this.configDefaultTheme)!.getStyles())),
       themeRAW.name,
       themeRAW.description
     );
@@ -328,8 +340,8 @@ export class Client {
     const lostDef = unwrapDef.slice(1);
 
     if (isInThemes) return unwrapThemeId;
-    else if (currentDef === 'light') return this._checkThemeAvailableAndGetActual(this.config.defaultTheme);
-    else if (currentDef === 'dark') return this._checkThemeAvailableAndGetActual(this.config.defaultDarkTheme);
+    else if (currentDef === 'light') return this._checkThemeAvailableAndGetActual(this.configDefaultTheme);
+    else if (currentDef === 'dark') return this._checkThemeAvailableAndGetActual(this.configDefaultDarkTheme);
     else if (currentDef === 'system') return this._getSystemThemeAssociation();
     else if (currentDef) return this._checkThemeAvailableAndGetActual(currentDef, ...lostDef);
     else return undefined;
@@ -389,7 +401,7 @@ export class Client {
       return results;
     };
 
-    Object.assign(this.themesPathsCache, finder(this.getThemeById(this.config.defaultTheme)!.getStyles().value));
+    Object.assign(this.themesPathsCache, finder(this.getThemeById(this.configDefaultTheme)!.getStyles().value));
   }
 
   private _selectThemeAs(as: ThemeSelectableType, themeId?: string): void {
@@ -429,6 +441,14 @@ export class Client {
 
   getBlockStatus(): boolean {
     return unwrap.get(this.isBlockVisible);
+  }
+
+  getGlobalBlockEnabledStatus(): boolean {
+    return this.isGlobalThemesEnabled;
+  }
+
+  getLocalBlockEnabledStatus(): boolean {
+    return this.isLocalThemesEnabled;
   }
 
   getThemeById(id?: string): ModuleTheme | undefined {
@@ -655,7 +675,7 @@ export class Client {
     const ctx = this;
 
     function getOnlyPreviewBlock(theme: ModuleLocalStorageThemeMini): ModuleThemeCleanedStyles[] {
-      const defaultThemeStyles = unwrap.get(ctx.getThemeById(ctx.config.defaultTheme)!.getStyles());
+      const defaultThemeStyles = unwrap.get(ctx.getThemeById(ctx.configDefaultTheme)!.getStyles());
 
       return [
         ...defaultThemeStyles.slice(0, -1).map(block => ({
@@ -674,13 +694,15 @@ export class Client {
       ctx.themes.splice(ctx.themes.indexOf(theme), 1);
     }
     function addTheme(theme: ModuleLocalStorageThemeMini): void {
-      ctx.themes.push(reactive(ctx._buildCustomTheme({
+      const buildTheme = ctx._buildCustomTheme({
         id: theme.id,
         name: theme.name,
         description: theme.description,
         type: 'global',
         styles: getOnlyPreviewBlock(theme)
-      }, true)));
+      }, true);
+
+      if (buildTheme) ctx.themes.push(reactive(buildTheme));
     }
     function editTheme(theme: ModuleLocalStorageThemeMini): void {
       const localTheme = ctx.getThemeById(theme.id)!;
@@ -701,7 +723,7 @@ export class Client {
     }
 
     try {
-      const loadedThemes = await useAPIFetch('GET', '/', {});
+      const loadedThemes = await useAPIFetch('GET', '/', {}, { globalConfig: this.config.themesConfig.global });
 
       const remoteThemesIds = loadedThemes.map(theme => theme.id);
       const currentThemesIds = this.themes.map(theme => theme.id);

@@ -23,8 +23,20 @@ export default defineNuxtModule<ModuleOptions>({
   meta,
   defaults: {
     systemUUID: 'system',
-    defaultTheme: 'light',
-    themesDir: './themes'
+    themesDir: './themes',
+
+    themesConfig: {
+      system: {
+        default: 'light'
+      },
+      global: {
+        enabled: false,
+        mode: 'nodeLocalStorage'
+      },
+      local: {
+        enabled: false
+      }
+    }
   },
   async setup(options, nuxt) {
     // @ts-ignore
@@ -34,9 +46,10 @@ export default defineNuxtModule<ModuleOptions>({
     const serverObject = new Server(nuxt, meta, resolver);
     await serverObject.readThemes();
     serverObject.getThemesFiles().create();
+    const serverConfig = serverObject.getConfig();
 
     // @ts-ignore
-    nuxt.options.runtimeConfig.public[MODULE_CONFIG_KEY] = serverObject.getConfig();
+    nuxt.options.runtimeConfig.public[MODULE_CONFIG_KEY] = serverConfig;
 
     nuxt.hook('builder:watch', (_, path) => serverObject.checkThemeChangesWithAction(path));
     nuxt.hook('build:before', () => serverObject.getMetaFiles().create());
@@ -50,8 +63,10 @@ export default defineNuxtModule<ModuleOptions>({
       path: resolver.resolve('./runtime/components/exports')
     });
 
-    const apiResolver = createResolver(resolver.resolve('./runtime/api'));
-    nuxt.options.runtimeConfig[MODULE_CONFIG_KEY] = { storagePath: apiResolver.resolve('../meta/storage') };
-    api(apiResolver);
+    if (serverConfig.themesConfig.global.enabled && serverConfig.themesConfig.global.mode === 'nodeLocalStorage') {
+      const apiResolver = createResolver(resolver.resolve('./runtime/api'));
+      nuxt.options.runtimeConfig[MODULE_CONFIG_KEY] = { storagePath: apiResolver.resolve('../meta/storage') };
+      api(apiResolver);
+    }
   }
 });

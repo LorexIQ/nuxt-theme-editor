@@ -355,7 +355,10 @@ export class Theme {
           params: {
             id: unwrap.get(this.id)
           }
-        }, { loader: this.loader });
+        }, {
+          loader: this.loader,
+          globalConfig: this.config.themesConfig.global
+        });
       }
 
       if (theme) {
@@ -389,7 +392,10 @@ export class Theme {
           previewStylesJSON: JSON.stringify(unwrap.get(this.getPrepareStylesPreview())),
           stylesJSON: JSON.stringify(unwrap.get(this.getStyles()))
         }
-      }, { loader: this.loader });
+      }, {
+        loader: this.loader,
+        globalConfig: this.config.themesConfig.global
+      });
 
       unwrap.set(this, 'type', 'global');
       this.ctx.setThemesBlockGlobalStatus(2);
@@ -414,7 +420,10 @@ export class Theme {
         params: {
           id: unwrap.get(this.id)
         }
-      }, { loader: this.loader });
+      }, {
+        loader: this.loader,
+        globalConfig: this.config.themesConfig.global
+      });
       await this.loadInfo(theme);
 
       unwrap.set(this, 'type', 'local');
@@ -447,7 +456,10 @@ export class Theme {
               name: unwrap.get(data.name),
               description: unwrap.get(data.description)
             }
-          }, { loader: this.loader });
+          }, {
+            loader: this.loader,
+            globalConfig: this.config.themesConfig.global
+          });
           await this.loader.promiseStatus();
 
           this.ctx.setThemesBlockGlobalStatus(2);
@@ -481,7 +493,10 @@ export class Theme {
             params: {
               id: unwrap.get(this.id)
             }
-          }, { loader: this.loader });
+          }, {
+            loader: this.loader,
+            globalConfig: this.config.themesConfig.global
+          });
 
           this.ctx.setThemesBlockGlobalStatus(2);
           return true;
@@ -517,7 +532,10 @@ export class Theme {
               previewStylesJSON: JSON.stringify(unwrap.get(this.getPrepareStylesPreview())),
               stylesJSON: JSON.stringify(unwrap.get(this.getStyles('edited')))
             }
-          }, { loader: this.loader });
+          }, {
+            loader: this.loader,
+            globalConfig: this.config.themesConfig.global
+          });
 
           this.setStyles(utils.copyObject(unwrap.get(this.getStyles('edited'))));
           this.ctx.setThemesBlockGlobalStatus(2);

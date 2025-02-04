@@ -2,7 +2,9 @@ export default defineNuxtConfig({
   // modules: ['../dist/module', '@nuxthub/core'],
   modules: ['../src/module', '@nuxthub/core'],
 
-  plugins: ['./plugins/test.ts'], ssr: false,
+  plugins: ['./plugins/AUTH.ts'],
+
+  ssr: false,
 
   devtools: {
     enabled: true,
@@ -28,6 +30,16 @@ export default defineNuxtConfig({
   },
 
   themesEditor: {
-    defaultTheme: 'light'
+    themesConfig: {
+      system: {
+        default: 'light'
+      },
+      global: {
+        enabled: true,
+        mode: 'customAPI',
+        origin: 'https://catrinix.atrinix.ru/api/themes',
+        authorizationUseStateKey: 'test-theme-editor-auth'
+      }
+    }
   }
 });

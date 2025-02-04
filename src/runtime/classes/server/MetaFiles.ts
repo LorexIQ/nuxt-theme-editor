@@ -15,10 +15,12 @@ import defineChecker from '../../helpers/defineChecker';
 export class MetaFiles {
   private readonly metaResolver: Resolver;
   private readonly config: ModuleOptionsExtend;
+  private readonly configDefaultTheme: string;
 
   constructor(private readonly ctx: ModuleServer) {
-    this.metaResolver = createResolver(this.ctx.getResolver().resolve('runtime', 'meta'));
     this.config = this.ctx.getConfig();
+    this.configDefaultTheme = this.config.themesConfig.system.default;
+    this.metaResolver = createResolver(this.ctx.getResolver().resolve('runtime', 'meta'));
   }
 
   private _remove(): void {
@@ -56,7 +58,7 @@ export class MetaFiles {
   private _createThemesStructure(): void {
     const filePath = this.metaResolver.resolve('themesStructure.ts');
     const metaFile = tsMorphProject.createSourceFile(filePath, '', { overwrite: true });
-    const defaultTheme = this.ctx.getThemes()[this.config.defaultTheme];
+    const defaultTheme = this.ctx.getThemes()[this.configDefaultTheme];
 
     if (defaultTheme) {
       metaFile.addTypeAlias({
@@ -92,7 +94,7 @@ export class MetaFiles {
 
     const filePath = this.metaResolver.resolve('themesStyles.css');
     const metaFile = tsMorphProject.createSourceFile(filePath, '', { overwrite: true });
-    const defaultTheme = this.ctx.getThemes()[this.config.defaultTheme];
+    const defaultTheme = this.ctx.getThemes()[this.configDefaultTheme];
 
     if (defaultTheme) {
       generateMergedStyles(defaultTheme.styles);

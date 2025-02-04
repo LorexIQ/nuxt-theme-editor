@@ -1,3 +1,5 @@
+import type { DeepRequired } from './helpers';
+
 export * from './apiSystem';
 export * from './defines';
 export * from './helpers';
@@ -9,11 +11,39 @@ export * from './themes';
 
 export type ModuleObject<T = string> = { [name: string]: T };
 
+type ModuleOptionsGlobalNodeLocalStorage = {
+  mode: 'nodeLocalStorage';
+};
+type ModuleOptionsGlobalCustomAPI = {
+  mode: 'customAPI';
+  origin: string;
+  authorizationUseStateKey?: string;
+};
+
+export type ModuleOptionsThemesConfigSystem = {
+  default: string;
+  defaultDark?: string;
+};
+export type ModuleOptionsThemesConfigGlobal = {
+  enabled: boolean;
+} & (
+  | ModuleOptionsGlobalNodeLocalStorage
+  | ModuleOptionsGlobalCustomAPI
+  );
+export type ModuleOptionsThemesConfigLocal = {
+  enabled: boolean;
+};
+
+export type ModuleOptionsThemesConfig = {
+  system?: ModuleOptionsThemesConfigSystem;
+  global?: ModuleOptionsThemesConfigGlobal;
+  local?: ModuleOptionsThemesConfigLocal;
+};
+
 export type ModuleOptions = {
   systemUUID: string;
-  defaultTheme: string;
   themesDir: string;
-  defaultDarkTheme?: string;
+  themesConfig: ModuleOptionsThemesConfig;
 };
 
 type ModuleOptionsExtendKeys = {
@@ -29,8 +59,8 @@ export type ModuleOptionsExtendMeta = {
   version: string;
   configKey: string;
 };
-export type ModuleOptionsExtend = ModuleOptions & {
-  themes: string[];
+export type ModuleOptionsExtend = DeepRequired<ModuleOptions> & {
+  themesNames: string[];
   keys: ModuleOptionsExtendKeys;
   meta: ModuleOptionsExtendMeta;
 };

@@ -54,7 +54,23 @@ export class Server {
   private _initConfig(options: ModuleOptions): ModuleOptionsExtend {
     return {
       ...options,
-      themes: [],
+      themesConfig: {
+        system: {
+          default: 'light',
+          ...options.themesConfig.system
+        },
+        global: {
+          enabled: false,
+          mode: 'nodeLocalStorage',
+          ...options.themesConfig.global
+        },
+        local: {
+          enabled: false,
+          ...options.themesConfig.local,
+          ...(options.themesConfig.global?.enabled ? { enabled: true } : {})
+        }
+      },
+      themesNames: [],
       keys: {
         state: 'nuxt-themes-editor:state',
         storage: 'nuxt-themes-editor:settings',
@@ -113,7 +129,7 @@ export class Server {
   async checkThemeChangesWithAction(path: string): Promise<void> {
     const pathFull = this.rootResolver.resolve(path);
 
-    if (this.watcherHash[path] === undefined) this.watcherHash[path] = pathFull.endsWith(`/${this.config.defaultTheme}/index.ts`);
+    if (this.watcherHash[path] === undefined) this.watcherHash[path] = pathFull.endsWith(`/${this.config.themesConfig.system.default}/index.ts`);
     if (!this.watcherHash[path]) return;
     if (Date.now() - this.watcherLastUpdate < 2000) return;
 
@@ -150,7 +166,7 @@ export class Server {
   getConfig(): ModuleOptionsExtend {
     return {
       ...this.config,
-      themes: [...this.themesNames]
+      themesNames: [...this.themesNames]
     };
   }
 

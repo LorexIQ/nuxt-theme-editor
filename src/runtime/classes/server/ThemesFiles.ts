@@ -12,9 +12,11 @@ import writeThemeStructure from '../../helpers/server/writeThemeStructure';
 export class ThemesFiles {
   private readonly themesResolver: Resolver;
   private readonly config: ModuleOptionsExtend;
+  private readonly configDefaultTheme: string;
 
   constructor(private readonly ctx: ModuleServer) {
     this.config = this.ctx.getConfig();
+    this.configDefaultTheme = this.config.themesConfig.system.default;
     this.themesResolver = createResolver(this.ctx.getRootResolver().resolve(this.config.themesDir));
   }
 
@@ -26,7 +28,7 @@ export class ThemesFiles {
   }
 
   private _checkAndCreateDefaultThemeDir(): void {
-    const defaultThemeDir = this.themesResolver.resolve(this.config.defaultTheme);
+    const defaultThemeDir = this.themesResolver.resolve(this.configDefaultTheme);
 
     if (!fs.existsSync(defaultThemeDir)) {
       fs.mkdirSync(defaultThemeDir);
@@ -34,7 +36,7 @@ export class ThemesFiles {
   }
 
   private _checkAndGenerateDefaultTheme(): void {
-    const defaultThemePath = this.themesResolver.resolve(this.config.defaultTheme, 'index.ts');
+    const defaultThemePath = this.themesResolver.resolve(this.configDefaultTheme, 'index.ts');
 
     if (!fs.existsSync(defaultThemePath)) {
       logger.info('Default theme generation...');
@@ -56,7 +58,7 @@ export class ThemesFiles {
       logger.info('Comments file generation...');
 
       const commentsFile = tsMorphProject.createSourceFile(commentsFilePath, '', { overwrite: true });
-      const defaultTheme = this.ctx.getThemes()[this.config.defaultTheme];
+      const defaultTheme = this.ctx.getThemes()[this.configDefaultTheme];
 
       commentsFile.addExportAssignment({
         isExportEquals: false,
