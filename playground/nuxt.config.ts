@@ -36,9 +36,7 @@ export default defineNuxtConfig({
       },
       global: {
         enabled: true,
-        mode: 'customAPI',
-        origin: 'https://catrinix.atrinix.ru/api/themes',
-        authorizationUseStateKey: 'test-theme-editor-auth'
+        mode: 'nodeLocalStorage'
       }
     }
   }

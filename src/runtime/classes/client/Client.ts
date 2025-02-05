@@ -205,7 +205,7 @@ export class Client {
       this.configDefaultDarkTheme,
       undefined,
       undefined,
-      undefined,
+      this.configDefaultTheme,
       this.configDefaultTheme
     );
   }
@@ -255,7 +255,6 @@ export class Client {
 
   private _saveStorage(): void {
     localStorage.setItem(this.config.keys.storage, JSON.stringify(unwrap.get(this.storageSettings)));
-    console.log('Save');
   }
 
   private _buildCustomTheme(themeRAW: ModuleThemeRAW, previewMode = false): ModuleThemeRef | undefined {
