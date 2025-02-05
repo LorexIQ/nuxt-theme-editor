@@ -63,6 +63,8 @@ export type ModuleDefineThemeMetaUI = Partial<{
   statusLightTitle: string;
   statusDarkBg: string;
   statusDarkTitle: string;
+  statusCacheBg: string;
+  statusCacheTitle: string;
 
   messageInfoBg: string;
   messageInfoTitle: string;

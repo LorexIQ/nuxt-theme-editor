@@ -22,6 +22,14 @@ defineProps<Props>();
         class="TE-theme-block__info__name"
         :class="{ 'TE-theme-block__info__name--transparent': !theme.name }"
       >
+        <transition-expand direction="horizontal">
+          <div
+            v-if="theme.isInCache && !theme.isInit"
+            class="TE-theme-block__info__name__cache"
+          >
+            Cache
+          </div>
+        </transition-expand>
         {{ theme.name || 'Empty' }}
       </div>
       <div
@@ -66,6 +74,7 @@ defineProps<Props>();
   }
   &__info {
     position: relative;
+    line-height: 18px;
     display: grid;
     grid-template-rows: 26px auto;
     align-content: center;
@@ -93,6 +102,18 @@ defineProps<Props>();
         width: 50px;
         height: 30px;
         background: linear-gradient(90deg, transparent 0%, var(--bg) 100%);
+      }
+
+      &__cache {
+        font-size: 8px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        padding: 0 5px;
+        margin-right: 5px;
+        border-radius: 4px;
+        background-color: var(--statusCacheBg);
+        color: var(--statusCacheTitle);
       }
 
       &--transparent {

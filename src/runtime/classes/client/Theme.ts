@@ -19,6 +19,7 @@ type ThemeStylesScope = 'main' | 'edited';
 export class Theme {
   private ctx: ModuleClient;
   private config!: ModuleOptionsExtend;
+  private configDefaultTheme!: string;
 
   private pathsCache!: ModulePathsCache;
   private md5Cache: ModuleObject<Uint8Array> = {};
@@ -67,6 +68,7 @@ export class Theme {
 
   private _initCtxData() {
     this.config = this.ctx.getConfig();
+    this.configDefaultTheme = this.config.themesConfig.system.default;
     this.pathsCache = this.ctx.getThemesPathsCache();
   }
 
@@ -364,7 +366,10 @@ export class Theme {
       if (theme) {
         this.setName(theme.name);
         this.setDescription(theme.description);
-        this.setStyles(JSON.parse(theme.stylesJSON), undefined, true);
+        this.setStyles(utils.mergeObjects(
+          JSON.parse(theme.stylesJSON),
+          utils.copyObject(unwrap.get(this.ctx.getThemeById(this.configDefaultTheme)!.getStyles()))
+        ), undefined, true);
         this.setInitStatus(true);
       }
       return true;

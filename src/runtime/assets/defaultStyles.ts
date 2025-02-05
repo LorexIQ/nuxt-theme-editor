@@ -64,6 +64,8 @@ export const DEFAULT_UI_STYLES: Required<ModuleDefineThemeMetaUI> = {
   statusLightTitle: '#5f3700',
   statusDarkBg: '#9e9eff',
   statusDarkTitle: '#fff',
+  statusCacheBg: '#ffbe6d',
+  statusCacheTitle: '#fff',
 
   messageInfoBg: '#65758528',
   messageInfoTitle: '#333',
