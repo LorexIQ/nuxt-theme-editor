@@ -14,10 +14,10 @@ const themesEditor = useThemesEditor();
       <div class="test-blocks__left" />
       <div class="test-blocks__right" />
     </div>
-    <button @click="themesEditor.setTheme('light')">
+    <button @click="themesEditor.setThemeSelectedAsMain('light')">
       LIGHT
     </button>
-    <button @click="themesEditor.setTheme('dark')">
+    <button @click="themesEditor.setThemeSelectedAsMain('dark')">
       DARK
     </button>
   </div>

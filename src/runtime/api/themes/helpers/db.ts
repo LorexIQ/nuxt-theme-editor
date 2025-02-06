@@ -1,5 +1,6 @@
 import getLocalStorage from '../../../helpers/server/getLocalStorage';
 import type {
+  APIResponseStatus,
   ModuleLocalStorageTheme, ModuleLocalStorageThemeCreate,
   ModuleLocalStorageThemeEdit,
   ModuleLocalStorageThemeMini
@@ -45,10 +46,30 @@ class FakeDB {
     }));
   }
 
-  getThemeById(id: string): ModuleLocalStorageTheme {
+  getThemeById(id: string | undefined): ModuleLocalStorageThemeMini {
+    const themeIndex = this.data.findIndex(theme => theme.id === id);
+    if (themeIndex === -1) throw new Error('Theme is not found!');
+    const theme = this.data[themeIndex];
+    return {
+      id: theme.id,
+      name: theme.name,
+      description: theme.description,
+      previewStylesJSON: theme.previewStylesJSON,
+      updatedAt: theme.updatedAt
+    };
+  }
+
+  getFullThemeById(id: string | undefined): ModuleLocalStorageTheme {
     const themeIndex = this.data.findIndex(theme => theme.id === id);
     if (themeIndex === -1) throw new Error('Theme is not found!');
     return this.data[themeIndex];
+  }
+
+  checkConflictById(id: string | undefined, updatedAt: number): APIResponseStatus {
+    const themeIndex = this.data.findIndex(theme => theme.id === id);
+    if (themeIndex === -1) throw new Error('Theme is not found!');
+    const themeUpdatedAt = this.data[themeIndex].updatedAt;
+    return { status: themeUpdatedAt > updatedAt };
   }
 
   addTheme(data: ModuleLocalStorageThemeCreate): ModuleLocalStorageTheme {
@@ -62,16 +83,19 @@ class FakeDB {
     return this.data.at(-1)!;
   }
 
-  updateTheme(id: string, data: ModuleLocalStorageThemeEdit): ModuleLocalStorageTheme {
+  updateTheme(id: string | undefined, data: ModuleLocalStorageThemeEdit): ModuleLocalStorageTheme {
     const themeIndex = this.data.findIndex(theme => theme.id === id);
     if (themeIndex === -1) throw new Error('Theme is not found!');
     const theme = this.data[themeIndex];
-    Object.assign(theme, data);
+    Object.assign(theme, {
+      ...data,
+      updatedAt: Date.now()
+    });
     this.save();
     return theme;
   }
 
-  deleteThemeById(id: string): ModuleLocalStorageTheme {
+  deleteThemeById(id: string | undefined): ModuleLocalStorageTheme {
     const themeIndex = this.data.findIndex(theme => theme.id === id);
     if (themeIndex === -1) throw new Error('Theme is not found!');
     const theme = this.data[themeIndex];

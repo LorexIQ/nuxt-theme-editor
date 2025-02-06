@@ -1,23 +1,13 @@
-import { createError } from 'h3';
-import { z } from 'zod';
+import { getRouterParam, createError } from 'h3';
 import defineServerRoute from '../../helpers/server/defineServerRoute';
 import type { ModuleLocalStorageTheme } from '../../types';
-import bodyReader from './helpers/bodyReader';
 import db from './helpers/db';
 
-const ThemeCreateDto = z.object({
-  id: z.string(),
-  name: z.string(),
-  description: z.string(),
-  previewStylesJSON: z.string(),
-  stylesJSON: z.string()
-});
-
 export default defineServerRoute<Promise<ModuleLocalStorageTheme>>(async (event) => {
-  const body = await bodyReader(event, ThemeCreateDto);
+  const themeId = getRouterParam(event, 'id');
 
   try {
-    return db.addTheme(body);
+    return db.getFullThemeById(themeId!);
   } catch (e: any) {
     throw createError({
       statusCode: 400,

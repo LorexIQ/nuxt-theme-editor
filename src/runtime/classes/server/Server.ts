@@ -1,4 +1,5 @@
 import fs from 'node:fs';
+import { randomUUID } from 'node:crypto';
 import type { Nuxt } from '@nuxt/schema';
 import { createResolver, type Resolver } from '@nuxt/kit';
 import type {
@@ -78,6 +79,10 @@ export class Server {
         colorsHistory: 'nuxt-themes-editor',
         sandbox: 'nuxt-themes-editor:sandbox',
         editor: 'nuxt-themes-editor:editor'
+      },
+      tokens: {
+        baseAuthorizationToken: `${randomUUID()}-${randomUUID()}`,
+        fullAuthorizationToken: `${randomUUID()}-${randomUUID()}`
       },
       meta: this.meta
     };

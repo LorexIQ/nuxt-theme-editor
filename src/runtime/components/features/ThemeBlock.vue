@@ -1,19 +1,30 @@
 <script setup lang="ts">
-import type { ModuleTheme } from '../../types';
+import type { ModuleLocalStorageThemeMini, ModuleTheme } from '../../types';
 import IconsStore from '../shared/IconsStore.vue';
+import { computed } from '#imports';
 
 type Props = {
-  theme: ModuleTheme;
+  theme: ModuleTheme | ModuleLocalStorageThemeMini;
+  useGlobalStyles?: boolean;
 };
 
-defineProps<Props>();
+const props = withDefaults(defineProps<Props>(), {
+  useGlobalStyles: true
+});
+const theme = computed(() => props.theme as Partial<ModuleTheme>);
+
+const styles = computed(() => {
+  const _styles = JSON.parse((theme.value as any).previewStylesJSON ?? '{}');
+  return Object.keys(_styles).reduce((acc, styleKey) => ({ ...acc, [`--${styleKey}`]: _styles[styleKey] }), {});
+});
 </script>
 
 <template>
   <div class="TE-theme-block">
     <div
       class="TE-theme-block__preview"
-      v-bind="{ [`theme-${theme.id}-preview`]: '' }"
+      :style="styles"
+      v-bind="useGlobalStyles ? { [`theme-${theme.id}-preview`]: '' } : {}"
     >
       <slot name="preview" />
     </div>

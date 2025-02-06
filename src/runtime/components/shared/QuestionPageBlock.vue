@@ -134,6 +134,9 @@ onBeforeMount(() => {
     font-weight: 600;
     color: var(--title);
   }
+  & svg {
+    color: var(--title);
+  }
   & .TE-is-button {
     margin-top: 10px;
   }

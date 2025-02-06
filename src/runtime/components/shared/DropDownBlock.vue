@@ -20,10 +20,7 @@ const props = withDefaults(defineProps<Props>(), {
 });
 const emit = defineEmits<Emits>();
 
-const loader = useSwitch({
-  minSwitchStatusDelay: 500,
-  maxQueue: 1
-});
+const loader = useSwitch();
 const isError = ref(false);
 const isInit = ref(props.expandIsInit ?? false);
 const isExpanded = ref(props.expandEnabled ? props.expandDefault : true);

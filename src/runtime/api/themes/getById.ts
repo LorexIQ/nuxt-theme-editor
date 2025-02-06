@@ -1,12 +1,12 @@
-import { defineEventHandler, getRouterParam, createError } from 'h3';
-import type { ModuleLocalStorageTheme } from '../../types';
+import { getRouterParam, createError } from 'h3';
+import defineServerRoute from '../../helpers/server/defineServerRoute';
+import type { ModuleLocalStorageThemeMini } from '../../types';
 import db from './helpers/db';
 
-export default defineEventHandler<Promise<ModuleLocalStorageTheme>>(async (event) => {
+export default defineServerRoute<Promise<ModuleLocalStorageThemeMini>>(async (event) => {
   const themeId = getRouterParam(event, 'id');
 
   try {
-    await new Promise(resolve => setTimeout(() => resolve(''), 1000));
     return db.getThemeById(themeId!);
   } catch (e: any) {
     throw createError({

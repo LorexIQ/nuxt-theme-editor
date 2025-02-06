@@ -3,7 +3,7 @@ import { md5 } from 'js-md5';
 import type {
   ModuleClient,
   ModuleDefaultBlockKeys, ModuleDefaultStyleKeys, ModuleDefineThemeBlockReturn,
-  ModuleDefineThemeMetaPreview, ModuleDefineThemeMetaUI, ModuleLocalStorageTheme,
+  ModuleDefineThemeMetaPreview, ModuleDefineThemeMetaUI, ModuleLocalStorageTheme, ModuleLocalStorageThemeMini,
   ModuleObject, ModuleOptionsExtend, ModulePathsCache, ModuleThemeCleanedStyles, ModuleThemeEditData,
   ModuleThemeSelectedStyles, ModuleThemeType
 } from '../../types';
@@ -28,9 +28,11 @@ export class Theme {
   public readonly type = ref<ModuleThemeType>('local');
   public readonly name = ref<string>('');
   public readonly description = ref<string>('');
+  public readonly updatedAt = ref<number>(0);
   public readonly isInit = ref(false);
   public readonly isInCache = computed(() => unwrap.get(this.type) === 'global' && (unwrap.get(this.isSelectedAsMain) || unwrap.get(this.isSelectedAsLight) || unwrap.get(this.isSelectedAsDark)));
   public readonly loader = useSwitch();
+  public readonly serverInfo = ref<ModuleLocalStorageThemeMini>();
 
   public readonly isSelected = computed(() => unwrap.get(this.ctx.getSelectedThemeId()) === unwrap.get(this.id));
   public readonly isSelectedAsMain = ref(false);
@@ -238,29 +240,36 @@ export class Theme {
     unwrap.set(this, 'description', description);
   }
 
+  setUpdatedAt(updatedAt: number): void {
+    unwrap.set(this, 'updatedAt', updatedAt);
+  }
+
   setInitStatus(status: boolean): void {
     unwrap.set(this, 'isInit', status);
   }
 
-  async setSelectedAsMain(state = true): Promise<void> {
+  async setSelectedAsMain(state = true, async = false): Promise<void> {
     if (state) {
-      await this.loadInfo();
+      if (async) this.loadInfo();
+      else await this.loadInfo();
       this.ctx.unselectAllThemesAs('main');
     }
     unwrap.set(this, 'isSelectedAsMain', state);
   }
 
-  async setSelectedAsLight(state = true): Promise<void> {
+  async setSelectedAsLight(state = true, async = false): Promise<void> {
     if (state) {
-      await this.loadInfo();
+      if (async) this.loadInfo();
+      else await this.loadInfo();
       this.ctx.unselectAllThemesAs('light');
     }
     unwrap.set(this, 'isSelectedAsLight', state);
   }
 
-  async setSelectedAsDark(state = true): Promise<void> {
+  async setSelectedAsDark(state = true, async = false): Promise<void> {
     if (state) {
-      await this.loadInfo();
+      if (async) this.loadInfo();
+      else await this.loadInfo();
       this.ctx.unselectAllThemesAs('dark');
     }
     unwrap.set(this, 'isSelectedAsDark', state);
@@ -353,19 +362,17 @@ export class Theme {
 
     try {
       if (force || (!theme && !unwrap.get(this.isInit) && !this.loader.status)) {
-        theme = await useAPIFetch('GET', '/{id}', {
+        theme = await useAPIFetch('GET', '/full/{id}', {
           params: {
             id: unwrap.get(this.id)
           }
-        }, {
-          loader: this.loader,
-          globalConfig: this.config.themesConfig.global
-        });
+        }, { loader: this.loader });
       }
 
       if (theme) {
         this.setName(theme.name);
         this.setDescription(theme.description);
+        this.setUpdatedAt(theme.updatedAt);
         this.setStyles(utils.mergeObjects(
           JSON.parse(theme.stylesJSON),
           utils.copyObject(unwrap.get(this.ctx.getThemeById(this.configDefaultTheme)!.getStyles()))
@@ -376,10 +383,33 @@ export class Theme {
     } catch {
       this.ctx.createError(
         'ERROR',
-        'index',
+        ['index', 'editThemeConflict'],
         'Error loading theme styles from the server. Please try again later.',
         'Error theme styles loading',
         'err_self_load_global'
+      );
+      return false;
+    }
+  }
+
+  async loadServerInfo(): Promise<boolean> {
+    if (unwrap.get(this.type) !== 'global') return false;
+
+    try {
+      unwrap.set(this, 'serverInfo', await useAPIFetch('GET', '/{id}', {
+        params: {
+          id: unwrap.get(this.id)
+        }
+      }, { loader: this.loader }));
+
+      return true;
+    } catch {
+      this.ctx.createError(
+        'ERROR',
+        ['index', 'editThemeConflict', 'editThemeStyles'],
+        'Error loading info from the server. Please try again later.',
+        'Error theme info loading',
+        'err_self_server_load_global'
       );
       return false;
     }
@@ -397,10 +427,7 @@ export class Theme {
           previewStylesJSON: JSON.stringify(unwrap.get(this.getPrepareStylesPreview())),
           stylesJSON: JSON.stringify(unwrap.get(this.getStyles()))
         }
-      }, {
-        loader: this.loader,
-        globalConfig: this.config.themesConfig.global
-      });
+      }, { loader: this.loader });
 
       unwrap.set(this, 'type', 'global');
       this.ctx.setThemesBlockGlobalStatus(2);
@@ -425,10 +452,7 @@ export class Theme {
         params: {
           id: unwrap.get(this.id)
         }
-      }, {
-        loader: this.loader,
-        globalConfig: this.config.themesConfig.global
-      });
+      }, { loader: this.loader });
       await this.loadInfo(theme);
 
       unwrap.set(this, 'type', 'local');
@@ -452,7 +476,7 @@ export class Theme {
         return false;
       case 'global': {
         try {
-          await useAPIFetch('PUT', '/{id}', {
+          const theme = await useAPIFetch('PUT', '/{id}', {
             params: {
               id: unwrap.get(this.id)
             },
@@ -461,11 +485,12 @@ export class Theme {
               name: unwrap.get(data.name),
               description: unwrap.get(data.description)
             }
-          }, {
-            loader: this.loader,
-            globalConfig: this.config.themesConfig.global
-          });
-          await this.loader.promiseStatus();
+          }, { loader: this.loader });
+
+          this.setId(theme.id);
+          this.setName(theme.name);
+          this.setDescription(theme.description);
+          this.setUpdatedAt(theme.updatedAt);
 
           this.ctx.setThemesBlockGlobalStatus(2);
           return true;
@@ -498,10 +523,7 @@ export class Theme {
             params: {
               id: unwrap.get(this.id)
             }
-          }, {
-            loader: this.loader,
-            globalConfig: this.config.themesConfig.global
-          });
+          }, { loader: this.loader });
 
           this.ctx.setThemesBlockGlobalStatus(2);
           return true;
@@ -534,13 +556,13 @@ export class Theme {
               id: unwrap.get(this.id)
             },
             body: {
+              id: unwrap.get(this.id),
+              name: unwrap.get(this.name),
+              description: unwrap.get(this.description),
               previewStylesJSON: JSON.stringify(unwrap.get(this.getPrepareStylesPreview())),
               stylesJSON: JSON.stringify(unwrap.get(this.getStyles('edited')))
             }
-          }, {
-            loader: this.loader,
-            globalConfig: this.config.themesConfig.global
-          });
+          }, { loader: this.loader });
 
           this.setStyles(utils.copyObject(unwrap.get(this.getStyles('edited'))));
           this.ctx.setThemesBlockGlobalStatus(2);
@@ -548,7 +570,7 @@ export class Theme {
         } catch {
           this.ctx.createError(
             'ERROR',
-            'editThemeStyles',
+            ['editThemeStyles', 'editThemeConflict'],
             'An error occurred on the server when saving the information. Please try again later.',
             'Styles modification error',
             'err_edit_styles_global'
@@ -559,6 +581,30 @@ export class Theme {
       case 'local':
         this.setStyles(utils.copyObject(unwrap.get(this.getStyles('edited'))));
         return true;
+    }
+  }
+
+  async checkServerConflict(): Promise<boolean> {
+    if (unwrap.get(this.type) !== 'global') return false;
+
+    try {
+      return await useAPIFetch('POST', '/check-conflict/{id}', {
+        params: {
+          id: unwrap.get(this.id)
+        },
+        body: {
+          updatedAt: unwrap.get(this.updatedAt)
+        }
+      }, { loader: this.loader }).then(res => res.status);
+    } catch {
+      this.ctx.createError(
+        'ERROR',
+        'editThemeStyles',
+        'The server returned an error. Please try again later.',
+        'Conflict verification error',
+        'err_check_conflict_global'
+      );
+      return false;
     }
   }
 }

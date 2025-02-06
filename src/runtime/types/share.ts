@@ -22,9 +22,10 @@ export type ModulePageAnimations = 'tab-fade-lr' | 'tab-fade-rl' | undefined;
 export type ModulePagesNames = (typeof pagesMeta extends { name: infer U }[] ? U : never) | string;
 export type ModuleIcons = keyof typeof iconsConnector;
 export type ModuleErrorType = 'INFO' | 'TIP' | 'WARN' | 'ERROR';
+export type ModuleUUID = `${string}-${string}-${string}-${string}-${string}-${string}-${string}-${string}-${string}-${string}`;
 export type ModuleErrorMessage = {
   id: number;
-  page: ModulePagesNames;
+  page: ModulePagesNames[];
   type: ModuleErrorType;
   message: string;
   title?: string;

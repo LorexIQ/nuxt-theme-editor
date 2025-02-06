@@ -11,10 +11,11 @@ const props = defineProps<Props>();
 const client = props.client;
 const router = client.getRouter();
 const themeId = computed(() => router.route.query.themeId);
+const cancelLink = computed(() => router.route.query.cancelLink ?? 'editThemeStyles');
 const withBlockClose = computed(() => router.route.query.withBlockClose ?? false);
 
 function onCancel() {
-  router.push(`editThemeStyles?themeId=${themeId.value}`, 'tab-fade-rl');
+  router.push(`${cancelLink.value}?themeId=${themeId.value}`, 'tab-fade-rl');
 }
 function onApprove() {
   client.setThemeSelectedAsEdited(undefined);

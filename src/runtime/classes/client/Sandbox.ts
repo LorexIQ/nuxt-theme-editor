@@ -76,6 +76,13 @@ export class Sandbox {
     const isSelectedLightTheme = this.ctx.getSelectedLightThemeId() === theme.id;
     const isSelectedDarkTheme = this.ctx.getSelectedDarkThemeId() === theme.id;
 
+    const isEditAccess = this.ctx.getEditingModeStatus();
+    const isLocalAccess = theme.type === 'local';
+    const isGlobalAccess = theme.type === 'global';
+    const isLocalEditAccess = isLocalAccess && isEditAccess;
+    const isGlobalEditAccess = isGlobalAccess && isEditAccess;
+    const isLocalOrGlobalEditAccess = isLocalAccess || isGlobalEditAccess;
+
     this.components.push({
       id: UUID(),
       component: markRaw(ContextMenu),
@@ -115,25 +122,25 @@ export class Sandbox {
             title: 'Publish',
             icon: 'Publish',
             action: () => router.push(`publishApprove?themeId=${theme.id}`, 'tab-fade-lr'),
-            isVisible: () => theme.type === 'local' && this.ctx.getGlobalBlockEnabledStatus()
+            isVisible: () => isLocalEditAccess
           },
           {
             title: 'Depublish',
             icon: 'Depublish',
             action: () => router.push(`depublishApprove?themeId=${theme.id}`, 'tab-fade-lr'),
-            isVisible: () => theme.type === 'global'
+            isVisible: () => isGlobalEditAccess
           },
           {
             title: 'Edit info',
             icon: 'PaperPen',
             action: () => router.push(`editThemeInfo?themeId=${theme.id}`, 'tab-fade-lr'),
-            isVisible: () => ['local', 'global'].includes(theme.type)
+            isVisible: () => isLocalOrGlobalEditAccess
           },
           {
             title: 'Edit styles',
             icon: 'WordsPen',
             action: () => router.push(`editThemeStyles?themeId=${theme.id}`, 'tab-fade-lr'),
-            isVisible: () => ['local', 'global'].includes(theme.type)
+            isVisible: () => isLocalOrGlobalEditAccess
           },
           {
             title: 'Delete theme',
@@ -141,7 +148,7 @@ export class Sandbox {
             icon: 'Bin',
             iconColor: 'var(--contextMenuIconError)',
             action: () => router.push(`deleteTheme?themeId=${theme.id}`, 'tab-fade-lr'),
-            isVisible: () => ['local', 'global'].includes(theme.type)
+            isVisible: () => isLocalOrGlobalEditAccess
           }
         ]
       },

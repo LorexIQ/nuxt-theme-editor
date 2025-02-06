@@ -58,6 +58,7 @@ onBeforeMount(() => {
 
 <template>
   <ViewPage
+    v-if="theme"
     page="editThemeInfo"
     :loader="theme.loader"
   >

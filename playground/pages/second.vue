@@ -2,6 +2,8 @@
 const router = useRouter();
 const themesEditor = useThemesEditor();
 const scopeStyles = useThemeBlock('sidebar.test');
+const isEditEnabled = useState('test-editing', () => false);
+
 console.log('second.vue useThemeBlock =>', scopeStyles.value);
 </script>
 
@@ -26,32 +28,37 @@ console.log('second.vue useThemeBlock =>', scopeStyles.value);
     <button @click="themesEditor.setAutoThemeModeStatus(!themesEditor.getAutoThemeModeStatus())">
       AUTO [{{ themesEditor.getAutoThemeModeStatus() ? 'ON' : 'OFF' }}]
     </button>
+    <button @click="isEditEnabled = !isEditEnabled">
+      Edit [{{ isEditEnabled ? 'ON' : 'OFF' }}]
+    </button>
     <theme-editor-opener v-slot="{ status }">
       <button>
         Editor {{ status ? 'Close' : 'Open' }}
       </button>
     </theme-editor-opener>
     {{ scopeStyles }}
-    <div style="max-height: 700px; overflow-y: auto">
-      <log-object
-        :value="themesEditor"
-        :replaces="[
-          'pathsCache',
-          'component',
-          'ctx',
-          'config',
-          'md5Cache',
-          'preparedUIStyles',
-          'styles',
-          'themesPathsCache',
-          'preparedStyles',
-          'preparedPreviewStyles',
-          'pages',
-          'currentPage',
-          'storageLocalThemes',
-        ]"
-      />
-    </div>
+    <!--    <div style="max-height: 700px; overflow-y: auto"> -->
+    <!--      <log-object -->
+    <!--        :value="themesEditor" -->
+    <!--        :replaces="[ -->
+    <!--          'pathsCache', -->
+    <!--          'component', -->
+    <!--          'ctx', -->
+    <!--          'config', -->
+    <!--          'md5Cache', -->
+    <!--          'preparedUIStyles', -->
+    <!--          'styles', -->
+    <!--          'themesPathsCache', -->
+    <!--          'preparedStyles', -->
+    <!--          'preparedPreviewStyles', -->
+    <!--          'pages', -->
+    <!--          'currentPage', -->
+    <!--          'storageLocalThemes', -->
+    <!--          'sandbox', -->
+    <!--          'router', -->
+    <!--        ]" -->
+    <!--      /> -->
+    <!--    </div> -->
   </div>
 </template>
 

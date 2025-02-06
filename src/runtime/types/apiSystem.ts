@@ -1,5 +1,4 @@
 import type { UseSwitchClass } from '../helpers/client/useSwitch';
-import type { ModuleOptionsThemesConfigGlobal } from './index';
 
 export type APIFetchDefaultStructBody<T = any> = {
   [param: string]: T;
@@ -15,10 +14,10 @@ export type APIFetchDefaultStructForMethodWithBody<T = any> = APIFetchDefaultStr
 
 export type APIFetchConfig<R> = {
   responseType?: 'json' | 'blob';
-  loader?: UseSwitchClass | UseSwitchClass[];
+  loader?: UseSwitchClass;
   onlyOffLoader?: boolean;
   addSlash?: boolean;
-  globalConfig?: ModuleOptionsThemesConfigGlobal;
+  withAuthorize?: boolean;
 
   success?: (res: R) => void;
   error?: (e: any) => void;
@@ -28,3 +27,4 @@ export type APIFetchReturn<R> = Promise<R>;
 
 export type APIQuery = string | number;
 export type APIParameter = string | number;
+export type APIResponseStatus = { status: boolean };

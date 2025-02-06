@@ -1,8 +1,9 @@
-import { defineEventHandler, createError } from 'h3';
+import { createError } from 'h3';
 import type { ModuleLocalStorageThemeMini } from '../../types';
+import defineServerRoute from '../../helpers/server/defineServerRoute';
 import db from './helpers/db';
 
-export default defineEventHandler<Promise<ModuleLocalStorageThemeMini[]>>(async () => {
+export default defineServerRoute<Promise<ModuleLocalStorageThemeMini[]>>(async () => {
   try {
     return db.getAll();
   } catch (e: any) {

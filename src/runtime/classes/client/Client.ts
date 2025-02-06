@@ -39,7 +39,7 @@ import { Theme } from '../../classes/client/Theme';
 import useAPIFetch from '../../helpers/client/useAPIFetch';
 import { Sandbox } from './Sandbox';
 import { Router } from './Router';
-import { useRuntimeConfig, reactive, ref, computed, watch } from '#imports';
+import { useRuntimeConfig, reactive, ref, computed, watch, useState } from '#imports';
 
 type ThemeId = string | Ref<string | undefined>;
 type ThemeDefConfig = 'light' | 'dark' | 'system' | ThemeId | undefined;
@@ -56,10 +56,12 @@ export class Client {
   private readonly themesBlockLocalStatus = ref<ThemeBlockStatus>(0);
 
   private readonly config = useRuntimeConfig().public.themesEditor as unknown as ModuleOptionsExtend;
-  private readonly configDefaultTheme = this.config.themesConfig.system.default;
-  private readonly configDefaultDarkTheme = this.config.themesConfig.system.defaultDark;
-  private readonly isGlobalThemesEnabled = this.config.themesConfig.global.enabled;
-  private readonly isLocalThemesEnabled = this.config.themesConfig.local.enabled;
+  private readonly configThemeSystem = this.config.themesConfig.system;
+  private readonly configThemeGlobal = this.config.themesConfig.global;
+  private readonly configThemeLocal = this.config.themesConfig.local;
+  private readonly isGlobalThemesEnabled = this.configThemeGlobal.enabled;
+  private readonly isLocalThemesEnabled = this.configThemeLocal.enabled;
+  private readonly isEditingModeEnabled = computed(() => this.configThemeGlobal.editingAllowedUseStateKey ? useState<boolean>(this.configThemeGlobal.editingAllowedUseStateKey).value : true);
 
   private readonly reloadMiddleware = useReloadMiddleware();
   private readonly sandbox = new Sandbox(this);
@@ -92,6 +94,7 @@ export class Client {
       id: theme.id,
       name: theme.name,
       description: theme.description,
+      updatedAt: theme.updatedAt,
       type: theme.type,
       styles: unwrap.get(theme.getStyles())
     }))));
@@ -102,6 +105,7 @@ export class Client {
         id: theme.id,
         name: theme.name,
         description: theme.description,
+        updatedAt: theme.updatedAt,
         type: theme.type,
         styles: unwrap.get(theme.getStyles())
       })));
@@ -168,16 +172,16 @@ export class Client {
 
     watch(this.storageSettings, this._saveStorage.bind(this));
 
-    watch(this.isBlockVisible, (status) => {
-      if (status) this._openOnlySelectedThemeBlock();
-    }, { immediate: true });
+    watch(this.isBlockVisible, status => status && this._openOnlySelectedThemeBlock(), { immediate: true });
+
+    watch(() => this.router.route.path, () => this.errorsMessages.splice(0));
   }
 
   private _readSystemThemes(): void {
     const getConnectorTheme = (themeName: string) => (connectorMeta as any)[`THEME_${themeName}`] as ModuleDefineThemeBlockRootReturn;
     this.themes.splice(0);
 
-    const defaultThemeName = this.configDefaultTheme;
+    const defaultThemeName = this.configThemeSystem.default;
     const defaultTheme = this._buildSystemTheme(getConnectorTheme(defaultThemeName), defaultThemeName, 'system');
 
     this.themes.push(
@@ -201,12 +205,12 @@ export class Client {
 
   private _selectDefaultThemes(): void {
     this._replaceSelectedThemes(
-      this.configDefaultTheme,
-      this.configDefaultDarkTheme,
+      this.configThemeSystem.default,
+      this.configThemeSystem.defaultDark,
       undefined,
       undefined,
-      this.configDefaultTheme,
-      this.configDefaultTheme
+      this.configThemeSystem.default,
+      this.configThemeSystem.default
     );
   }
 
@@ -218,31 +222,25 @@ export class Client {
 
   private _replaceSelectedThemes(light?: ThemeId, dark?: ThemeId, main?: ThemeId, lightDef?: ThemeId, darkDef?: ThemeId, mainDef?: ThemeId): void {
     const lightId = this._checkThemeAvailableAndGetActual(unwrap.get(light ?? this.selectedLightThemeId), lightDef, 'light');
-    this._selectThemeAs('light', lightId);
+    this._selectThemeAs('light', lightId, true);
 
     const darkId = this._checkThemeAvailableAndGetActual(unwrap.get(dark ?? this.selectedDarkThemeId), darkDef, 'dark');
-    this._selectThemeAs('dark', darkId);
+    this._selectThemeAs('dark', darkId, true);
 
     const mainId = this._checkThemeAvailableAndGetActual(unwrap.get(main ?? this.selectedMainThemeId), mainDef, unwrap.get(this.isAutoThemeMode) ? 'system' : unwrap.get(this.selectedLightThemeId));
-    this._selectThemeAs('main', mainId);
+    this._selectThemeAs('main', mainId, true);
   }
 
   private _readStorage(): void {
     const storage = JSON.parse(localStorage.getItem(this.config.keys.storage) as string) as ModuleStorage | null;
 
     if (storage) {
-      const localThemes = storage.localThemes
-        .map(theme => this._buildCustomTheme(theme))
-        .filter(Boolean)
-        .map(theme => reactive(theme!));
-      const globalThemes = storage.globalThemesCache
+      const themes = [...storage.localThemes, ...storage.globalThemesCache]
         .map(theme => this._buildCustomTheme(theme))
         .filter(Boolean)
         .map(theme => reactive(theme!));
 
-      globalThemes.forEach(theme => theme.loadInfo());
-
-      this.themes.push(...localThemes, ...globalThemes);
+      this.themes.push(...themes);
 
       this._replaceSelectedThemes(
         this._checkThemeAvailableAndGetActual(storage.selectedLightThemeId, 'light'),
@@ -269,7 +267,7 @@ export class Client {
       themeRAW.type,
       previewMode
         ? themeRAW.styles
-        : utils.mergeObjects(themeRAW.styles, unwrap.get(this.getThemeById(this.configDefaultTheme)!.getStyles())),
+        : utils.mergeObjects(themeRAW.styles, unwrap.get(this.getThemeById(this.configThemeSystem.default)!.getStyles())),
       themeRAW.name,
       themeRAW.description
     );
@@ -339,8 +337,8 @@ export class Client {
     const lostDef = unwrapDef.slice(1);
 
     if (isInThemes) return unwrapThemeId;
-    else if (currentDef === 'light') return this._checkThemeAvailableAndGetActual(this.configDefaultTheme);
-    else if (currentDef === 'dark') return this._checkThemeAvailableAndGetActual(this.configDefaultDarkTheme);
+    else if (currentDef === 'light') return this._checkThemeAvailableAndGetActual(this.configThemeSystem.default);
+    else if (currentDef === 'dark') return this._checkThemeAvailableAndGetActual(this.configThemeSystem.defaultDark);
     else if (currentDef === 'system') return this._getSystemThemeAssociation();
     else if (currentDef) return this._checkThemeAvailableAndGetActual(currentDef, ...lostDef);
     else return undefined;
@@ -400,14 +398,14 @@ export class Client {
       return results;
     };
 
-    Object.assign(this.themesPathsCache, finder(this.getThemeById(this.configDefaultTheme)!.getStyles().value));
+    Object.assign(this.themesPathsCache, finder(this.getThemeById(this.configThemeSystem.default)!.getStyles().value));
   }
 
-  private _selectThemeAs(as: ThemeSelectableType, themeId?: string): void {
+  private _selectThemeAs(as: ThemeSelectableType, themeId?: string, async = false): void {
     const theme = this.getThemeById(themeId);
     const functionName = `setSelectedAs${as[0].toUpperCase() + as.slice(1)}`;
 
-    if (theme) (theme as any)[functionName]();
+    if (theme) (theme as any)[functionName](true, async);
     else this.unselectAllThemesAs(as);
   }
 
@@ -448,6 +446,10 @@ export class Client {
 
   getLocalBlockEnabledStatus(): boolean {
     return this.isLocalThemesEnabled;
+  }
+
+  getEditingModeStatus(): boolean {
+    return unwrap.get(this.isEditingModeEnabled);
   }
 
   getThemeById(id?: string): ModuleTheme | undefined {
@@ -510,8 +512,9 @@ export class Client {
     );
   }
 
-  getErrors(type?: ModuleErrorType, page?: ModulePagesNames): ModuleErrorMessage[] {
-    return this.errorsMessages.filter(error => (type ? error.type === type : true) && (page ? error.page === page : true));
+  getErrors(type?: ModuleErrorType, page?: ModulePagesNames | ModulePagesNames[]): ModuleErrorMessage[] {
+    const pages = page ? Array.isArray(page) ? page : [page] : this.router.getPagesNames();
+    return this.errorsMessages.filter(error => (type ? error.type === type : true) && pages.some(page => error.page.includes(page)));
   }
 
   getThemesBlockSystemStatus(): ThemeBlockStatus {
@@ -598,12 +601,12 @@ export class Client {
     this.themes.push(reactive(newTheme));
   }
 
-  createError(type: ModuleErrorType, page: ModulePagesNames, message: string, title?: string, uuid?: string): number {
+  createError(type: ModuleErrorType, page: ModulePagesNames | ModulePagesNames[], message: string, title?: string, uuid?: string): number {
     const uuidMessage = this.errorsMessages.find(message => message.uuid === uuid);
 
     if (uuidMessage) {
       uuidMessage.type = type;
-      uuidMessage.page = page;
+      uuidMessage.page = Array.isArray(page) ? page : [page];
       uuidMessage.message = message;
       uuidMessage.title = title;
       return uuidMessage.id;
@@ -612,7 +615,7 @@ export class Client {
       this.errorsMessages.push({
         id,
         type,
-        page,
+        page: Array.isArray(page) ? page : [page],
         message,
         title,
         uuid
@@ -661,7 +664,7 @@ export class Client {
     }
   }
 
-  unselectAllThemesAs(as: ThemeSelectableType) {
+  unselectAllThemesAs(as: ThemeSelectableType): void {
     const functionName = `setSelectedAs${as[0].toUpperCase() + as.slice(1)}`;
     this.themes.forEach((theme: any) => theme[functionName](false));
   }
@@ -674,7 +677,7 @@ export class Client {
     const ctx = this;
 
     function getOnlyPreviewBlock(theme: ModuleLocalStorageThemeMini): ModuleThemeCleanedStyles[] {
-      const defaultThemeStyles = unwrap.get(ctx.getThemeById(ctx.configDefaultTheme)!.getStyles());
+      const defaultThemeStyles = unwrap.get(ctx.getThemeById(ctx.configThemeSystem.default)!.getStyles());
 
       return [
         ...defaultThemeStyles.slice(0, -1).map(block => ({
@@ -697,6 +700,7 @@ export class Client {
         id: theme.id,
         name: theme.name,
         description: theme.description,
+        updatedAt: theme.updatedAt,
         type: 'global',
         styles: getOnlyPreviewBlock(theme)
       }, true);
@@ -711,6 +715,7 @@ export class Client {
       } else if (localTheme.type === 'global') {
         localTheme.setName(theme.name);
         localTheme.setDescription(theme.description);
+        localTheme.setUpdatedAt(theme.updatedAt);
         localTheme.setInitStatus(false);
 
         if (localTheme.isInCache) localTheme.loadInfo(undefined, true);
@@ -722,7 +727,7 @@ export class Client {
     }
 
     try {
-      const loadedThemes = await useAPIFetch('GET', '/', {}, { globalConfig: this.config.themesConfig.global });
+      const loadedThemes = await useAPIFetch('GET', '/', {});
 
       const remoteThemesIds = loadedThemes.map(theme => theme.id);
       const currentThemesIds = this.themes.map(theme => theme.id);
@@ -736,10 +741,8 @@ export class Client {
       themesForEdit.forEach(editTheme);
 
       this.setThemesBlockGlobalStatus(1);
-
       this._replaceSelectedThemes();
-    } catch (e) {
-      console.error(e);
+    } catch {
       this.createError(
         'ERROR',
         'index',

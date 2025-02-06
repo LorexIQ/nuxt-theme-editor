@@ -11,10 +11,10 @@ export * from './themes';
 
 export type ModuleObject<T = string> = { [name: string]: T };
 
-type ModuleOptionsGlobalNodeLocalStorage = {
+export type ModuleOptionsGlobalNodeLocalStorage = {
   mode: 'nodeLocalStorage';
 };
-type ModuleOptionsGlobalCustomAPI = {
+export type ModuleOptionsGlobalCustomAPI = {
   mode: 'customAPI';
   origin: string;
   authorizationUseStateKey?: string;
@@ -26,6 +26,7 @@ export type ModuleOptionsThemesConfigSystem = {
 };
 export type ModuleOptionsThemesConfigGlobal = {
   enabled: boolean;
+  editingAllowedUseStateKey?: string;
 } & (
   | ModuleOptionsGlobalNodeLocalStorage
   | ModuleOptionsGlobalCustomAPI
@@ -59,8 +60,13 @@ export type ModuleOptionsExtendMeta = {
   version: string;
   configKey: string;
 };
+export type ModuleOptionsAccessTokens = {
+  baseAuthorizationToken: string;
+  fullAuthorizationToken: string;
+};
 export type ModuleOptionsExtend = DeepRequired<ModuleOptions> & {
   themesNames: string[];
   keys: ModuleOptionsExtendKeys;
+  tokens: ModuleOptionsAccessTokens;
   meta: ModuleOptionsExtendMeta;
 };

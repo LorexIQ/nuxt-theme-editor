@@ -70,9 +70,13 @@ function inheritanceAnimation() {
 async function onSave() {
   if (!theme.value) return;
 
-  if (await theme.value.saveEditedStyles()) {
-    client.unselectAllThemesAs('edited');
-    router.push('index', 'tab-fade-lr');
+  if (await theme.value.checkServerConflict()) {
+    router.push(`editThemeConflict?themeId=${themeId.value}&cancelLink=editThemeStyles`, 'tab-fade-lr');
+  } else {
+    if (await theme.value.saveEditedStyles()) {
+      client.unselectAllThemesAs('edited');
+      router.push('index', 'tab-fade-rl');
+    }
   }
 }
 
@@ -132,18 +136,6 @@ onBeforeMount(() => {
         </IsButton>
         <IsButton
           decor="success"
-          :items="[
-            {
-              title: 'Save',
-              action: onSave,
-              icon: 'Save',
-            },
-            {
-              title: 'Save the draft',
-              action: () => {},
-              icon: 'SaveEdit',
-            },
-          ]"
           @click="onSave"
         >
           Save

@@ -64,4 +64,8 @@ export class Router {
   getTransitionName(): ModulePageAnimations {
     return unwrap.get(this.transitionName);
   }
+
+  getPagesNames(): ModulePagesNames[] {
+    return this.pages.map(page => page.name);
+  }
 }

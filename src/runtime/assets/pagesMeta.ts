@@ -1,18 +1,14 @@
-import ThemesList from '../components/views/ThemesList.vue';
 import ThemeCreate from '../components/views/ThemeCreate.vue';
 import ThemeDelete from '../components/views/ThemeDelete.vue';
+import ThemeDepublish from '../components/views/ThemeDepublish.vue';
+import ThemeEditConflict from '../components/views/ThemeEditConflict.vue';
 import ThemeEditInfo from '../components/views/ThemeEditInfo.vue';
 import ThemeEditStyles from '../components/views/ThemeEditStyles.vue';
 import ThemeEditStylesCancel from '../components/views/ThemeEditStylesCancel.vue';
 import ThemePublish from '../components/views/ThemePublish.vue';
-import ThemeDepublish from '../components/views/ThemeDepublish.vue';
+import ThemesList from '../components/views/ThemesList.vue';
 
 export default [
-  {
-    name: 'index',
-    title: '',
-    component: ThemesList
-  },
   {
     name: 'newTheme',
     title: 'New',
@@ -22,6 +18,16 @@ export default [
     name: 'deleteTheme',
     title: 'Delete',
     component: ThemeDelete
+  },
+  {
+    name: 'depublishApprove',
+    title: 'Depublish Approve',
+    component: ThemeDepublish
+  },
+  {
+    name: 'editThemeConflict',
+    title: 'Conflict',
+    component: ThemeEditConflict
   },
   {
     name: 'editThemeInfo',
@@ -44,8 +50,8 @@ export default [
     component: ThemePublish
   },
   {
-    name: 'depublishApprove',
-    title: 'Depublish Approve',
-    component: ThemeDepublish
+    name: 'index',
+    title: '',
+    component: ThemesList
   }
 ] as const;

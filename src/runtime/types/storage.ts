@@ -1,11 +1,13 @@
 import type { ModuleThemeRAW } from './themes';
 
-export type ModuleLocalStorageThemeMini = {
+export type ModuleLocalStorageThemeTimestamp = {
+  updatedAt: number;
+};
+export type ModuleLocalStorageThemeMini = ModuleLocalStorageThemeTimestamp & {
   id: string;
   name: string;
   description: string;
   previewStylesJSON: string;
-  updatedAt: number;
 };
 export type ModuleLocalStorageTheme = ModuleLocalStorageThemeMini & {
   stylesJSON: string;

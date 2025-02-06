@@ -23,7 +23,7 @@ const isEditedPage = computed(() => client.getSelectedEditedThemeId());
 
 function onGoHome() {
   if (isEditedPage.value) {
-    router.push(`editThemeStylesCancel?themeId=${isEditedPage.value}`, 'tab-fade-lr');
+    router.push(`editThemeStylesCancel?themeId=${isEditedPage.value}&cancelLink=${router.route.path}`, 'tab-fade-lr');
   } else {
     router.push('index', 'tab-fade-rl');
   }

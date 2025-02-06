@@ -15,6 +15,16 @@ export default function (resolver: Resolver) {
     method: 'get'
   });
   addServerHandler({
+    route: '/te-api/themes/full/:id',
+    handler: resolver.resolve('./themes/getFullById.ts'),
+    method: 'get'
+  });
+  addServerHandler({
+    route: '/te-api/themes/check-conflict/:id',
+    handler: resolver.resolve('./themes/checkConflictById.ts'),
+    method: 'post'
+  });
+  addServerHandler({
     route: '/te-api/themes',
     handler: resolver.resolve('./themes/add.ts'),
     method: 'post'

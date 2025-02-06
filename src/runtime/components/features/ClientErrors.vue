@@ -6,7 +6,7 @@ import { computed } from '#imports';
 type Props = {
   client: ModuleClient;
   type?: ModuleErrorType;
-  page?: ModulePagesNames;
+  page?: ModulePagesNames | ModulePagesNames[];
 };
 
 const props = defineProps<Props>();
