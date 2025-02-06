@@ -20,7 +20,7 @@ const props = defineProps<Props>();
 const emit = defineEmits<Emits>();
 
 const isAddActive = computed(() => props.type === 'local');
-const themes = computed(() => Object.values(props.client.getThemes()).filter(theme => theme.type === props.type));
+const themes = computed(() => Object.values(props.client.getThemes()).filter(theme => theme.type === props.type).sort((a, b) => a.name.localeCompare(b.name)));
 const typeUpper = computed(() => `${props.type[0].toUpperCase()}${props.type.slice(1)}`);
 const expandStatus = computed(() => (props.client as any)[`getThemesBlock${typeUpper.value}Status`]());
 
