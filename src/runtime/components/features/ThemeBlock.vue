@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import type { ModuleLocalStorageThemeMini, ModuleTheme } from '../../types';
 import IconsStore from '../shared/IconsStore.vue';
+import useLang from '../../helpers/useLang';
 import { computed } from '#imports';
 
 type Props = {
@@ -38,16 +39,16 @@ const styles = computed(() => {
             v-if="theme.isInCache && !theme.isInit"
             class="TE-theme-block__info__name__cache"
           >
-            Cache
+            {{ useLang('themeCard.status.cache') }}
           </div>
         </transition-expand>
-        {{ theme.name || 'Empty' }}
+        {{ theme.name || useLang('themeCard.emptyName') }}
       </div>
       <div
         class="TE-theme-block__info__description"
         :class="{ 'TE-theme-block__info__description--transparent': !theme.description }"
       >
-        <span>{{ theme.description || 'Description isn\'t set' }}</span>
+        <span>{{ theme.description || useLang('themeCard.emptyDescription') }}</span>
       </div>
     </div>
     <slot name="status" />

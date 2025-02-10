@@ -1,3 +1,4 @@
+import useLang from '../useLang';
 import { computed, reactive } from '#imports';
 
 type ValidationError = {
@@ -10,10 +11,10 @@ type ValidationErrorPrepared = {
 };
 
 const validationErrors: ValidationError[] = [
-  { id: 0, message: () => 'The ID value is required.' },
-  { id: 1, message: () => 'The ID may only contain digits, letters (a-z, A-Z), hyphens (-), and underscores (_).' },
-  { id: 2, message: ({ id }) => `The theme with the ID "${id}" already exists.` },
-  { id: 3, message: () => 'The parent theme is not set.' }
+  { id: 0, message: () => useLang('pageCreateEdit.messages.idRequired') },
+  { id: 1, message: ({ id }) => useLang('pageCreateEdit.messages.idIncorrect')(id) },
+  { id: 2, message: ({ id }) => useLang('pageCreateEdit.messages.idConflict')(id) },
+  { id: 3, message: () => useLang('pageCreateEdit.messages.parentRequired') }
 ];
 
 export default function () {

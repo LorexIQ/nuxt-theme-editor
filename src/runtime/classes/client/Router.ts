@@ -26,7 +26,7 @@ type ModuleRouterRoute = {
 
 export class Router {
   private readonly config: ModuleOptionsExtend;
-  private readonly pages = pagesMeta;
+  private readonly pages = pagesMeta();
 
   public readonly route: ModuleRouterRoute = reactive({
     fullPath: 'index',

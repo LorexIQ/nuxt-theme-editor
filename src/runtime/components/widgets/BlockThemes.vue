@@ -4,6 +4,7 @@ import ThemeBlock from '../features/ThemeBlock.vue';
 import ThemeBlockStatus from '../features/ThemeBlockStatus.vue';
 import IconsStore from '../shared/IconsStore.vue';
 import DropDownBlock from '../shared/DropDownBlock.vue';
+import useLang from '../../helpers/useLang';
 import { computed } from '#imports';
 
 type Props = {
@@ -23,6 +24,18 @@ const isAddActive = computed(() => props.type === 'local');
 const themes = computed(() => Object.values(props.client.getThemes()).filter(theme => theme.type === props.type).sort((a, b) => a.name.localeCompare(b.name)));
 const typeUpper = computed(() => `${props.type[0].toUpperCase()}${props.type.slice(1)}`);
 const expandStatus = computed(() => (props.client as any)[`getThemesBlock${typeUpper.value}Status`]());
+const blockTitle = computed(() => {
+  switch (props.type) {
+    case 'system':
+      return useLang('pageIndex.blockSystemTitle');
+    case 'global':
+      return useLang('pageIndex.blockGlobalTitle');
+    case 'local':
+      return useLang('pageIndex.blockLocalTitle');
+    default:
+      return useLang('global.unknown');
+  }
+});
 
 function onChangeStatus(status: boolean) {
   (props.client as any)[`setThemesBlock${typeUpper.value}Status`](Number(status));
@@ -39,7 +52,7 @@ function onChangeStatus(status: boolean) {
     @change-status="onChangeStatus"
   >
     <template #title>
-      {{ typeUpper }}
+      {{ blockTitle }}
     </template>
     <template #default>
       <transition-expand>
@@ -75,7 +88,7 @@ function onChangeStatus(status: boolean) {
             v-else
             class="TE-block-themes__content__null"
           >
-            No themes available
+            {{ useLang('pageIndex.themesEmpty') }}
           </div>
         </div>
       </transition-expand>

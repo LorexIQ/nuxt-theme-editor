@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import type { ModuleClient } from '../../types';
 import QuestionPageBlock from '../shared/QuestionPageBlock.vue';
+import useLang from '../../helpers/useLang';
 import { computed } from '#imports';
 
 type Props = {
@@ -33,10 +34,10 @@ async function onApproveSuccess() {
     page="depublishApprove"
     class="TE-theme-depublish"
     icon="Depublish"
-    question-title="Are you serious about removing the topic from publication?"
-    first-btn-title="Cancel"
+    :question-title="useLang('pageDepublish.title')"
+    :first-btn-title="useLang('pageDepublish.buttons.cancel')"
     :first-on-click="onCancel"
-    second-btn-title="Depublish"
+    :second-btn-title="useLang('pageDepublish.buttons.depublish')"
     second-btn-decor="error"
     :second-on-click="onApprove"
     :second-on-success="onApproveSuccess"

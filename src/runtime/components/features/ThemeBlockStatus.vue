@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type { ModuleTheme } from '../../types';
+import useLang from '../../helpers/useLang';
 import { computed } from '#imports';
 
 type Props = {
@@ -32,25 +33,25 @@ const isBoxActive = computed(() => isLightTheme.value || isDarkTheme.value || is
         v-if="isActiveTheme"
         class="TE-theme-block-status__active"
       >
-        Active
+        {{ useLang('themeCard.status.active') }}
       </div>
       <div
         v-else-if="isLightDartTheme"
         class="TE-theme-block-status__light_dark"
       >
-        Light/Dark
+        {{ useLang('themeCard.status.lightDark') }}
       </div>
       <div
         v-else-if="isLightTheme"
         class="TE-theme-block-status__light"
       >
-        Light
+        {{ useLang('themeCard.status.light') }}
       </div>
       <div
         v-else-if="isDarkTheme"
         class="TE-theme-block-status__dark"
       >
-        Dark
+        {{ useLang('themeCard.status.dark') }}
       </div>
     </transition>
   </div>

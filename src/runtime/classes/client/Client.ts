@@ -37,6 +37,7 @@ import useIdProtect from '../../helpers/useIdProtect';
 import utils from '../../helpers/utils';
 import { Theme } from '../../classes/client/Theme';
 import useAPIFetch from '../../helpers/client/useAPIFetch';
+import useLang from '../../helpers/useLang';
 import { Sandbox } from './Sandbox';
 import { Router } from './Router';
 import { useRuntimeConfig, reactive, ref, computed, watch, useState } from '#imports';
@@ -168,7 +169,7 @@ export class Client {
       );
     });
 
-    // watch(this.selectedEditedThemeId, themeId => this.reloadMiddleware[themeId ? 'on' : 'off']());
+    watch(this.selectedEditedThemeId, themeId => this.reloadMiddleware[themeId ? 'on' : 'off']());
 
     watch(this.storageSettings, this._saveStorage.bind(this));
 
@@ -272,7 +273,7 @@ export class Client {
       themeRAW.description
     );
 
-    this._checkAndFixIdsThemesConflict(theme, 'self', 'ID duplicate detected');
+    this._checkAndFixIdsThemesConflict(theme, 'self', useLang('errorsMessages.idConflict.globalTitle'));
 
     return theme;
   }
@@ -308,7 +309,7 @@ export class Client {
             ...file.meta.uiStyles
           }],
           settings: {
-            name: 'UI',
+            name: useLang('pageEditThemeStyles.uiHeader'),
             inheritanceParent: false
           }
         },
@@ -319,7 +320,7 @@ export class Client {
             ...file.meta.previewStyles
           }],
           settings: {
-            name: 'Preview',
+            name: useLang('pageEditThemeStyles.previewHeader'),
             inheritanceParent: false
           }
         }
@@ -416,7 +417,7 @@ export class Client {
     if (storageTheme) {
       const fixedTheme = replace === 'self' ? theme : storageTheme;
       fixedTheme.setId(`${initThemeId}-${utils.getUUID().slice(-4)}`);
-      this.createError('WARN', 'index', `Used plug: ${initThemeId} (${unwrap.get(fixedTheme.name)}) > ${unwrap.get(fixedTheme.id)}`, message);
+      this.createError('WARN', 'index', useLang('errorsMessages.idConflict.message')(initThemeId, unwrap.get(fixedTheme.id), unwrap.get(fixedTheme.name)), message);
     }
   }
 
@@ -721,7 +722,7 @@ export class Client {
         if (localTheme.isInCache) localTheme.loadInfo(undefined, true);
         else localTheme.setStyles(getOnlyPreviewBlock(theme), undefined, true);
       } else if (localTheme.type === 'local') {
-        ctx._checkAndFixIdsThemesConflict(localTheme, 'self', 'Local theme id conflict with global theme id');
+        ctx._checkAndFixIdsThemesConflict(localTheme, 'self', useLang('errorsMessages.idConflict.globalTitle'));
         addTheme(theme);
       }
     }
@@ -746,8 +747,8 @@ export class Client {
       this.createError(
         'ERROR',
         'index',
-        'Wait and try downloading again. If there is this error, it is NOT RECOMMENDED to edit topics, these actions may lead to conflicts.',
-        'Error downloading themes from the server',
+        useLang('errorsMessages.loadThemes.message'),
+        useLang('errorsMessages.loadThemes.title'),
         'err_load_global'
       );
     }

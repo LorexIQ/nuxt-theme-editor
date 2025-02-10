@@ -6,6 +6,7 @@ import ThemeStylesPreviewBlock from '../widgets/ThemeStylesPreviewBlock.vue';
 import ThemeStylesUIBlock from '../widgets/ThemeStylesUIBlock.vue';
 import ThemeStylesBlock from '../widgets/ThemeStylesBlock.vue';
 import unwrap from '../../helpers/client/unwrap';
+import useLang from '../../helpers/useLang';
 import { computed, onBeforeMount, ref } from '#imports';
 
 type Props = {
@@ -132,13 +133,13 @@ onBeforeMount(() => {
     <template #footer>
       <div class="TE-theme-edit-styles-footer">
         <IsButton @click="goBack">
-          Go back
+          {{ useLang('pageEditThemeStyles.buttons.goBack') }}
         </IsButton>
         <IsButton
           decor="success"
           @click="onSave"
         >
-          Save
+          {{ useLang('pageEditThemeStyles.buttons.save') }}
         </IsButton>
       </div>
     </template>

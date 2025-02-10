@@ -5,6 +5,7 @@ import DropDownBlock from '../shared/DropDownBlock.vue';
 import type { ModuleTheme } from '../../types';
 import ThemeBlock from '../../components/features/ThemeBlock.vue';
 import unwrap from '../../helpers/client/unwrap';
+import useLang from '../../helpers/useLang';
 import { computed } from '#imports';
 
 type Props = {
@@ -35,7 +36,7 @@ const themePreviewTargetStyles = computed(() => unwrap.get(theme.value.getStyles
     </div>
     <DropDownBlock expand-enabled>
       <template #title>
-        Preview card
+        {{ useLang('pageEditThemeStyles.previewHeader') }}
       </template>
       <template #default>
         <div class="TE-theme-styles-preview-block__styles">

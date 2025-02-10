@@ -4,6 +4,7 @@ import StyleEditBlock from '../features/StyleEditBlock.vue';
 import DropDownBlock from '../shared/DropDownBlock.vue';
 import type { ModuleTheme } from '../../types';
 import unwrap from '../../helpers/client/unwrap';
+import useLang from '../../helpers/useLang';
 import { computed } from '#imports';
 
 type Props = {
@@ -29,7 +30,7 @@ const themeUITargetStyles = computed(() => unwrap.get(theme.value.getStylesUI('e
     expand-enabled
   >
     <template #title>
-      Editor UI
+      {{ useLang('pageEditThemeStyles.uiHeader') }}
     </template>
     <template #default>
       <div class="TE-theme-styles-ui-block__styles">

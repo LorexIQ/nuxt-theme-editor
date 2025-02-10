@@ -1,6 +1,10 @@
+<script setup lang="ts">
+import useLang from '../../helpers/useLang';
+</script>
+
 <template>
   <div class="TE-is-hr">
-    <slot>Not set</slot>
+    <slot>{{ useLang('global.notSet') }}</slot>
   </div>
 </template>
 

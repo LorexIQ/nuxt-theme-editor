@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import type { ModuleClient } from '../../types';
 import QuestionPageBlock from '../shared/QuestionPageBlock.vue';
+import useLang from '../../helpers/useLang';
 
 type Props = {
   client: ModuleClient;
@@ -19,8 +20,8 @@ function goMain() {
     page="Error404"
     class="TE-error-404"
     icon="I404"
-    question-title="Page not found"
-    first-btn-title="Go main"
+    :question-title="useLang('page404.title')"
+    :first-btn-title="useLang('page404.buttons.goMain')"
     :first-on-click="goMain"
   />
 </template>

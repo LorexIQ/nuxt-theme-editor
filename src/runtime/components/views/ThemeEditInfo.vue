@@ -7,6 +7,7 @@ import ThemeBlock from '../features/ThemeBlock.vue';
 import ViewPage from '../widgets/ViewPage.vue';
 import useErrorMessages from '../../helpers/client/useErrorMessages';
 import IsHr from '../shared/IsHr.vue';
+import useLang from '../../helpers/useLang';
 import { computed, onBeforeMount, reactive } from '#imports';
 
 type Props = {
@@ -67,12 +68,12 @@ onBeforeMount(() => {
       @keyup.enter="editTheme"
     >
       <div class="TE-theme-edit-info__block">
-        <IsHr>Theme Info</IsHr>
+        <IsHr>{{ useLang('pageCreateEdit.infoTitle') }}</IsHr>
         <div class="TE-theme-edit-info__block__row">
           <IsInput
             id="id"
             v-model="themeEditData.id"
-            title="ID"
+            :title="useLang('pageCreateEdit.inputId')"
             is-required-icon
             :max-length="30"
             @input="activeErrors.remove(0, 1, 2)"
@@ -82,7 +83,7 @@ onBeforeMount(() => {
           <IsInput
             id="name"
             v-model="themeEditData.name"
-            title="Name"
+            :title="useLang('pageCreateEdit.inputName')"
             :placeholder="themeEditData.id"
             :max-length="30"
           />
@@ -91,13 +92,13 @@ onBeforeMount(() => {
           <IsInput
             id="description"
             v-model="themeEditData.description"
-            title="Description"
+            :title="useLang('pageCreateEdit.inputDescription')"
             :max-length="200"
           />
         </div>
       </div>
       <div class="TE-theme-edit-info__block">
-        <IsHr>Preview Card</IsHr>
+        <IsHr>{{ useLang('pageCreateEdit.previewTitle') }}</IsHr>
         <div class="TE-theme-edit-info__block__row">
           <ThemeBlock :theme="previewTheme">
             <template #preview>
@@ -115,7 +116,7 @@ onBeforeMount(() => {
             type="ERROR"
           >
             <template #title>
-              Validation error
+              {{ useLang('pageCreateEdit.messages.validationError') }}
             </template>
             <transition-expand tag="div">
               <p
@@ -132,13 +133,13 @@ onBeforeMount(() => {
     <template #footer>
       <div class="TE-theme-edit-info-footer">
         <IsButton @click="router.push('index', 'tab-fade-rl')">
-          Go back
+          {{ useLang('pageCreateEdit.buttons.goBack') }}
         </IsButton>
         <IsButton
           decor="success"
           @click="editTheme"
         >
-          Save
+          {{ useLang('pageCreateEdit.buttons.save') }}
         </IsButton>
       </div>
     </template>

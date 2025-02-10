@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import type { ModuleClient } from '../../types';
 import QuestionPageBlock from '../shared/QuestionPageBlock.vue';
+import useLang from '../../helpers/useLang';
 import { computed } from '#imports';
 
 type Props = {
@@ -33,10 +34,10 @@ async function onApproveSuccess() {
     page="=publishApprove"
     class="TE-theme-publish"
     icon="Publish"
-    question-title="Are you sure you want to make the theme global?"
-    first-btn-title="Cancel"
+    :question-title="useLang('pagePublish.title')"
+    :first-btn-title="useLang('pagePublish.buttons.cancel')"
     :first-on-click="onCancel"
-    second-btn-title="Publish"
+    :second-btn-title="useLang('pagePublish.buttons.publish')"
     second-btn-decor="success"
     :second-btn-loader="theme?.loader"
     :second-on-click="onApprove"

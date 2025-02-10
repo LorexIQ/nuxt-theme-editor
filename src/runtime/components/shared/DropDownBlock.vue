@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import useSwitch from '../../helpers/client/useSwitch';
+import useLang from '../../helpers/useLang';
 import TextRunner from './TextRunner.vue';
 import IconsStore from './IconsStore.vue';
 import { computed, onBeforeMount, ref, watch } from '#imports';
@@ -79,7 +80,7 @@ onBeforeMount(() => {
       <div class="TE-drop-down-block__header__title">
         <TextRunner stop-on-hover>
           <slot name="title">
-            Not set
+            {{ useLang('global.notSet') }}
           </slot>
         </TextRunner>
       </div>
@@ -119,7 +120,7 @@ onBeforeMount(() => {
             icon="Spinner"
             size="18"
           />
-          <span>Loading...</span>
+          <span>{{ useLang('global.loading') }}</span>
         </div>
         <div
           v-else-if="isError"
@@ -130,7 +131,7 @@ onBeforeMount(() => {
             size="18"
             @click="onClickRefresh"
           />
-          <span>Error loading</span>
+          <span>{{ useLang('global.loadingError') }}</span>
         </div>
         <slot
           v-else

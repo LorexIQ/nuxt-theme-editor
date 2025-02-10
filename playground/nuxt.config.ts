@@ -39,6 +39,10 @@ export default defineNuxtConfig({
         mode: 'nodeLocalStorage',
         editingAllowedUseStateKey: 'test-editing'
       }
+    },
+    localization: {
+      type: 'system',
+      lang: 'EN'
     }
   }
 });

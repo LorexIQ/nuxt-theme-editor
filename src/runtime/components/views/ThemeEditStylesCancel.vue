@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import type { ModuleClient } from '../../types';
 import QuestionPageBlock from '../shared/QuestionPageBlock.vue';
+import useLang from '../../helpers/useLang';
 import { computed } from '#imports';
 
 type Props = {
@@ -33,10 +34,10 @@ function onApprove() {
     page="editThemeStylesCancel"
     class="TE-theme-edit-styles-cancel"
     icon="Warn"
-    question-title="The changes you have made may not be saved"
-    first-btn-title="Cancel"
+    :question-title="useLang('pageEditStylesCancel.title')"
+    :first-btn-title="useLang('pageEditStylesCancel.buttons.cancel')"
     :first-on-click="onCancel"
-    second-btn-title="Approve"
+    :second-btn-title="useLang('pageEditStylesCancel.buttons.approve')"
     :second-on-click="onApprove"
   />
 </template>

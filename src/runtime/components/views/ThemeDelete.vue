@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import type { ModuleClient } from '../../types';
 import QuestionPageBlock from '../shared/QuestionPageBlock.vue';
+import useLang from '../../helpers/useLang';
 import { computed } from '#imports';
 
 type Props = {
@@ -38,10 +39,10 @@ function onBeforeMount() {
     page="deleteTheme"
     class="TE-theme-delete"
     icon="Question"
-    question-title="Are you sure you want to delete the theme"
-    first-btn-title="Cancel"
+    :question-title="useLang('pageDelete.title')"
+    :first-btn-title="useLang('pageDelete.buttons.cancel')"
     :first-on-click="onCancel"
-    second-btn-title="Delete"
+    :second-btn-title="useLang('pageDelete.buttons.delete')"
     :second-on-click="onApprove"
     :second-on-success="onApproveSuccess"
     :before-mount="onBeforeMount"

@@ -11,6 +11,7 @@ import type {
 import ContextMenu from '../../components/shared/ContextMenu.vue';
 import ModuleSandbox from '../../components/views/ModuleSandbox.vue';
 import type { StylePickerData } from '../../components/features/StyleEditBlock.vue';
+import useLang from '../../helpers/useLang';
 import { markRaw, reactive } from '#imports';
 
 const CONTEXT_MENU_ID = 'context-menu';
@@ -90,60 +91,60 @@ export class Sandbox {
       props: {
         clickPosition,
         sandboxSize: this.boxSize,
-        tipText: 'Select an action',
+        tipText: useLang('contextMenu.selectActionTip'),
         items: <ModuleSandboxContextMenuItem[]>[
           {
-            title: isSelectedTheme ? 'Theme is active' : 'Select a theme',
+            title: isSelectedTheme ? useLang('contextMenu.selectTheme.active') : useLang('contextMenu.selectTheme.main'),
             isDisabled: () => isSelectedTheme,
             icon: isSelectedTheme ? 'Check' : 'Palette',
             iconColor: isSelectedTheme ? 'var(--contextMenuIconSuccess)' : undefined,
             action: () => this.ctx.setThemeSelectedAsMain(theme.id)
           },
           {
-            title: isSelectedLightTheme ? 'Light theme is set' : 'Set as light theme',
+            title: isSelectedLightTheme ? useLang('contextMenu.selectAsLightTheme.active') : useLang('contextMenu.selectAsLightTheme.main'),
             isDisabled: () => isSelectedLightTheme,
             icon: isSelectedLightTheme ? 'Check' : 'Sun',
             iconColor: isSelectedLightTheme ? 'var(--contextMenuIconSuccess)' : undefined,
             action: () => this.ctx.setThemeSelectedAsLight(theme.id)
           },
           {
-            title: isSelectedDarkTheme ? 'Dark theme is set' : 'Set as dark theme',
+            title: isSelectedDarkTheme ? useLang('contextMenu.selectAsDarkTheme.active') : useLang('contextMenu.selectAsDarkTheme.main'),
             isDisabled: () => isSelectedDarkTheme,
             icon: isSelectedDarkTheme ? 'Check' : 'Moon',
             iconColor: isSelectedDarkTheme ? 'var(--contextMenuIconSuccess)' : undefined,
             action: () => this.ctx.setThemeSelectedAsDark(theme.id)
           },
           {
-            title: 'Create theme copy',
+            title: useLang('contextMenu.createThemeCopy'),
             icon: 'Palette2',
             action: () => router.push(`newTheme?parentThemeId=${theme.id}`, 'tab-fade-lr')
           },
           {
-            title: 'Publish',
+            title: useLang('contextMenu.publish'),
             icon: 'Publish',
             action: () => router.push(`publishApprove?themeId=${theme.id}`, 'tab-fade-lr'),
             isVisible: () => isLocalEditAccess
           },
           {
-            title: 'Depublish',
+            title: useLang('contextMenu.depublish'),
             icon: 'Depublish',
             action: () => router.push(`depublishApprove?themeId=${theme.id}`, 'tab-fade-lr'),
             isVisible: () => isGlobalEditAccess
           },
           {
-            title: 'Edit info',
+            title: useLang('contextMenu.editInfo'),
             icon: 'PaperPen',
             action: () => router.push(`editThemeInfo?themeId=${theme.id}`, 'tab-fade-lr'),
             isVisible: () => isLocalOrGlobalEditAccess
           },
           {
-            title: 'Edit styles',
+            title: useLang('contextMenu.editStyles'),
             icon: 'WordsPen',
             action: () => router.push(`editThemeStyles?themeId=${theme.id}`, 'tab-fade-lr'),
             isVisible: () => isLocalOrGlobalEditAccess
           },
           {
-            title: 'Delete theme',
+            title: useLang('contextMenu.deleteTheme'),
             titleColor: 'var(--contextMenuIconError)',
             icon: 'Bin',
             iconColor: 'var(--contextMenuIconError)',
@@ -169,15 +170,15 @@ export class Sandbox {
       props: {
         clickPosition,
         sandboxSize: this.boxSize,
-        tipText: 'Select an action',
+        tipText: useLang('contextMenu.selectActionTip'),
         items: <ModuleSandboxContextMenuItem[]>[
           {
-            title: 'Use inheritance',
+            title: useLang('contextMenu.useInheritance'),
             icon: 'Palette',
             action: () => this.openStyleInheritanceContextMenu(event, style, currentValue)
           },
           {
-            title: 'Select by color picker',
+            title: useLang('contextMenu.useColorPicker'),
             icon: 'Palette',
             action: () => this.openStylePickerMenu(event, pickerRef)
           }
@@ -220,7 +221,7 @@ export class Sandbox {
       props: {
         clickPosition,
         sandboxSize: this.boxSize,
-        tipText: 'Select an inheritance',
+        tipText: useLang('contextMenu.selectAnInheritanceTip'),
         maxWidth: 'min(100%, 300px)',
         maxHeight: 'min(100%, 400px)',
         items: <ModuleSandboxContextMenuItem[]>[

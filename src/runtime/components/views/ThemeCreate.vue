@@ -9,6 +9,7 @@ import IsHr from '../shared/IsHr.vue';
 import BlockRadioThemes from '../widgets/BlockRadioThemes.vue';
 import useErrorMessages from '../../helpers/client/useErrorMessages';
 import useIdProtect from '../../helpers/useIdProtect';
+import useLang from '../../helpers/useLang';
 import { computed, onBeforeMount, reactive } from '#imports';
 
 type Props = {
@@ -57,12 +58,12 @@ onBeforeMount(() => {});
       @keyup.enter="createTheme"
     >
       <div class="TE-theme-create__block">
-        <IsHr>Theme Info</IsHr>
+        <IsHr>{{ useLang('pageCreateEdit.infoTitle') }}</IsHr>
         <div class="TE-theme-create__block__row">
           <IsInput
             id="id"
             v-model="themeCreateData.id"
-            title="ID"
+            :title="useLang('pageCreateEdit.inputId')"
             is-required-icon
             :max-length="30"
             @input="activeErrors.remove(0, 1, 2)"
@@ -72,7 +73,7 @@ onBeforeMount(() => {});
           <IsInput
             id="name"
             v-model="themeCreateData.name"
-            title="Name"
+            :title="useLang('pageCreateEdit.inputName')"
             :placeholder="themeCreateData.id"
             :max-length="30"
           />
@@ -81,13 +82,13 @@ onBeforeMount(() => {});
           <IsInput
             id="description"
             v-model="themeCreateData.description"
-            title="Description"
+            :title="useLang('pageCreateEdit.inputDescription')"
             :max-length="200"
           />
         </div>
       </div>
       <div class="TE-theme-create__block">
-        <IsHr>Preview Card</IsHr>
+        <IsHr>{{ useLang('pageCreateEdit.previewTitle') }}</IsHr>
         <div class="TE-theme-create__block__row">
           <ThemeBlock :theme="previewTheme">
             <template #preview>
@@ -97,7 +98,7 @@ onBeforeMount(() => {});
         </div>
       </div>
       <div class="TE-theme-create__block">
-        <IsHr>Parent Theme</IsHr>
+        <IsHr>{{ useLang('pageCreateEdit.parentTitle') }}</IsHr>
         <div class="TE-theme-create__block__row TE-theme-create__block__row--parent-theme">
           <BlockRadioThemes
             v-model="themeCreateData.parentThemeId"
@@ -111,9 +112,9 @@ onBeforeMount(() => {});
       <div class="TE-theme-create-messages">
         <NotifyBlock type="INFO">
           <template #title>
-            Information
+            {{ useLang('pageCreateEdit.messages.info.title') }}
           </template>
-          You can customize all styles, including preview card and theme editor, after creating the theme.
+          {{ useLang('pageCreateEdit.messages.info.description') }}
         </NotifyBlock>
         <transition-expand>
           <NotifyBlock
@@ -121,7 +122,7 @@ onBeforeMount(() => {});
             type="ERROR"
           >
             <template #title>
-              Validation error
+              {{ useLang('pageCreateEdit.messages.validationError') }}
             </template>
             <transition-expand tag="div">
               <p
@@ -138,13 +139,13 @@ onBeforeMount(() => {});
     <template #footer>
       <div class="TE-theme-create-footer">
         <IsButton @click="router.push('index', 'tab-fade-rl')">
-          Go back
+          {{ useLang('pageCreateEdit.buttons.goBack') }}
         </IsButton>
         <IsButton
           decor="success"
           @click="createTheme"
         >
-          Create
+          {{ useLang('pageCreateEdit.buttons.create') }}
         </IsButton>
       </div>
     </template>

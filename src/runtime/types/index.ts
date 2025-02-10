@@ -1,8 +1,10 @@
-import type { DeepRequired } from './helpers';
+import type { DeepPartial, DeepRequired } from './helpers';
+import type { ModuleLang, ModuleLocalizationStructure } from './localization';
 
 export * from './apiSystem';
 export * from './defines';
 export * from './helpers';
+export * from './localization';
 export * from './metaFiles';
 export * from './sandbox';
 export * from './share';
@@ -41,10 +43,24 @@ export type ModuleOptionsThemesConfig = {
   local?: ModuleOptionsThemesConfigLocal;
 };
 
+export type ModuleOptionsLocalizationDefaults = {
+  type: 'system';
+  lang: ModuleLang;
+};
+export type ModuleOptionsLocalizationCustom = {
+  type: 'custom';
+  translations: DeepPartial<ModuleLocalizationStructure>;
+  parentLang: ModuleLang;
+};
+export type ModuleOptionsLocalization =
+  | ModuleOptionsLocalizationDefaults
+  | ModuleOptionsLocalizationCustom;
+
 export type ModuleOptions = {
   systemUUID: string;
   themesDir: string;
   themesConfig: ModuleOptionsThemesConfig;
+  localization: ModuleOptionsLocalization;
 };
 
 type ModuleOptionsExtendKeys = {
@@ -64,7 +80,8 @@ export type ModuleOptionsAccessTokens = {
   baseAuthorizationToken: string;
   fullAuthorizationToken: string;
 };
-export type ModuleOptionsExtend = DeepRequired<ModuleOptions> & {
+export type ModuleOptionsExtend = DeepRequired<Omit<ModuleOptions, 'localization'>> & {
+  localization: ModuleOptionsLocalization;
   themesNames: string[];
   keys: ModuleOptionsExtendKeys;
   tokens: ModuleOptionsAccessTokens;

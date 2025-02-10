@@ -1,7 +1,7 @@
-import type { ModuleDefineThemeBlockSetting } from '../types';
+import type { ModuleDefineThemeBlockStyles } from '../types';
 
 export default function (
-  define: ModuleDefineThemeBlockSetting,
+  define: ModuleDefineThemeBlockStyles,
   checkedIds: 'all' | 'root' | 'block' = 'all'
 ) {
   const ids

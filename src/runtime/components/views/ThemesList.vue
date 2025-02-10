@@ -3,6 +3,7 @@ import type { ModuleClient, ModuleTheme } from '../../types';
 import BlockThemes from '../widgets/BlockThemes.vue';
 import ViewPage from '../widgets/ViewPage.vue';
 import IsSwitch from '../shared/IsSwitch.vue';
+import useLang from '../../helpers/useLang';
 
 type Props = {
   client: ModuleClient;
@@ -71,7 +72,7 @@ function openThemeContextMenu([event, theme]: [MouseEvent, ModuleTheme]) {
           @check="client.setAutoThemeModeStatus(true)"
           @uncheck="client.setAutoThemeModeStatus(false)"
         />
-        <p>Use the color scheme of the device</p>
+        <p>{{ useLang('pageIndex.autoModeTitle') }}</p>
       </div>
     </template>
   </ViewPage>

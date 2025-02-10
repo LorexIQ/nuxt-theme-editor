@@ -1,5 +1,5 @@
 import type { CodeBlockWriter } from 'ts-morph';
-import type { ModuleDefineThemeBlockRootReturn, ModuleDefineThemeBlockSetting } from '../../types';
+import type { ModuleDefineThemeBlockRootReturn, ModuleDefineThemeBlockStyles } from '../../types';
 import defineChecker from '../defineChecker';
 
 type FileType = 'type' | 'object';
@@ -18,11 +18,11 @@ const generateBlockCode = (writer: CodeBlockWriter, obj: Record<string, any>, ty
     });
   });
 };
-const grabAllThemeStylesToStructure = (styles: ModuleDefineThemeBlockSetting[]) => {
+const grabAllThemeStylesToStructure = (styles: ModuleDefineThemeBlockStyles[]) => {
   const result: Record<string, any> = {};
   styles.forEach((block) => {
     if (defineChecker(block)) {
-      result[block.id] = grabAllThemeStylesToStructure(block.styles as ModuleDefineThemeBlockSetting[]);
+      result[block.id] = grabAllThemeStylesToStructure(block.styles as ModuleDefineThemeBlockStyles[]);
     } else {
       Object.assign(result, Object.entries(block).reduce((acc, [key]) => ({ ...acc, [key]: '' }), {}));
     }

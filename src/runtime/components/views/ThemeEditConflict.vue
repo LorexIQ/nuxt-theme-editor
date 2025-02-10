@@ -4,6 +4,7 @@ import ViewPage from '../widgets/ViewPage.vue';
 import ThemeBlock from '../features/ThemeBlock.vue';
 import IconsStore from '../shared/IconsStore.vue';
 import IsButton from '../shared/IsButton.vue';
+import useLang from '../../helpers/useLang';
 import { computed, onBeforeMount } from '#imports';
 
 type Props = {
@@ -61,7 +62,7 @@ onBeforeMount(async () => {
           <IconsStore icon="Warn" />
         </div>
         <div class="TE-theme-edit-conflict__header__title">
-          Conflict detected
+          {{ useLang('pageEditConflict.title') }}
         </div>
       </div>
       <div class="TE-theme-edit-conflict__cards">
@@ -70,7 +71,7 @@ onBeforeMount(async () => {
           class="TE-theme-edit-conflict__cards__card"
         >
           <div class="TE-theme-edit-conflict__cards__card__title">
-            Server
+            {{ useLang('pageEditConflict.server') }}
             <div class="TE-theme-edit-conflict__cards__card__title__date">
               {{ timestampToDate(serverTheme.updatedAt) }}
             </div>
@@ -89,7 +90,7 @@ onBeforeMount(async () => {
           class="TE-theme-edit-conflict__cards__card"
         >
           <div class="TE-theme-edit-conflict__cards__card__title">
-            Local
+            {{ useLang('pageEditConflict.local') }}
             <div class="TE-theme-edit-conflict__cards__card__title__date">
               {{ timestampToDate(theme.updatedAt) }}
             </div>
@@ -105,10 +106,10 @@ onBeforeMount(async () => {
     <template #footer>
       <div class="TE-theme-edit-conflict__buttons">
         <is-button @click="onPull">
-          Pull
+          {{ useLang('pageEditConflict.buttons.pull') }}
         </is-button>
         <is-button @click="onPush">
-          Push
+          {{ useLang('pageEditConflict.buttons.push') }}
         </is-button>
       </div>
     </template>

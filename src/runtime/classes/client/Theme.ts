@@ -12,6 +12,7 @@ import unwrap from '../../helpers/client/unwrap';
 import useAPIFetch from '../../helpers/client/useAPIFetch';
 import useSwitch from '../../helpers/client/useSwitch';
 import useIdProtect from '../../helpers/useIdProtect';
+import useLang from '../../helpers/useLang';
 import { computed, reactive, ref, watch } from '#imports';
 
 type ThemeStylesScope = 'main' | 'edited';
@@ -384,8 +385,8 @@ export class Theme {
       this.ctx.createError(
         'ERROR',
         ['index', 'editThemeConflict'],
-        'Error loading theme styles from the server. Please try again later.',
-        'Error theme styles loading',
+        useLang('errorsMessages.loadThemeStyles.message'),
+        useLang('errorsMessages.loadThemeStyles.title'),
         'err_self_load_global'
       );
       return false;
@@ -407,8 +408,8 @@ export class Theme {
       this.ctx.createError(
         'ERROR',
         ['index', 'editThemeConflict', 'editThemeStyles'],
-        'Error loading info from the server. Please try again later.',
-        'Error theme info loading',
+        useLang('errorsMessages.loadThemeInfo.message'),
+        useLang('errorsMessages.loadThemeInfo.title'),
         'err_self_server_load_global'
       );
       return false;
@@ -436,8 +437,8 @@ export class Theme {
       this.ctx.createError(
         'ERROR',
         'publishApprove',
-        'Error uploading the theme to the server. Please try again later.',
-        'Error theme publishing',
+        useLang('errorsMessages.publishTheme.message'),
+        useLang('errorsMessages.publishTheme.title'),
         'err_publish_global'
       );
       return false;
@@ -462,8 +463,8 @@ export class Theme {
       this.ctx.createError(
         'ERROR',
         'depublishApprove',
-        'The error of removing a topic from publication. Please try again later.',
-        'Error theme depublishing',
+        useLang('errorsMessages.depublishTheme.message'),
+        useLang('errorsMessages.depublishTheme.title'),
         'err_depublish_global'
       );
       return false;
@@ -498,8 +499,8 @@ export class Theme {
           this.ctx.createError(
             'ERROR',
             'editThemeInfo',
-            'An error occurred on the server when saving the information. Please try again later.',
-            'Information modification error',
+            useLang('errorsMessages.editTheme.message'),
+            useLang('errorsMessages.editTheme.title'),
             'err_edit_global'
           );
           return false;
@@ -531,8 +532,8 @@ export class Theme {
           this.ctx.createError(
             'ERROR',
             'deleteTheme',
-            'An error occurred while deleting the theme. Please try again later.',
-            'Error theme deleting',
+            useLang('errorsMessages.deleteTheme.message'),
+            useLang('errorsMessages.deleteTheme.title'),
             'err_delete_global'
           );
           return false;
@@ -571,8 +572,8 @@ export class Theme {
           this.ctx.createError(
             'ERROR',
             ['editThemeStyles', 'editThemeConflict'],
-            'An error occurred on the server when saving the information. Please try again later.',
-            'Styles modification error',
+            useLang('errorsMessages.editThemeStyles.message'),
+            useLang('errorsMessages.editThemeStyles.title'),
             'err_edit_styles_global'
           );
           return false;
@@ -600,8 +601,8 @@ export class Theme {
       this.ctx.createError(
         'ERROR',
         'editThemeStyles',
-        'The server returned an error. Please try again later.',
-        'Conflict verification error',
+        useLang('errorsMessages.checkConflict.message'),
+        useLang('errorsMessages.checkConflict.title'),
         'err_check_conflict_global'
       );
       return false;

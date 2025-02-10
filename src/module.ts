@@ -36,6 +36,10 @@ export default defineNuxtModule<ModuleOptions>({
       local: {
         enabled: false
       }
+    },
+    localization: {
+      type: 'system',
+      lang: 'EN'
     }
   },
   async setup(options, nuxt) {

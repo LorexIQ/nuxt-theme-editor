@@ -7,51 +7,54 @@ import ThemeEditStyles from '../components/views/ThemeEditStyles.vue';
 import ThemeEditStylesCancel from '../components/views/ThemeEditStylesCancel.vue';
 import ThemePublish from '../components/views/ThemePublish.vue';
 import ThemesList from '../components/views/ThemesList.vue';
+import useLang from '../helpers/useLang';
 
-export default [
-  {
-    name: 'newTheme',
-    title: 'New',
-    component: ThemeCreate
-  },
-  {
-    name: 'deleteTheme',
-    title: 'Delete',
-    component: ThemeDelete
-  },
-  {
-    name: 'depublishApprove',
-    title: 'Depublish Approve',
-    component: ThemeDepublish
-  },
-  {
-    name: 'editThemeConflict',
-    title: 'Conflict',
-    component: ThemeEditConflict
-  },
-  {
-    name: 'editThemeInfo',
-    title: 'Edit Info',
-    component: ThemeEditInfo
-  },
-  {
-    name: 'editThemeStyles',
-    title: 'Edit Styles',
-    component: ThemeEditStyles
-  },
-  {
-    name: 'editThemeStylesCancel',
-    title: 'Cancel Changes',
-    component: ThemeEditStylesCancel
-  },
-  {
-    name: 'publishApprove',
-    title: 'Publish Approve',
-    component: ThemePublish
-  },
-  {
-    name: 'index',
-    title: '',
-    component: ThemesList
-  }
-] as const;
+export default function () {
+  return [
+    {
+      name: 'newTheme',
+      title: useLang('pagesTitles.newTheme'),
+      component: ThemeCreate
+    },
+    {
+      name: 'deleteTheme',
+      title: useLang('pagesTitles.deleteTheme'),
+      component: ThemeDelete
+    },
+    {
+      name: 'depublishApprove',
+      title: useLang('pagesTitles.depublishApprove'),
+      component: ThemeDepublish
+    },
+    {
+      name: 'editThemeConflict',
+      title: useLang('pagesTitles.editThemeConflict'),
+      component: ThemeEditConflict
+    },
+    {
+      name: 'editThemeInfo',
+      title: useLang('pagesTitles.editThemeInfo'),
+      component: ThemeEditInfo
+    },
+    {
+      name: 'editThemeStyles',
+      title: useLang('pagesTitles.editThemeStyles'),
+      component: ThemeEditStyles
+    },
+    {
+      name: 'editThemeStylesCancel',
+      title: useLang('pagesTitles.editThemeStylesCancel'),
+      component: ThemeEditStylesCancel
+    },
+    {
+      name: 'publishApprove',
+      title: useLang('pagesTitles.publishApprove'),
+      component: ThemePublish
+    },
+    {
+      name: 'index',
+      title: '',
+      component: ThemesList
+    }
+  ] as const;
+}

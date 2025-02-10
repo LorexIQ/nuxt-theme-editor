@@ -2,6 +2,7 @@
 import type { Ref } from 'vue';
 import TextRunner from '../shared/TextRunner.vue';
 import type { ModuleDefaultStyleKeys, ModuleTheme } from '../../types';
+import useLang from '../../helpers/useLang';
 import { computed, ref } from '#imports';
 
 export type StylePickerData = {
@@ -70,8 +71,8 @@ const isCircular = computed(() => currentValue.value === 'CIRCULAR');
       v-if="rawValue.startsWith('$')"
       class="TE-style-edit-block__inheritance"
     >
-      <span v-if="isCircular">Circular Inheritance</span>
-      <span v-else>Inheritance from</span>
+      <span v-if="isCircular">{{ useLang('pageEditThemeStyles.circularInheritance') }}</span>
+      <span v-else>{{ useLang('pageEditThemeStyles.inheritanceFrom') }}</span>
       <div
         class="TE-style-edit-block__inheritance__value"
         @click="emit('inheritanceClick', rawValue)"
