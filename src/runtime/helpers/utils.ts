@@ -1,8 +1,11 @@
-import SparkMD5 from 'spark-md5';
 import type { ModuleObject } from '../types';
 
 class Utils {
-  private lastUUID = SparkMD5.hash(Date.now().toString());
+  private lastUUID: string;
+
+  constructor() {
+    this.lastUUID = this.generateRandomString();
+  }
 
   mergeObjects<T>(target: Record<any, any>, template: T): T {
     const merger = <TR>(_target: Record<any, any>, _template: TR, level = 0): TR => {
@@ -51,9 +54,9 @@ class Utils {
     target.push(...data);
   }
 
-  hash(obj: ModuleObject<any>): string {
-    return SparkMD5.hash(JSON.stringify(obj));
-  }
+  generateRandomString(length = 8) {
+    return Math.random().toString(36).substring(2, 2 + length).toUpperCase();
+  };
 
   trimStr(str: string, trim: string): string {
     if (trim === '') return str;
@@ -68,7 +71,7 @@ class Utils {
   }
 
   getUUID(): string {
-    this.lastUUID = SparkMD5.hash(this.lastUUID);
+    this.lastUUID = this.generateRandomString();
     return this.lastUUID;
   }
 }

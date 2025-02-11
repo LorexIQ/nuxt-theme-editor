@@ -57,9 +57,7 @@
     "node-localstorage": "^3.0.5",
     "nuxt-color-picker": "1.2.7",
     "nuxt-transition-expand": "^1.1.0",
-    "spark-md5": "^3.0.2",
-    "ts-morph": "^24.0.0",
-    "zod": "^3.24.1"
+    "ts-morph": "^24.0.0"
   },
   "devDependencies": {
     "@nuxt/devtools": "^1.6.0",

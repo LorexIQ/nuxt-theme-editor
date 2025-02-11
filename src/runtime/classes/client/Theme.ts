@@ -116,15 +116,12 @@ export class Theme {
 
   private _buildCustomStyles(scope: ThemeStylesScope = 'main') {
     const rawStyles = unwrap.get(this.getStylesWithoutSystem(scope));
+    const rawStylesCopy = utils.copyObject(rawStyles);
 
-    if (!this._validateMd5Cache('custom', rawStyles)) {
-      const rawStylesCopy = utils.copyObject(rawStyles);
-
-      utils.replaceObjectData(
-        this.preparedStyles,
-        rawStylesCopy.map(style => this._fillStylesBlock(style, scope))
-      );
-    }
+    utils.replaceObjectData(
+      this.preparedStyles,
+      rawStylesCopy.map(style => this._fillStylesBlock(style, scope))
+    );
   }
 
   private _buildAllStyles(scope: ThemeStylesScope = 'main') {
@@ -205,25 +202,6 @@ export class Theme {
     };
 
     return prepareBlock(stylesBlock);
-  }
-
-  private _validateMd5Cache(key: string, obj: ModuleObject<any>): boolean {
-    const cache = this.md5Cache;
-    const cachedObj = utils.hash(obj);
-
-    if (!cache[key]) {
-      cache[key] = cachedObj;
-      return false;
-    } else {
-      const readCache = cache[key];
-
-      if (readCache !== cachedObj) {
-        cache[key] = cachedObj;
-        return false;
-      }
-
-      return true;
-    }
   }
 
   setId(id: string): void {
