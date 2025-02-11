@@ -13,26 +13,16 @@ export * from './themes';
 
 export type ModuleObject<T = string> = { [name: string]: T };
 
-export type ModuleOptionsGlobalNodeLocalStorage = {
-  mode: 'nodeLocalStorage';
-};
-export type ModuleOptionsGlobalCustomAPI = {
-  mode: 'customAPI';
-  origin: string;
-  authorizationUseStateKey?: string;
-};
-
 export type ModuleOptionsThemesConfigSystem = {
   default: string;
   defaultDark?: string;
 };
 export type ModuleOptionsThemesConfigGlobal = {
   enabled: boolean;
+  origin: string;
   editingAllowedUseStateKey?: string;
-} & (
-  | ModuleOptionsGlobalNodeLocalStorage
-  | ModuleOptionsGlobalCustomAPI
-  );
+  authorizationUseStateKey?: string;
+};
 export type ModuleOptionsThemesConfigLocal = {
   enabled: boolean;
 };
@@ -84,6 +74,5 @@ export type ModuleOptionsExtend = DeepRequired<Omit<ModuleOptions, 'localization
   localization: ModuleOptionsLocalization;
   themesNames: string[];
   keys: ModuleOptionsExtendKeys;
-  tokens: ModuleOptionsAccessTokens;
   meta: ModuleOptionsExtendMeta;
 };

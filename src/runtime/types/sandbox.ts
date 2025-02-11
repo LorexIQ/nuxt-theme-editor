@@ -1,5 +1,5 @@
-import type { Component } from 'vue';
-import type { ModuleIcons } from './share';
+import type { Component, Ref } from 'vue';
+import type { ModuleDefaultStyleKeys, ModuleIcons } from './share';
 
 export type ModuleSandboxComponent = {
   id: string;
@@ -21,6 +21,12 @@ export type ModuleSandboxContextMenuItem = {
   isDisabled?: () => boolean;
   isVisible?: () => boolean;
 };
+export type ModuleSandboxPickerRef = {
+  color: Ref<string | undefined>;
+  hide: () => void;
+  show: (event: MouseEvent) => void;
+};
+export type ModuleSandboxStyleContextMenuData = [MouseEvent, ModuleSandboxPickerRef, ModuleDefaultStyleKeys, string];
 
 export type ModuleSandboxSize = {
   width: number;

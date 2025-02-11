@@ -4,13 +4,12 @@ import type {
   ModuleOptionsExtend,
   ModuleSandboxComponents,
   ModuleSandboxContextMenuItem,
-  ModuleSandboxMousePosition,
+  ModuleSandboxMousePosition, ModuleSandboxPickerRef,
   ModuleSandboxSize,
   ModuleTheme
 } from '../../types';
 import ContextMenu from '../../components/shared/ContextMenu.vue';
 import ModuleSandbox from '../../components/views/ModuleSandbox.vue';
-import type { StylePickerData } from '../../components/features/StyleEditBlock.vue';
 import useLang from '../../helpers/useLang';
 import { markRaw, reactive } from '#imports';
 
@@ -159,7 +158,7 @@ export class Sandbox {
     });
   }
 
-  openStyleContextMenu(event: MouseEvent, pickerRef: StylePickerData, style: ModuleDefaultStyleKeys, currentValue: string): void {
+  openStyleContextMenu(event: MouseEvent, pickerRef: ModuleSandboxPickerRef, style: ModuleDefaultStyleKeys, currentValue: string): void {
     this.closeContextMenu();
     const clickPosition: ModuleSandboxMousePosition = { x: event.pageX, y: event.pageY };
 
@@ -190,7 +189,7 @@ export class Sandbox {
     });
   }
 
-  openStyleClickMenu(event: MouseEvent, pickerRef: StylePickerData, style: ModuleDefaultStyleKeys, currentValue: string): void {
+  openStyleClickMenu(event: MouseEvent, pickerRef: ModuleSandboxPickerRef, style: ModuleDefaultStyleKeys, currentValue: string): void {
     this.closeContextMenu();
 
     if (currentValue.startsWith('$')) {
@@ -200,7 +199,7 @@ export class Sandbox {
     }
   }
 
-  openStylePickerMenu(event: MouseEvent, pickerRef: StylePickerData): void {
+  openStylePickerMenu(event: MouseEvent, pickerRef: ModuleSandboxPickerRef): void {
     this.closeContextMenu();
 
     pickerRef.show(event);

@@ -25,26 +25,11 @@ function preparePath(path: string, params?: APIFetchDefaultStructBody): string {
 }
 function getOrigin(runtimeConfig: ModuleOptionsExtend) {
   const globalConfig = runtimeConfig.themesConfig.global;
-
-  switch (globalConfig.mode) {
-    case 'nodeLocalStorage':
-      return '/te-api/themes';
-    case 'customAPI':
-      return globalConfig.origin;
-  }
+  return globalConfig.origin;
 }
 function getAuthorizationToken(runtimeConfig: ModuleOptionsExtend): string | undefined {
   const globalConfig = runtimeConfig.themesConfig.global;
-
-  switch (globalConfig.mode) {
-    case 'customAPI':
-      if (globalConfig.authorizationUseStateKey) return useState<string>(globalConfig.authorizationUseStateKey).value;
-      break;
-    case 'nodeLocalStorage': {
-      const isFullAccess = globalConfig.editingAllowedUseStateKey ? useState<boolean>(globalConfig.editingAllowedUseStateKey).value : true;
-      return runtimeConfig.tokens[isFullAccess ? 'fullAuthorizationToken' : 'baseAuthorizationToken'];
-    }
-  }
+  if (globalConfig.authorizationUseStateKey) return useState<string>(globalConfig.authorizationUseStateKey).value;
 }
 
 export default async function useAPIFetch<
@@ -78,13 +63,14 @@ export default async function useAPIFetch<
   const typedPath = path as string;
 
   const authToken = getAuthorizationToken(runtimeConfig);
+  const origin = getOrigin(runtimeConfig);
   const preparedPath = preparePath(typedPath, typedOptions.params);
 
   _config.loader.show(!_config.onlyOffLoader);
 
   return new Promise((resolve, reject) => {
     $fetch<Res>(
-      `${getOrigin(runtimeConfig)}/${preparedPath}${_config.addSlash && preparedPath.length ? '/' : ''}`,
+      `${origin}${preparedPath}${_config.addSlash && preparedPath.length ? '/' : ''}`,
       {
         method: method as string,
         query: typedOptions.query ?? {},
@@ -101,6 +87,7 @@ export default async function useAPIFetch<
         resolve(res);
       })
       .catch(async (e) => {
+        console.error(e);
         await _config.loader.hide();
         _config.error(e);
         reject(e);

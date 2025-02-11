@@ -1,42 +1,57 @@
-import type { Resolver } from '@nuxt/kit';
-import { addServerHandler } from '@nuxt/kit';
+import type {
+  APIParameter, APIResponseStatus,
+  ModuleLocalStorageTheme,
+  ModuleLocalStorageThemeCreate,
+  ModuleLocalStorageThemeEdit,
+  ModuleLocalStorageThemeMini, ModuleLocalStorageThemeTimestamp
+} from '../types';
 
-export * from './swagger';
-
-export default function (resolver: Resolver) {
-  addServerHandler({
-    route: '/te-api/themes',
-    handler: resolver.resolve('./themes/getAll.ts'),
-    method: 'get'
-  });
-  addServerHandler({
-    route: '/te-api/themes/:id',
-    handler: resolver.resolve('./themes/getById.ts'),
-    method: 'get'
-  });
-  addServerHandler({
-    route: '/te-api/themes/full/:id',
-    handler: resolver.resolve('./themes/getFullById.ts'),
-    method: 'get'
-  });
-  addServerHandler({
-    route: '/te-api/themes/check-conflict/:id',
-    handler: resolver.resolve('./themes/checkConflictById.ts'),
-    method: 'post'
-  });
-  addServerHandler({
-    route: '/te-api/themes',
-    handler: resolver.resolve('./themes/add.ts'),
-    method: 'post'
-  });
-  addServerHandler({
-    route: '/te-api/themes/:id',
-    handler: resolver.resolve('./themes/update.ts'),
-    method: 'put'
-  });
-  addServerHandler({
-    route: '/te-api/themes/:id',
-    handler: resolver.resolve('./themes/deleteById.ts'),
-    method: 'delete'
-  });
-}
+export type ModuleAPISwagger = {
+  GET: {
+    '/themes/': {
+      response: ModuleLocalStorageThemeMini[];
+    };
+    '/themes/{id}': {
+      response: ModuleLocalStorageThemeMini;
+      params: {
+        id: APIParameter;
+      };
+    };
+    '/themes/full/{id}': {
+      response: ModuleLocalStorageTheme;
+      params: {
+        id: APIParameter;
+      };
+    };
+  };
+  POST: {
+    '/themes/': {
+      response: ModuleLocalStorageTheme;
+      body: ModuleLocalStorageThemeCreate;
+    };
+    '/themes/check-conflict/{id}': {
+      response: APIResponseStatus;
+      params: {
+        id: APIParameter;
+      };
+      body: ModuleLocalStorageThemeTimestamp;
+    };
+  };
+  PUT: {
+    '/themes/{id}': {
+      response: ModuleLocalStorageTheme;
+      body: ModuleLocalStorageThemeEdit;
+      params: {
+        id: APIParameter;
+      };
+    };
+  };
+  DELETE: {
+    '/themes/{id}': {
+      response: ModuleLocalStorageTheme;
+      params: {
+        id: APIParameter;
+      };
+    };
+  };
+};

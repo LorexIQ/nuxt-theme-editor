@@ -728,7 +728,7 @@ export class Client {
     }
 
     try {
-      const loadedThemes = await useAPIFetch('GET', '/', {});
+      const loadedThemes = await useAPIFetch('GET', '/themes/', {});
 
       const remoteThemesIds = loadedThemes.map(theme => theme.id);
       const currentThemesIds = this.themes.map(theme => theme.id);

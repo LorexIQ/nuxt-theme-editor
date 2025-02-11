@@ -1,5 +1,4 @@
 import type { Reactive, Ref } from 'vue';
-import type { UnwrapRefSimple } from '@vue/reactivity';
 import unwrap from './unwrap';
 import { reactive, ref, watch } from '#imports';
 
@@ -89,7 +88,7 @@ class UseSwitch {
 }
 
 export class _UseSwitch extends UseSwitch {}
-export type UseSwitchClass = UnwrapRefSimple<UseSwitch>;
+export type UseSwitchClass = Reactive<UseSwitch>;
 
 export default function (config?: UseSwitchConfig): UseSwitchClass {
   return reactive(new UseSwitch(config));

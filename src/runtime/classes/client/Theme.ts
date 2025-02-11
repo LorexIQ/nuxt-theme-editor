@@ -32,7 +32,7 @@ export class Theme {
   public readonly updatedAt = ref<number>(0);
   public readonly isInit = ref(false);
   public readonly isInCache = computed(() => unwrap.get(this.type) === 'global' && (unwrap.get(this.isSelectedAsMain) || unwrap.get(this.isSelectedAsLight) || unwrap.get(this.isSelectedAsDark)));
-  public readonly loader = useSwitch();
+  public readonly loader: any = useSwitch();
   public readonly serverInfo = ref<ModuleLocalStorageThemeMini>();
 
   public readonly isSelected = computed(() => unwrap.get(this.ctx.getSelectedThemeId()) === unwrap.get(this.id));
@@ -363,7 +363,7 @@ export class Theme {
 
     try {
       if (force || (!theme && !unwrap.get(this.isInit) && !this.loader.status)) {
-        theme = await useAPIFetch('GET', '/full/{id}', {
+        theme = await useAPIFetch('GET', '/themes/full/{id}', {
           params: {
             id: unwrap.get(this.id)
           }
@@ -397,7 +397,7 @@ export class Theme {
     if (unwrap.get(this.type) !== 'global') return false;
 
     try {
-      unwrap.set(this, 'serverInfo', await useAPIFetch('GET', '/{id}', {
+      unwrap.set(this, 'serverInfo', await useAPIFetch('GET', '/themes/{id}', {
         params: {
           id: unwrap.get(this.id)
         }
@@ -420,7 +420,7 @@ export class Theme {
     if (unwrap.get(this.type) !== 'local') return false;
 
     try {
-      await useAPIFetch('POST', '/', {
+      await useAPIFetch('POST', '/themes/', {
         body: {
           id: unwrap.get(this.id),
           name: unwrap.get(this.name),
@@ -449,7 +449,7 @@ export class Theme {
     if (unwrap.get(this.type) !== 'global') return false;
 
     try {
-      const theme = await useAPIFetch('DELETE', '/{id}', {
+      const theme = await useAPIFetch('DELETE', '/themes/{id}', {
         params: {
           id: unwrap.get(this.id)
         }
@@ -477,7 +477,7 @@ export class Theme {
         return false;
       case 'global': {
         try {
-          const theme = await useAPIFetch('PUT', '/{id}', {
+          const theme = await useAPIFetch('PUT', '/themes/{id}', {
             params: {
               id: unwrap.get(this.id)
             },
@@ -520,7 +520,7 @@ export class Theme {
         return false;
       case 'global': {
         try {
-          await useAPIFetch('DELETE', '/{id}', {
+          await useAPIFetch('DELETE', '/themes/{id}', {
             params: {
               id: unwrap.get(this.id)
             }
@@ -552,7 +552,7 @@ export class Theme {
         return false;
       case 'global': {
         try {
-          await useAPIFetch('PUT', '/{id}', {
+          await useAPIFetch('PUT', '/themes/{id}', {
             params: {
               id: unwrap.get(this.id)
             },
@@ -589,7 +589,7 @@ export class Theme {
     if (unwrap.get(this.type) !== 'global') return false;
 
     try {
-      return await useAPIFetch('POST', '/check-conflict/{id}', {
+      return await useAPIFetch('POST', '/themes/check-conflict/{id}', {
         params: {
           id: unwrap.get(this.id)
         },

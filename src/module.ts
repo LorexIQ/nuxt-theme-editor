@@ -10,7 +10,6 @@ import defu from 'defu';
 import { name, version } from '../package.json';
 import type { ModuleOptions } from './runtime/types';
 import { Server } from './runtime/classes/server/Server';
-import api from './runtime/api';
 
 const MODULE_CONFIG_KEY = 'themesEditor';
 const meta = {
@@ -31,7 +30,7 @@ export default defineNuxtModule<ModuleOptions>({
       },
       global: {
         enabled: false,
-        mode: 'nodeLocalStorage'
+        origin: ''
       },
       local: {
         enabled: false
@@ -50,10 +49,9 @@ export default defineNuxtModule<ModuleOptions>({
     const serverObject = new Server(nuxt, meta, resolver);
     await serverObject.readThemes();
     serverObject.getThemesFiles().create();
-    const serverConfig = serverObject.getConfig();
 
     // @ts-ignore
-    nuxt.options.runtimeConfig.public[MODULE_CONFIG_KEY] = serverConfig;
+    nuxt.options.runtimeConfig.public[MODULE_CONFIG_KEY] = serverObject.getConfig();
 
     nuxt.hook('builder:watch', (_, path) => serverObject.checkThemeChangesWithAction(path));
     nuxt.hook('build:before', () => serverObject.getMetaFiles().create());
@@ -66,11 +64,5 @@ export default defineNuxtModule<ModuleOptions>({
     await addComponentsDir({
       path: resolver.resolve('./runtime/components/exports')
     });
-
-    if (serverConfig.themesConfig.global.enabled && serverConfig.themesConfig.global.mode === 'nodeLocalStorage') {
-      const apiResolver = createResolver(resolver.resolve('./runtime/api'));
-      nuxt.options.runtimeConfig[MODULE_CONFIG_KEY] = { storagePath: apiResolver.resolve('../meta/storage') };
-      api(apiResolver);
-    }
   }
 });

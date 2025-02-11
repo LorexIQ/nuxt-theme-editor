@@ -39,6 +39,7 @@
     "cleanDevMeta": "rimraf src/runtime/meta",
     "createMetaPlugs": "ncp src/runtime/metaPlugs src/runtime/meta",
     "prepack": "npm run cleanDevMeta && npm run createMetaPlugs && nuxt-module-build build",
+    "prepack:dev": "npm run prepack && npm run dev",
     "dev": "nuxi dev playground",
     "dev:build": "nuxi build playground",
     "dev:prepare": "nuxt-module-build build --stub && nuxt-module-build prepare && nuxi prepare playground",
@@ -49,6 +50,7 @@
   },
   "dependencies": {
     "@nuxt/kit": "^3.14.159",
+    "@vue/reactivity": "^3.5.13",
     "defu": "^6.1.4",
     "esbuild": "^0.24.0",
     "glob": "^11.0.0",

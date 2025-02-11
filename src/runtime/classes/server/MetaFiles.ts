@@ -23,6 +23,10 @@ export class MetaFiles {
     this.metaResolver = createResolver(this.ctx.getResolver().resolve('runtime', 'meta'));
   }
 
+  getResolver(): Resolver {
+    return this.metaResolver;
+  }
+
   private _remove(): void {
     const metaDir = this.metaResolver.resolve();
     if (fs.existsSync(metaDir)) fs.rmSync(metaDir, { recursive: true });

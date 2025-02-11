@@ -1,16 +1,8 @@
 <script setup lang="ts">
-import type { Ref } from 'vue';
 import TextRunner from '../shared/TextRunner.vue';
-import type { ModuleDefaultStyleKeys, ModuleTheme } from '../../types';
+import type { ModuleSandboxStyleContextMenuData, ModuleSandboxPickerRef, ModuleTheme } from '../../types';
 import useLang from '../../helpers/useLang';
 import { computed, ref } from '#imports';
-
-export type StylePickerData = {
-  color: Ref<string | undefined>;
-  hide: () => void;
-  show: (event: MouseEvent) => void;
-};
-export type StyleContextMenuData = [MouseEvent, StylePickerData, ModuleDefaultStyleKeys, string];
 
 type Props = {
   id: string;
@@ -20,15 +12,15 @@ type Props = {
   rawStyles: Record<string, string>;
 };
 type Emits = {
-  (e: 'contextMenuOpen', v: StyleContextMenuData): void;
-  (e: 'click', v: StyleContextMenuData): void;
+  (e: 'contextMenuOpen', v: ModuleSandboxStyleContextMenuData): void;
+  (e: 'click', v: ModuleSandboxStyleContextMenuData): void;
   (e: 'inheritanceClick', v: string): void;
 };
 
 const props = defineProps<Props>();
 const emit = defineEmits<Emits>();
 
-const pickerRef = ref<StylePickerData>();
+const pickerRef = ref<ModuleSandboxPickerRef>();
 
 const currentValue = computed(() => props.styles[props.styleKey]);
 const rawValue = computed(() => props.rawStyles[props.styleKey]);
