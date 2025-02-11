@@ -22,7 +22,6 @@ export class Theme {
   private configDefaultTheme!: string;
 
   private pathsCache!: ModulePathsCache;
-  private md5Cache: ModuleObject = {};
 
   public readonly id = ref<string>('');
   public readonly type = ref<ModuleThemeType>('local');
