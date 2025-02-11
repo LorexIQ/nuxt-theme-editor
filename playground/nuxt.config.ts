@@ -1,6 +1,10 @@
 export default defineNuxtConfig({
-  // modules: ['../dist/module', '@nuxthub/core'],
-  modules: ['../src/module', '@nuxthub/core'],
+  modules: [
+    // '../dist/module',
+    // '../src/module',
+    'nuxt-theme-editor',
+    '@nuxthub/core'
+  ],
 
   plugins: ['./plugins/AUTH.ts'],
 

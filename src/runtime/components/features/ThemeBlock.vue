@@ -99,6 +99,7 @@ const styles = computed(() => {
     &__name {
       font-size: 20px;
       font-weight: 600;
+      line-height: 21px;
       display: flex;
       align-items: flex-end;
       width: 100%;
