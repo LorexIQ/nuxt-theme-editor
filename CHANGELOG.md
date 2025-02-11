@@ -1,6 +1,20 @@
 # Changelog
 
 
+## v1.1.2
+
+[compare changes](https://github.com/LorexIQ/nuxt-theme-editor/compare/v1.1.1...v1.1.2)
+
+### 🩹 Fixes
+
+- Удалена зависимость md5 ([c145faf](https://github.com/LorexIQ/nuxt-theme-editor/commit/c145faf))
+- Удалена зависимость md5 ([bf97504](https://github.com/LorexIQ/nuxt-theme-editor/commit/bf97504))
+- Исправлены типы ([9ee71de](https://github.com/LorexIQ/nuxt-theme-editor/commit/9ee71de))
+
+### ❤️ Contributors
+
+- LorexIQ <dmitrymurashko0@gmail.com>
+
 ## v1.1.1
 
 [compare changes](https://github.com/LorexIQ/nuxt-theme-editor/compare/v1.1.0...v1.1.1)
