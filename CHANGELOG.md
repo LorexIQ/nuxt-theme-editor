@@ -1,6 +1,22 @@
 # Changelog
 
 
+## v1.1.1
+
+[compare changes](https://github.com/LorexIQ/nuxt-theme-editor/compare/v1.1.0...v1.1.1)
+
+### 🩹 Fixes
+
+- Заменена библиотека md5 ([06ad979](https://github.com/LorexIQ/nuxt-theme-editor/commit/06ad979))
+
+### 🎨 Styles
+
+- Исправлено обрезание названия темы ([01b8a85](https://github.com/LorexIQ/nuxt-theme-editor/commit/01b8a85))
+
+### ❤️ Contributors
+
+- LorexIQ <dmitrymurashko0@gmail.com>
+
 ## v1.1.0
 
 
