@@ -1,5 +1,4 @@
 import type { ComputedRef } from 'vue';
-import { md5 } from 'js-md5';
 import type {
   ModuleClient,
   ModuleDefaultBlockKeys, ModuleDefaultStyleKeys, ModuleDefineThemeBlockReturn,
@@ -23,7 +22,7 @@ export class Theme {
   private configDefaultTheme!: string;
 
   private pathsCache!: ModulePathsCache;
-  private md5Cache: ModuleObject<Uint8Array> = {};
+  private md5Cache: ModuleObject = {};
 
   public readonly id = ref<string>('');
   public readonly type = ref<ModuleThemeType>('local');
@@ -210,19 +209,17 @@ export class Theme {
 
   private _validateMd5Cache(key: string, obj: ModuleObject<any>): boolean {
     const cache = this.md5Cache;
-    const cachedObj = new Uint8Array(md5.arrayBuffer(JSON.stringify(obj)));
+    const cachedObj = utils.hash(obj);
 
     if (!cache[key]) {
       cache[key] = cachedObj;
       return false;
     } else {
-      const readCache = new Uint8Array(cache[key]);
+      const readCache = cache[key];
 
-      for (let byteI = 0; byteI < cachedObj.length; byteI++) {
-        if (cachedObj[byteI] !== readCache[byteI]) {
-          cache[key] = cachedObj;
-          return false;
-        }
+      if (readCache !== cachedObj) {
+        cache[key] = cachedObj;
+        return false;
       }
 
       return true;

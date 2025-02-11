@@ -1,8 +1,8 @@
-import { md5 } from 'js-md5';
-import type { ModuleObject } from '~/src/runtime/types';
+import SparkMD5 from 'spark-md5';
+import type { ModuleObject } from '../types';
 
 class Utils {
-  private lastUUID = md5(Date.now().toString());
+  private lastUUID = SparkMD5.hash(Date.now().toString());
 
   mergeObjects<T>(target: Record<any, any>, template: T): T {
     const merger = <TR>(_target: Record<any, any>, _template: TR, level = 0): TR => {
@@ -52,7 +52,7 @@ class Utils {
   }
 
   hash(obj: ModuleObject<any>): string {
-    return md5.hex(JSON.stringify(obj));
+    return SparkMD5.hash(JSON.stringify(obj));
   }
 
   trimStr(str: string, trim: string): string {
@@ -68,7 +68,7 @@ class Utils {
   }
 
   getUUID(): string {
-    this.lastUUID = md5(this.lastUUID);
+    this.lastUUID = SparkMD5.hash(this.lastUUID);
     return this.lastUUID;
   }
 }
