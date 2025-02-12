@@ -1,6 +1,6 @@
 <script setup lang="ts">
 const router = useRouter();
-const themesEditor = useThemesEditor();
+const themesEditor = useThemeEditor();
 const scopeStyles = useThemeBlock('sidebar.test');
 const isEditEnabled = useState('test-editing', () => false);
 

@@ -1,6 +1,6 @@
 <script setup lang="ts">
 const router = useRouter();
-const themesEditor = useThemesEditor();
+const themesEditor = useThemeEditor();
 </script>
 
 <template>

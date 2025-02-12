@@ -1,10 +1,10 @@
 <script setup lang="ts">
-import useThemesEditor from '../../composables/useThemesEditor';
+import useThemeEditor from '../../composables/useThemeEditor';
 import ThemePreview from '../features/ThemePreview.vue';
 import ThemeEditorBlock from './themeEditorBlock.vue';
 import { computed } from '#imports';
 
-const client = useThemesEditor();
+const client = useThemeEditor();
 const isBlockVisible = computed(() => client.getBlockStatus());
 </script>
 

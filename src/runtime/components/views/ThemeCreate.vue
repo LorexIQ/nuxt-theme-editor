@@ -6,7 +6,7 @@ import NotifyBlock from '../shared/NotifyBlock.vue';
 import ThemeBlock from '../features/ThemeBlock.vue';
 import ViewPage from '../widgets/ViewPage.vue';
 import IsHr from '../shared/IsHr.vue';
-import BlockRadioThemes from '../widgets/BlockRadioThemes.vue';
+import ThemesBlockRadio from '../widgets/ThemesBlockRadio.vue';
 import useErrorMessages from '../../helpers/client/useErrorMessages';
 import useIdProtect from '../../helpers/useIdProtect';
 import useLang from '../../helpers/useLang';
@@ -100,7 +100,7 @@ onBeforeMount(() => {});
       <div class="TE-theme-create__block">
         <IsHr>{{ useLang('pageCreateEdit.parentTitle') }}</IsHr>
         <div class="TE-theme-create__block__row TE-theme-create__block__row--parent-theme">
-          <BlockRadioThemes
+          <ThemesBlockRadio
             v-model="themeCreateData.parentThemeId"
             :client="client"
             @update:model-value="activeErrors.remove(3)"

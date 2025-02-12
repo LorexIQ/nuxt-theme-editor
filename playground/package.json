@@ -10,7 +10,7 @@
   "dependencies": {
     "@nuxthub/core": "^0.8.7",
     "nuxt": "^3.14.159",
-    "nuxt-theme-editor": "^1.1.0"
+    "nuxt-theme-editor": "^1.1.2"
   },
   "devDependencies": {
     "sass-embedded": "^1.81.0"

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import RadioThemeBlock from '../features/RadioThemeBlock.vue';
+import ThemeBlockRadio from '../features/ThemeBlockRadio.vue';
 import ThemeBlockStatus from '../features/ThemeBlockStatus.vue';
 import type { ModuleClient } from '../../types';
 import { ref, watch } from '#imports';
@@ -23,7 +23,7 @@ watch(innerValue, newVal => emit('update:modelValue', newVal));
 
 <template>
   <div class="TE-block-radio-themes">
-    <RadioThemeBlock
+    <ThemeBlockRadio
       v-for="theme of client.getThemes()"
       :key="theme.id"
       v-model="innerValue"
@@ -35,7 +35,7 @@ watch(innerValue, newVal => emit('update:modelValue', newVal));
           :theme="theme"
         />
       </template>
-    </RadioThemeBlock>
+    </ThemeBlockRadio>
   </div>
 </template>
 

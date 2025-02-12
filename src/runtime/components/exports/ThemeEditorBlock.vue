@@ -1,10 +1,10 @@
 <script setup lang="ts">
-import useThemesEditor from '../../composables/useThemesEditor';
+import useThemeEditor from '../../composables/useThemeEditor';
 import EditorHeader from '../widgets/EditorHeader.vue';
 import Error404 from '../views/Error404.vue';
 import { computed } from '#imports';
 
-const client = useThemesEditor();
+const client = useThemeEditor();
 const router = client.getRouter();
 
 const pageComponent = computed(() => router.route.page?.component ?? Error404);
@@ -76,6 +76,7 @@ const addStyles = computed(() => ({
 .TE-block {
   display: grid;
   grid-template-rows: auto 1fr;
+  min-width: 400px;
   width: 400px;
   height: 100%;
   border-left: 1px solid var(--border);

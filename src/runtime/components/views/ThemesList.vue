@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type { ModuleClient, ModuleTheme } from '../../types';
-import BlockThemes from '../widgets/BlockThemes.vue';
+import ThemesBlock from '../widgets/ThemesBlock.vue';
 import ViewPage from '../widgets/ViewPage.vue';
 import IsSwitch from '../shared/IsSwitch.vue';
 import useLang from '../../helpers/useLang';
@@ -31,7 +31,7 @@ function openThemeContextMenu([event, theme]: [MouseEvent, ModuleTheme]) {
 <template>
   <ViewPage page="index">
     <div class="TE-themes-list">
-      <BlockThemes
+      <ThemesBlock
         type="system"
         :client="client"
         @double-click="selectThemeAsMain"
@@ -40,8 +40,8 @@ function openThemeContextMenu([event, theme]: [MouseEvent, ModuleTheme]) {
         <template #preview>
           <slot name="preview" />
         </template>
-      </BlockThemes>
-      <BlockThemes
+      </ThemesBlock>
+      <ThemesBlock
         v-if="client.getGlobalBlockEnabledStatus()"
         type="global"
         :client="client"
@@ -52,8 +52,8 @@ function openThemeContextMenu([event, theme]: [MouseEvent, ModuleTheme]) {
         <template #preview>
           <slot name="preview" />
         </template>
-      </BlockThemes>
-      <BlockThemes
+      </ThemesBlock>
+      <ThemesBlock
         v-if="client.getLocalBlockEnabledStatus()"
         type="local"
         :client="client"
@@ -63,7 +63,7 @@ function openThemeContextMenu([event, theme]: [MouseEvent, ModuleTheme]) {
         <template #preview>
           <slot name="preview" />
         </template>
-      </BlockThemes>
+      </ThemesBlock>
     </div>
     <template #footer>
       <div class="TE-themes-list-footer">

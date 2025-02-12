@@ -77,8 +77,10 @@ export class Sandbox {
     const isSelectedDarkTheme = this.ctx.getSelectedDarkThemeId() === theme.id;
 
     const isEditAccess = this.ctx.getEditingModeStatus();
-    const isLocalAccess = theme.type === 'local';
-    const isGlobalAccess = theme.type === 'global';
+    const isLocalEnabled = this.ctx.getLocalBlockEnabledStatus();
+    const isGlobalEnabled = this.ctx.getGlobalBlockEnabledStatus();
+    const isLocalAccess = theme.type === 'local' && isLocalEnabled;
+    const isGlobalAccess = theme.type === 'global' && isGlobalEnabled;
     const isLocalEditAccess = isLocalAccess && isEditAccess;
     const isGlobalEditAccess = isGlobalAccess && isEditAccess;
     const isLocalOrGlobalEditAccess = isLocalAccess || isGlobalEditAccess;
@@ -116,13 +118,14 @@ export class Sandbox {
           {
             title: useLang('contextMenu.createThemeCopy'),
             icon: 'Palette2',
-            action: () => router.push(`newTheme?parentThemeId=${theme.id}`, 'tab-fade-lr')
+            action: () => router.push(`newTheme?parentThemeId=${theme.id}`, 'tab-fade-lr'),
+            isVisible: () => isLocalEnabled
           },
           {
             title: useLang('contextMenu.publish'),
             icon: 'Publish',
             action: () => router.push(`publishApprove?themeId=${theme.id}`, 'tab-fade-lr'),
-            isVisible: () => isLocalEditAccess
+            isVisible: () => isLocalEditAccess && isGlobalEnabled
           },
           {
             title: useLang('contextMenu.depublish'),

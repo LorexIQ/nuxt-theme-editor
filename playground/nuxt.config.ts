@@ -1,7 +1,7 @@
 export default defineNuxtConfig({
   modules: [
-    '../dist/module',
-    // '../src/module',
+    // '../dist/module',
+    '../src/module',
     // 'nuxt-theme-editor',
     '@nuxthub/core'
   ],
@@ -20,10 +20,6 @@ export default defineNuxtConfig({
   css: [
     './assets/main.scss'
   ],
-
-  devServer: {
-    port: 3001
-  },
 
   compatibilityDate: '2024-11-18',
 
@@ -44,7 +40,8 @@ export default defineNuxtConfig({
       },
       global: {
         enabled: true,
-        origin: '/'
+        origin: '/',
+        editingAllowedUseStateKey: 'test-editing'
       }
     },
     localization: {

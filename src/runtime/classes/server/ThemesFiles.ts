@@ -63,7 +63,7 @@ export class ThemesFiles {
       commentsFile.addExportAssignment({
         isExportEquals: false,
         expression: (writer) => {
-          writer.write('defineThemesComments(');
+          writer.write('defineThemeComments(');
           writeThemeStructure(writer, defaultTheme, 'object');
           writer.write(')');
         }

@@ -1,4 +1,4 @@
-export default defineThemesComments({
+export default defineThemeComments({
   test: '',
   dsd: '',
   dssssss3: '',

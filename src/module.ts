@@ -56,13 +56,11 @@ export default defineNuxtModule<ModuleOptions>({
     nuxt.hook('builder:watch', (_, path) => serverObject.checkThemeChangesWithAction(path));
     nuxt.hook('build:before', () => serverObject.getMetaFiles().create());
 
-    addImportsDir(resolver.resolve('./runtime/composables'));
-    addPlugin(resolver.resolve('./runtime/plugin'));
-
     await installModule('nuxt-transition-expand');
     await installModule('nuxt-color-picker');
-    await addComponentsDir({
-      path: resolver.resolve('./runtime/components/exports')
-    });
+
+    addImportsDir(resolver.resolve('./runtime/composables'));
+    addPlugin(resolver.resolve('./runtime/plugin'));
+    addComponentsDir({ path: resolver.resolve('./runtime/components/exports') });
   }
 });
