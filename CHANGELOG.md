@@ -1,6 +1,18 @@
 # Changelog
 
 
+## v1.1.3
+
+[compare changes](https://github.com/LorexIQ/nuxt-theme-editor/compare/v1.1.2...v1.1.3)
+
+### 🩹 Fixes
+
+- Решена проблема с анимацией блока TE. Убраны кнопки взаимодействия с темами, если блоки отключены. Исправлены имена composables и внутренних компонентов ([5f6816b](https://github.com/LorexIQ/nuxt-theme-editor/commit/5f6816b))
+
+### ❤️ Contributors
+
+- LorexIQ <dmitrymurashko0@gmail.com>
+
 ## v1.1.2
 
 [compare changes](https://github.com/LorexIQ/nuxt-theme-editor/compare/v1.1.1...v1.1.2)
