@@ -1,6 +1,18 @@
 # Changelog
 
 
+## v1.1.8
+
+[compare changes](https://github.com/LorexIQ/nuxt-theme-editor/compare/v1.1.7...v1.1.8)
+
+### 💅 Refactors
+
+- Изменена логика регистрации scopes ([93436aa](https://github.com/LorexIQ/nuxt-theme-editor/commit/93436aa))
+
+### ❤️ Contributors
+
+- LorexIQ <dmitrymurashko0@gmail.com>
+
 ## v1.1.7
 
 [compare changes](https://github.com/LorexIQ/nuxt-theme-editor/compare/v1.1.6...v1.1.7)
