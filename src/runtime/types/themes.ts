@@ -28,7 +28,7 @@ export type ModuleThemeStyleObject = ModuleObject<ThemeStyleValueType>;
 export type ModuleThemeStyleBlock = ModuleThemeStyleBlockReturn<ThemeStyleValueType>;
 export type ModuleThemeSelectedStyles = ModuleThemeStyleObject | ModuleThemeStyleBlock;
 export type ModuleThemeScopes = ModuleObject<{
-  scopesIds: string[];
+  scopes: ModuleObject<number>;
   styles: ModuleThemeScopesStyles;
 }>;
 export type ModuleThemeScopesStyles = ModuleObject | ComputedRef<ModuleObject>;

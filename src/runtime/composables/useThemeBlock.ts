@@ -27,14 +27,8 @@ export default function useBlock(block: ModuleDefaultBlockKeys, withInheritance:
   const blockStyles = computed(() => unwrap.get(client.getSelectedTheme()?.getPreparedStylesBlock(block, withInheritance)) ?? {});
   const currentInstance = getCurrentInstance()!;
 
-  onMounted(() => {
-    const scopeId = getComponentId(currentInstance);
-    if (client.checkScopeRegistration(scopeId, block)) console.warn(`useThemeBlock('${block}') is already used in [${currentInstance.type.__file}]. Registration will be skipped.`);
-    client.createScopeStyles(scopeId, block, blockStyles);
-  });
-  onUnmounted(() => {
-    client.deleteScopeStyles(getComponentId(currentInstance), block);
-  });
+  onMounted(() => client.createScopeStyles(getComponentId(currentInstance), block, blockStyles));
+  onUnmounted(() => client.deleteScopeStyles(getComponentId(currentInstance), block));
 
   return blockStyles;
 }

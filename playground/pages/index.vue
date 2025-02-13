@@ -6,6 +6,7 @@ const themesEditor = useThemeEditor();
 <template>
   <div class="page-index">
     <h4>PAGE: INDEX</h4>
+
     <button @click="router.push({ path: '/second' })">
       Go Second Page
     </button>

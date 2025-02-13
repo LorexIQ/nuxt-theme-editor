@@ -164,7 +164,7 @@ export class Client {
         `${this.config.keys.style}:scope`,
         Object.values(this.usesScopesProperties).reduce((acc, property) => ({
           ...acc,
-          [property.scopesIds.map(scopeId => `[${scopeId}]`).join(',\n')]: property.styles
+          [Object.keys(property.scopes).map(scopeId => `[${scopeId}]`).join(',\n')]: property.styles
         }), {})
       );
     });
@@ -629,12 +629,14 @@ export class Client {
     const blockPathStyles = this.usesScopesProperties[blockPath];
 
     if (blockPathStyles) {
-      if (!blockPathStyles.scopesIds.includes(scopeId)) {
-        blockPathStyles.scopesIds.push(scopeId);
+      if (!blockPathStyles.scopes[scopeId]) {
+        blockPathStyles.scopes[scopeId] = 1;
+      } else {
+        blockPathStyles.scopes[scopeId]++;
       }
     } else {
       this.usesScopesProperties[blockPath] = {
-        scopesIds: [scopeId],
+        scopes: { [scopeId]: 1 },
         styles
       };
     }
@@ -658,20 +660,15 @@ export class Client {
     const blockPathStyles = this.usesScopesProperties[blockPath];
 
     if (blockPathStyles) {
-      const scopeIdIndex = blockPathStyles.scopesIds.indexOf(scopeId);
-
-      if (scopeIdIndex !== -1) blockPathStyles.scopesIds.splice(scopeIdIndex, 1);
-      if (blockPathStyles.scopesIds.length === 0) delete this.usesScopesProperties[blockPath];
+      if (blockPathStyles.scopes[scopeId] > 1) blockPathStyles.scopes[scopeId]--;
+      else delete blockPathStyles.scopes[scopeId];
+      if (Object.keys(blockPathStyles.scopes).length === 0) delete this.usesScopesProperties[blockPath];
     }
   }
 
   unselectAllThemesAs(as: ThemeSelectableType): void {
     const functionName = `setSelectedAs${as[0].toUpperCase() + as.slice(1)}`;
     this.themes.forEach((theme: any) => theme[functionName](false));
-  }
-
-  checkScopeRegistration(scopeId: string, blockPath: ModuleDefaultBlockKeys): boolean {
-    return !!this.usesScopesProperties[blockPath]?.scopesIds.includes(scopeId);
   }
 
   async loadGlobalThemes(): Promise<void> {
