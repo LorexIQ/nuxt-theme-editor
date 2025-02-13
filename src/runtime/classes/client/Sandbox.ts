@@ -142,7 +142,11 @@ export class Sandbox {
           {
             title: useLang('contextMenu.editStyles'),
             icon: 'WordsPen',
-            action: () => router.push(`editThemeStyles?themeId=${theme.id}`, 'tab-fade-lr'),
+            action: async () => {
+              if (await theme.loadInfo()) {
+                router.push(`editThemeStyles?themeId=${theme.id}`, 'tab-fade-lr');
+              }
+            },
             isVisible: () => isLocalOrGlobalEditAccess
           },
           {

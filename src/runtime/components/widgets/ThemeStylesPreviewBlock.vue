@@ -1,8 +1,7 @@
 <script setup lang="ts">
-import type { StyleContextMenuData } from '../features/StyleEditBlock.vue';
 import StyleEditBlock from '../features/StyleEditBlock.vue';
 import DropDownBlock from '../shared/DropDownBlock.vue';
-import type { ModuleTheme } from '../../types';
+import type { ModuleSandboxStyleContextMenuData, ModuleTheme } from '../../types';
 import ThemeBlock from '../../components/features/ThemeBlock.vue';
 import unwrap from '../../helpers/client/unwrap';
 import useLang from '../../helpers/useLang';
@@ -12,8 +11,8 @@ type Props = {
   theme: ModuleTheme;
 };
 type Emits = {
-  (e: 'contextMenuOpen', v: StyleContextMenuData): void;
-  (e: 'click', v: StyleContextMenuData): void;
+  (e: 'contextMenuOpen', v: ModuleSandboxStyleContextMenuData): void;
+  (e: 'click', v: ModuleSandboxStyleContextMenuData): void;
   (e: 'inheritanceClick', v: string): void;
 };
 

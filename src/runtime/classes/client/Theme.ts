@@ -223,40 +223,45 @@ export class Theme {
     unwrap.set(this, 'isInit', status);
   }
 
-  async setSelectedAsMain(state = true, async = false): Promise<void> {
+  async setSelectedAsMain(state = true, async = false): Promise<boolean> {
     if (state) {
       if (async) this.loadInfo();
-      else await this.loadInfo();
+      else if (!await this.loadInfo()) return false;
       this.ctx.unselectAllThemesAs('main');
     }
     unwrap.set(this, 'isSelectedAsMain', state);
+    return true;
   }
 
-  async setSelectedAsLight(state = true, async = false): Promise<void> {
+  async setSelectedAsLight(state = true, async = false): Promise<boolean> {
     if (state) {
       if (async) this.loadInfo();
-      else await this.loadInfo();
+      else if (!await this.loadInfo()) return false;
       this.ctx.unselectAllThemesAs('light');
     }
     unwrap.set(this, 'isSelectedAsLight', state);
+    return true;
   }
 
-  async setSelectedAsDark(state = true, async = false): Promise<void> {
+  async setSelectedAsDark(state = true, async = false): Promise<boolean> {
     if (state) {
       if (async) this.loadInfo();
-      else await this.loadInfo();
+      else if (!await this.loadInfo()) return false;
       this.ctx.unselectAllThemesAs('dark');
     }
     unwrap.set(this, 'isSelectedAsDark', state);
+    return true;
   }
 
-  async setSelectedAsEdited(state = true): Promise<void> {
+  async setSelectedAsEdited(state = true, async = false): Promise<boolean> {
     if (state) {
-      await this.loadInfo();
+      if (async) this.loadInfo();
+      else if (!await this.loadInfo()) return false;
       this.ctx.unselectAllThemesAs('edited');
       utils.replaceArrayData(this.editedStyles, utils.copyObject(this.styles));
     }
     unwrap.set(this, 'isSelectedAsEdited', state);
+    return true;
   }
 
   setStyles(styles: ModuleThemeCleanedStyles[], scope: ThemeStylesScope = 'main', force = false): void {
@@ -333,7 +338,7 @@ export class Theme {
   }
 
   async loadInfo(theme?: ModuleLocalStorageTheme, force = false): Promise<boolean> {
-    if (unwrap.get(this.type) !== 'global') return false;
+    if (unwrap.get(this.type) !== 'global') return true;
 
     try {
       if (force || (!theme && !unwrap.get(this.isInit) && !this.loader.status)) {
