@@ -9,7 +9,7 @@ import utils from './utils';
 import { useRuntimeConfig, useState } from '#imports';
 
 export default function<T extends ModuleHelpersNestedKeys<ModuleLocalizationStructure> | ModuleHelpersStringKeys<ModuleLocalizationStructure>>(path: T): ModuleHelpersGetValueByPath<ModuleLocalizationStructure, T> {
-  const moduleConfig = useRuntimeConfig().public.themesEditor as ModuleOptionsExtend;
+  const moduleConfig = useRuntimeConfig().public.themesEditor as unknown as ModuleOptionsExtend;
   const localizationConfig = moduleConfig.localization;
   const translations = useState(moduleConfig.keys.state + ':localization', () => localizationConfig.type === 'system' ? LANGUAGES[localizationConfig.lang] : utils.mergeObjects(localizationConfig.translations, LANGUAGES[localizationConfig.parentLang]) as any);
 
