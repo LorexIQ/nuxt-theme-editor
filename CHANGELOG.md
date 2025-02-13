@@ -1,6 +1,23 @@
 # Changelog
 
 
+## v1.1.4
+
+[compare changes](https://github.com/LorexIQ/nuxt-theme-editor/compare/v1.1.3...v1.1.4)
+
+### 🩹 Fixes
+
+- Исправление багов ([d246721](https://github.com/LorexIQ/nuxt-theme-editor/commit/d246721))
+- Заблокировано редактирование id у глобальных тем ([e6954e9](https://github.com/LorexIQ/nuxt-theme-editor/commit/e6954e9))
+
+### 💅 Refactors
+
+- Переделана конфигурация системных блоков. Добавлена возможность добавления слэша в конец запросов ([6e6b6a4](https://github.com/LorexIQ/nuxt-theme-editor/commit/6e6b6a4))
+
+### ❤️ Contributors
+
+- LorexIQ <dmitrymurashko0@gmail.com>
+
 ## v1.1.3
 
 [compare changes](https://github.com/LorexIQ/nuxt-theme-editor/compare/v1.1.2...v1.1.3)
