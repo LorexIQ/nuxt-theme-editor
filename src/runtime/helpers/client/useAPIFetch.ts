@@ -31,6 +31,10 @@ function getAuthorizationToken(runtimeConfig: ModuleOptionsExtend): string | und
   const globalConfig = runtimeConfig.themesConfig.global;
   if (globalConfig.authorizationUseStateKey) return useState<string>(globalConfig.authorizationUseStateKey).value;
 }
+function getEndSlash(runtimeConfig: ModuleOptionsExtend): string | undefined {
+  const globalConfig = runtimeConfig.themesConfig.global;
+  return globalConfig.addSlashToTheEndRequest ? '/' : '';
+}
 
 export default async function useAPIFetch<
   Method extends keyof ModuleAPISwagger,
@@ -48,8 +52,6 @@ export default async function useAPIFetch<
     responseType: 'json',
     loader: useSwitch(),
     onlyOffLoader: false,
-    addSlash: false,
-    withAuthorize: true,
 
     success: () => {},
     error: () => {},
@@ -64,13 +66,14 @@ export default async function useAPIFetch<
 
   const authToken = getAuthorizationToken(runtimeConfig);
   const origin = getOrigin(runtimeConfig);
+  const endSlash = getEndSlash(runtimeConfig);
   const preparedPath = preparePath(typedPath, typedOptions.params);
 
   _config.loader.show(!_config.onlyOffLoader);
 
   return new Promise((resolve, reject) => {
     $fetch<Res>(
-      `${origin}${preparedPath}${_config.addSlash && preparedPath.length ? '/' : ''}`,
+      `${origin}/${preparedPath}${endSlash}`,
       {
         method: method as string,
         query: typedOptions.query ?? {},

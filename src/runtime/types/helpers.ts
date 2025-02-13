@@ -31,9 +31,7 @@ export type ModuleLoadTsModuleBaseReturn = {
 };
 
 export type DeepRequired<T> = {
-  [K in keyof T]-?: T[K] extends object
-    ? DeepRequired<T[K]>
-    : T[K];
+  [K in keyof T]: Required<DeepRequired<T[K]>>
 };
 export type DeepPartial<T> = {
   [K in keyof T]?: T[K] extends object

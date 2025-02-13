@@ -16,8 +16,6 @@ export type APIFetchConfig<R> = {
   responseType?: 'json' | 'blob';
   loader?: UseSwitchClass;
   onlyOffLoader?: boolean;
-  addSlash?: boolean;
-  withAuthorize?: boolean;
 
   success?: (res: R) => void;
   error?: (e: any) => void;

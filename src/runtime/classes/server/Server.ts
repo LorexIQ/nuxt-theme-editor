@@ -43,7 +43,7 @@ export class Server {
   ) {
     this.config = this._initConfig(this.nuxt.options.runtimeConfig.public.themesEditor as any);
     this.rootResolver = createResolver(this.nuxt.options.rootDir);
-    this.themesResolver = createResolver(this.rootResolver.resolve(this.config.themesDir));
+    this.themesResolver = createResolver(this.rootResolver.resolve(this.config.themesConfig.system.themesDir));
 
     this.metaFiles = new MetaFiles(this);
     this.themesFiles = new ThemesFiles(this);
@@ -56,12 +56,17 @@ export class Server {
       ...options,
       themesConfig: {
         system: {
+          themesDir: './themes',
           default: 'light',
+          defaultDark: 'light',
           ...options.themesConfig.system
         },
         global: {
           enabled: false,
           origin: '',
+          editingAllowedUseStateKey: null,
+          authorizationUseStateKey: null,
+          addSlashToTheEndRequest: false,
           ...options.themesConfig.global
         },
         local: {

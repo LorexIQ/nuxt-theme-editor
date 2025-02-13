@@ -40,8 +40,9 @@ export default defineNuxtConfig({
       },
       global: {
         enabled: true,
-        origin: '/',
-        editingAllowedUseStateKey: 'test-editing'
+        origin: '',
+        editingAllowedUseStateKey: 'test-editing',
+        addSlashToTheEndRequest: true
       }
     },
     localization: {

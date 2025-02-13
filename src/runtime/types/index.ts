@@ -14,14 +14,16 @@ export * from './themes';
 export type ModuleObject<T = string> = { [name: string]: T };
 
 export type ModuleOptionsThemesConfigSystem = {
-  default: string;
+  themesDir?: string;
+  default?: string;
   defaultDark?: string;
 };
 export type ModuleOptionsThemesConfigGlobal = {
   enabled: boolean;
   origin: string;
-  editingAllowedUseStateKey?: string;
-  authorizationUseStateKey?: string;
+  editingAllowedUseStateKey?: string | null;
+  authorizationUseStateKey?: string | null;
+  addSlashToTheEndRequest?: boolean;
 };
 export type ModuleOptionsThemesConfigLocal = {
   enabled: boolean;
@@ -48,7 +50,6 @@ export type ModuleOptionsLocalization =
 
 export type ModuleOptions = {
   systemUUID: string;
-  themesDir: string;
   themesConfig: ModuleOptionsThemesConfig;
   localization: ModuleOptionsLocalization;
 };

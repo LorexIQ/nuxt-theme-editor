@@ -22,10 +22,10 @@ export default defineNuxtModule<ModuleOptions>({
   meta,
   defaults: {
     systemUUID: 'system',
-    themesDir: './themes',
 
     themesConfig: {
       system: {
+        themesDir: './themes',
         default: 'light'
       },
       global: {

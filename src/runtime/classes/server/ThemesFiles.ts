@@ -17,7 +17,7 @@ export class ThemesFiles {
   constructor(private readonly ctx: ModuleServer) {
     this.config = this.ctx.getConfig();
     this.configDefaultTheme = this.config.themesConfig.system.default;
-    this.themesResolver = createResolver(this.ctx.getRootResolver().resolve(this.config.themesDir));
+    this.themesResolver = createResolver(this.ctx.getRootResolver().resolve(this.config.themesConfig.system.themesDir));
   }
 
   private _checkAndCreateThemesDir(): void {
