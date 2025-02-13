@@ -7,6 +7,7 @@ type Props = {
   title: string;
   modelValue: string;
   placeholder?: string;
+  isDisabled?: boolean;
   isRequiredIcon?: boolean;
   maxLength?: number;
 };
@@ -41,19 +42,21 @@ watch(innerValue, (value) => {
     class="TE-is-input"
     :class="{
       'TE-is-input--with-max-length': maxLength,
+      'TE-is-input--disabled': isDisabled,
       'x-shake': isAnimation,
     }"
   >
     <div class="TE-is-input__title">
       {{ title }}
       <IconsStore
-        v-if="isRequiredIcon"
+        v-if="isRequiredIcon && !isDisabled"
         icon="Asterisk"
       />
     </div>
     <input
       :id="`TE-input-${id}`"
       v-model="innerValue"
+      :disabled="isDisabled"
       class="TE-is-input__input"
       :placeholder="placeholder"
       autocomplete="off"
@@ -124,6 +127,9 @@ watch(innerValue, (value) => {
     }
   }
 
+  &--disabled {
+    opacity: 0.5;
+  }
   &--with-max-length {
     .TE-is-input {
       &__input {

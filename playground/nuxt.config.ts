@@ -1,3 +1,8 @@
+const env = {
+  serverOrigin: process.env.SERVER_ORIGIN ?? '',
+  serverToken: process.env.SERVER_TOKEN ?? ''
+};
+
 export default defineNuxtConfig({
   modules: [
     // '../dist/module',
@@ -21,6 +26,16 @@ export default defineNuxtConfig({
     './assets/main.scss'
   ],
 
+  runtimeConfig: {
+    public: {
+      env
+    }
+  },
+
+  devServer: {
+    port: 3001
+  },
+
   compatibilityDate: '2024-11-18',
 
   vite: {
@@ -40,8 +55,9 @@ export default defineNuxtConfig({
       },
       global: {
         enabled: true,
-        origin: '',
+        origin: env.serverOrigin,
         editingAllowedUseStateKey: 'test-editing',
+        authorizationUseStateKey: 'test-auth',
         addSlashToTheEndRequest: true
       }
     },

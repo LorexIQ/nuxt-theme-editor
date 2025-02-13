@@ -31,7 +31,7 @@ async function onApproveSuccess() {
 
 <template>
   <QuestionPageBlock
-    page="=publishApprove"
+    page="publishApprove"
     class="TE-theme-publish"
     icon="Publish"
     :question-title="useLang('pagePublish.title')"
