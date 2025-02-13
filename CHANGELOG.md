@@ -1,6 +1,23 @@
 # Changelog
 
 
+## v1.1.6
+
+[compare changes](https://github.com/LorexIQ/nuxt-theme-editor/compare/v1.1.4...v1.1.6)
+
+### 🩹 Fixes
+
+- Исправлен запрос на получение полной темы ([6726ed1](https://github.com/LorexIQ/nuxt-theme-editor/commit/6726ed1))
+- Исправлены обработки ошибок запросов тем ([1efeab1](https://github.com/LorexIQ/nuxt-theme-editor/commit/1efeab1))
+
+### 🏡 Chore
+
+- **release:** V1.1.5 ([0014658](https://github.com/LorexIQ/nuxt-theme-editor/commit/0014658))
+
+### ❤️ Contributors
+
+- LorexIQ <dmitrymurashko0@gmail.com>
+
 ## v1.1.4
 
 [compare changes](https://github.com/LorexIQ/nuxt-theme-editor/compare/v1.1.3...v1.1.4)
