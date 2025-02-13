@@ -203,6 +203,12 @@ export class Theme {
     return prepareBlock(stylesBlock);
   }
 
+  private async _loadInfoWithSettings(async = false): Promise<boolean> {
+    if (async) setTimeout(() => this.loadInfo(), this.config.themesConfig.global.awaitTicksBeforeInitFetch);
+    else if (!await this.loadInfo()) return false;
+    return true;
+  }
+
   setId(id: string): void {
     unwrap.set(this, 'id', id);
   }
@@ -225,8 +231,7 @@ export class Theme {
 
   async setSelectedAsMain(state = true, async = false): Promise<boolean> {
     if (state) {
-      if (async) this.loadInfo();
-      else if (!await this.loadInfo()) return false;
+      if (!await this._loadInfoWithSettings(async)) return false;
       this.ctx.unselectAllThemesAs('main');
     }
     unwrap.set(this, 'isSelectedAsMain', state);
@@ -235,8 +240,7 @@ export class Theme {
 
   async setSelectedAsLight(state = true, async = false): Promise<boolean> {
     if (state) {
-      if (async) this.loadInfo();
-      else if (!await this.loadInfo()) return false;
+      if (!await this._loadInfoWithSettings(async)) return false;
       this.ctx.unselectAllThemesAs('light');
     }
     unwrap.set(this, 'isSelectedAsLight', state);
@@ -245,8 +249,7 @@ export class Theme {
 
   async setSelectedAsDark(state = true, async = false): Promise<boolean> {
     if (state) {
-      if (async) this.loadInfo();
-      else if (!await this.loadInfo()) return false;
+      if (!await this._loadInfoWithSettings(async)) return false;
       this.ctx.unselectAllThemesAs('dark');
     }
     unwrap.set(this, 'isSelectedAsDark', state);
@@ -255,8 +258,7 @@ export class Theme {
 
   async setSelectedAsEdited(state = true, async = false): Promise<boolean> {
     if (state) {
-      if (async) this.loadInfo();
-      else if (!await this.loadInfo()) return false;
+      if (!await this._loadInfoWithSettings(async)) return false;
       this.ctx.unselectAllThemesAs('edited');
       utils.replaceArrayData(this.editedStyles, utils.copyObject(this.styles));
     }

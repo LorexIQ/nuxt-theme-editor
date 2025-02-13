@@ -21,6 +21,7 @@ export type ModuleOptionsThemesConfigSystem = {
 export type ModuleOptionsThemesConfigGlobal = {
   enabled: boolean;
   origin: string;
+  awaitTicksBeforeInitFetch?: number;
   editingAllowedUseStateKey?: string | null;
   authorizationUseStateKey?: string | null;
   addSlashToTheEndRequest?: boolean;
@@ -66,10 +67,6 @@ export type ModuleOptionsExtendMeta = {
   name: string;
   version: string;
   configKey: string;
-};
-export type ModuleOptionsAccessTokens = {
-  baseAuthorizationToken: string;
-  fullAuthorizationToken: string;
 };
 export type ModuleOptionsExtend = DeepRequired<Omit<ModuleOptions, 'localization'>> & {
   localization: ModuleOptionsLocalization;

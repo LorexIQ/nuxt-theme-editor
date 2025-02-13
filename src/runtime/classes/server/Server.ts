@@ -64,6 +64,7 @@ export class Server {
         global: {
           enabled: false,
           origin: '',
+          awaitTicksBeforeInitFetch: 0,
           editingAllowedUseStateKey: null,
           authorizationUseStateKey: null,
           addSlashToTheEndRequest: false,
