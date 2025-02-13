@@ -1,6 +1,18 @@
 # Changelog
 
 
+## v1.1.7
+
+[compare changes](https://github.com/LorexIQ/nuxt-theme-editor/compare/v1.1.6...v1.1.7)
+
+### 🩹 Fixes
+
+- Добавлена "отсрочка" запроса инициализации глобальных тем ([3596f64](https://github.com/LorexIQ/nuxt-theme-editor/commit/3596f64))
+
+### ❤️ Contributors
+
+- LorexIQ <dmitrymurashko0@gmail.com>
+
 ## v1.1.6
 
 [compare changes](https://github.com/LorexIQ/nuxt-theme-editor/compare/v1.1.4...v1.1.6)
