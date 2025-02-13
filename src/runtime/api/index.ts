@@ -17,7 +17,7 @@ export type ModuleAPISwagger = {
         id: APIParameter;
       };
     };
-    '/themes/full/{id}': {
+    '/themes/{id}/full': {
       response: ModuleLocalStorageTheme;
       params: {
         id: APIParameter;

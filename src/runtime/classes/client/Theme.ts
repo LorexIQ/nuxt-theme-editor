@@ -337,7 +337,7 @@ export class Theme {
 
     try {
       if (force || (!theme && !unwrap.get(this.isInit) && !this.loader.status)) {
-        theme = await useAPIFetch('GET', '/themes/full/{id}', {
+        theme = await useAPIFetch('GET', '/themes/{id}/full', {
           params: {
             id: unwrap.get(this.id)
           }
