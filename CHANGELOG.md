@@ -1,6 +1,18 @@
 # Changelog
 
 
+## v1.3.2
+
+[compare changes](https://github.com/LorexIQ/nuxt-theme-editor/compare/v1.3.1...v1.3.2)
+
+### 🩹 Fixes
+
+- Исправлен баг с timestamp ([20489d1](https://github.com/LorexIQ/nuxt-theme-editor/commit/20489d1))
+
+### ❤️ Contributors
+
+- LorexIQ <dmitrymurashko0@gmail.com>
+
 ## v1.3.1
 
 [compare changes](https://github.com/LorexIQ/nuxt-theme-editor/compare/v1.3.0...v1.3.1)
