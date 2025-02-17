@@ -1,7 +1,7 @@
 import type { ModuleThemeRAW } from './themes';
 
 export type ModuleLocalStorageThemeTimestamp = {
-  updatedAt: number;
+  timestamp: number;
 };
 export type ModuleLocalStorageThemeMini = ModuleLocalStorageThemeTimestamp & {
   id: string;
@@ -12,7 +12,7 @@ export type ModuleLocalStorageThemeMini = ModuleLocalStorageThemeTimestamp & {
 export type ModuleLocalStorageTheme = ModuleLocalStorageThemeMini & {
   stylesJSON: string;
 };
-export type ModuleLocalStorageThemeCreate = Omit<ModuleLocalStorageTheme, 'updatedAt'>;
+export type ModuleLocalStorageThemeCreate = Omit<ModuleLocalStorageTheme, 'timestamp'>;
 export type ModuleLocalStorageThemeEdit = Partial<ModuleLocalStorageThemeCreate>;
 
 export type ModuleStorage = {

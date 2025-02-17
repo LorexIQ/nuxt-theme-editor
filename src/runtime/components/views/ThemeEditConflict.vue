@@ -73,7 +73,7 @@ onBeforeMount(async () => {
           <div class="TE-theme-edit-conflict__cards__card__title">
             {{ useLang('pageEditConflict.server') }}
             <div class="TE-theme-edit-conflict__cards__card__title__date">
-              {{ timestampToDate(serverTheme.updatedAt) }}
+              {{ timestampToDate(serverTheme.timestamp) }}
             </div>
           </div>
           <theme-block
@@ -92,7 +92,7 @@ onBeforeMount(async () => {
           <div class="TE-theme-edit-conflict__cards__card__title">
             {{ useLang('pageEditConflict.local') }}
             <div class="TE-theme-edit-conflict__cards__card__title__date">
-              {{ timestampToDate(theme.updatedAt) }}
+              {{ timestampToDate(theme.timestamp) }}
             </div>
           </div>
           <theme-block :theme="theme">

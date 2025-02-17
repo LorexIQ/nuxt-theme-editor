@@ -27,7 +27,7 @@ export class Theme {
   public readonly type = ref<ModuleThemeType>('local');
   public readonly name = ref<string>('');
   public readonly description = ref<string>('');
-  public readonly updatedAt = ref<number>(0);
+  public readonly timestamp = ref<number>(0);
   public readonly isInit = ref(false);
   public readonly isInCache = computed(() => unwrap.get(this.type) === 'global' && (unwrap.get(this.isSelectedAsMain) || unwrap.get(this.isSelectedAsLight) || unwrap.get(this.isSelectedAsDark)));
   public readonly loader: any = useSwitch();
@@ -221,8 +221,8 @@ export class Theme {
     unwrap.set(this, 'description', description);
   }
 
-  setUpdatedAt(updatedAt: number): void {
-    unwrap.set(this, 'updatedAt', updatedAt);
+  setTimestamp(timestamp: number): void {
+    unwrap.set(this, 'timestamp', timestamp);
   }
 
   setInitStatus(status: boolean): void {
@@ -354,7 +354,7 @@ export class Theme {
       if (theme) {
         this.setName(theme.name);
         this.setDescription(theme.description);
-        this.setUpdatedAt(theme.updatedAt);
+        this.setTimestamp(theme.timestamp);
         this.setStyles(utils.mergeThemes(
           JSON.parse(theme.stylesJSON),
           utils.copyObject(unwrap.get(this.ctx.getThemeById(this.configDefaultTheme)!.getStyles()))
@@ -472,7 +472,7 @@ export class Theme {
           this.setId(theme.id);
           this.setName(theme.name);
           this.setDescription(theme.description);
-          this.setUpdatedAt(theme.updatedAt);
+          this.setTimestamp(theme.timestamp);
 
           this.ctx.setThemesBlockGlobalStatus(2);
           return true;
@@ -575,7 +575,7 @@ export class Theme {
           id: unwrap.get(this.id)
         },
         body: {
-          updatedAt: unwrap.get(this.updatedAt)
+          timestamp: unwrap.get(this.timestamp)
         }
       }, { loader: this.loader }).then(res => res.status);
     } catch {

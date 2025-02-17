@@ -18,7 +18,7 @@ export type ModuleThemeRAW<T = string> = {
   id: string;
   name: string;
   description: string;
-  updatedAt: number;
+  timestamp: number;
   type: ModuleThemeType;
   styles: ModuleThemeCleanedStyles<T>[];
 };

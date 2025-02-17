@@ -95,7 +95,7 @@ export class Client {
       id: theme.id,
       name: theme.name,
       description: theme.description,
-      updatedAt: theme.updatedAt,
+      timestamp: theme.timestamp,
       type: theme.type,
       styles: unwrap.get(theme.getStyles())
     }))));
@@ -106,7 +106,7 @@ export class Client {
         id: theme.id,
         name: theme.name,
         description: theme.description,
-        updatedAt: theme.updatedAt,
+        timestamp: theme.timestamp,
         type: theme.type,
         styles: unwrap.get(theme.getStyles())
       })));
@@ -700,7 +700,7 @@ export class Client {
         id: theme.id,
         name: theme.name,
         description: theme.description,
-        updatedAt: theme.updatedAt,
+        timestamp: theme.timestamp,
         type: 'global',
         styles: getOnlyPreviewBlock(theme)
       }, true);
@@ -715,7 +715,7 @@ export class Client {
       } else if (localTheme.type === 'global') {
         localTheme.setName(theme.name);
         localTheme.setDescription(theme.description);
-        localTheme.setUpdatedAt(theme.updatedAt);
+        localTheme.setTimestamp(theme.timestamp);
         localTheme.setInitStatus(false);
 
         if (localTheme.isInCache) localTheme.loadInfo(undefined, true);

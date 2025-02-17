@@ -1,7 +1,7 @@
 <script setup lang="ts">
 const router = useRouter();
 const themesEditor = useThemeEditor();
-const isEditEnabled = useState('test-editing', () => false);
+const isEditEnabled = useState('test-editing', () => true);
 useThemeBlock('sidebar');
 </script>
 
