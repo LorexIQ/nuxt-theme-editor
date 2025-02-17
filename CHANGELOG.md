@@ -1,6 +1,26 @@
 # Changelog
 
 
+## v1.2.0
+
+[compare changes](https://github.com/LorexIQ/nuxt-theme-editor/compare/v1.1.8...v1.2.0)
+
+### 🚀 Enhancements
+
+- Добавлено скрытие пустых блоков стилей при редактировании тем ([b4a874d](https://github.com/LorexIQ/nuxt-theme-editor/commit/b4a874d))
+
+### 🩹 Fixes
+
+- Исправлено редактирование id у локальных тем ([2cb176d](https://github.com/LorexIQ/nuxt-theme-editor/commit/2cb176d))
+
+### 💅 Refactors
+
+- Переписан механизм мержей тем ([b779e7b](https://github.com/LorexIQ/nuxt-theme-editor/commit/b779e7b))
+
+### ❤️ Contributors
+
+- LorexIQ <dmitrymurashko0@gmail.com>
+
 ## v1.1.8
 
 [compare changes](https://github.com/LorexIQ/nuxt-theme-editor/compare/v1.1.7...v1.1.8)
