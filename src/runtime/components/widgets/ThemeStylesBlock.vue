@@ -49,7 +49,7 @@ const stylesBlocks = computed(() => props.styles.map((stylesBlock, index) => ({
         @context-menu-open="emit('contextMenuOpen', $event)"
         @inheritance-click="emit('inheritanceClick', $event)"
       />
-      <DropDownBlock v-else>
+      <DropDownBlock v-else-if="Object.keys(block.stylesBlock).length">
         <template #title>
           {{ settings?.name || ctxPathComputed }}
         </template>
