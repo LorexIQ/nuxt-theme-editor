@@ -73,7 +73,7 @@ onBeforeMount(() => {
           <IsInput
             id="id"
             v-model="themeEditData.id"
-            :is-disabled="true"
+            :is-disabled="theme.type === 'global'"
             :title="useLang('pageCreateEdit.inputId')"
             :max-length="30"
             is-required-icon
