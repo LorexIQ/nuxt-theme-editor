@@ -1,6 +1,22 @@
 # Changelog
 
 
+## v1.3.0
+
+[compare changes](https://github.com/LorexIQ/nuxt-theme-editor/compare/v1.2.0...v1.3.0)
+
+### 🚀 Enhancements
+
+- Добавлены модификаторы путей для стилей, спасающие от перетираний в случае использования разных блоков стилей в одном компоненте ([1d873cc](https://github.com/LorexIQ/nuxt-theme-editor/commit/1d873cc))
+
+### 🩹 Fixes
+
+- Исправлено отображение ошибки проверки конфликтов ([c640ddf](https://github.com/LorexIQ/nuxt-theme-editor/commit/c640ddf))
+
+### ❤️ Contributors
+
+- LorexIQ <dmitrymurashko0@gmail.com>
+
 ## v1.2.0
 
 [compare changes](https://github.com/LorexIQ/nuxt-theme-editor/compare/v1.1.8...v1.2.0)
