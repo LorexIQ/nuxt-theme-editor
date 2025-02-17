@@ -581,12 +581,12 @@ export class Theme {
     } catch {
       this.ctx.createError(
         'ERROR',
-        'editThemeStyles',
+        'editThemeConflict',
         useLang('errorsMessages.checkConflict.message'),
         useLang('errorsMessages.checkConflict.title'),
         'err_check_conflict_global'
       );
-      return false;
+      return true;
     }
   }
 }

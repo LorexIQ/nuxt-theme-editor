@@ -175,7 +175,7 @@ export class Client {
 
     watch(this.isBlockVisible, status => status && this._openOnlySelectedThemeBlock(), { immediate: true });
 
-    watch(() => this.router.route.path, () => this.errorsMessages.splice(0));
+    watch(() => this.router.route.path, () => this.errorsMessages.filter(error => error.timestamp + 1000 < Date.now()).splice(0));
   }
 
   private _readSystemThemes(): void {
@@ -610,6 +610,7 @@ export class Client {
       uuidMessage.page = Array.isArray(page) ? page : [page];
       uuidMessage.message = message;
       uuidMessage.title = title;
+      uuidMessage.timestamp = Date.now();
       return uuidMessage.id;
     } else {
       const id = Math.max(...this.errorsMessages.map(error => error.id), 0) + 1;
@@ -619,6 +620,7 @@ export class Client {
         page: Array.isArray(page) ? page : [page],
         message,
         title,
+        timestamp: Date.now(),
         uuid
       });
       return id;

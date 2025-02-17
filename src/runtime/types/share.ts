@@ -27,6 +27,7 @@ export type ModuleErrorMessage = {
   page: ModulePagesNames[];
   type: ModuleErrorType;
   message: string;
+  timestamp: number;
   title?: string;
   uuid?: string;
 };
