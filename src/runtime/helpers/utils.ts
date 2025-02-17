@@ -1,10 +1,48 @@
-import type { ModuleObject } from '../types';
+import type { ModuleObject, ModuleThemeCleanedStyles } from '../types';
 
 class Utils {
   private lastUUID: string;
 
   constructor() {
     this.lastUUID = this.generateRandomString();
+  }
+
+  mergeThemes<T extends ModuleThemeCleanedStyles>(target: Record<any, any>, template: T[]): T[] {
+    const blockValidate = (block?: any): boolean => {
+      return block
+        && typeof block.id === 'string'
+        && typeof block.settings === 'object'
+        && Array.isArray(block.styles);
+    };
+    const objectMerger = <TR extends Record<string, any>>(_target: TR, _template: TR): TR => {
+      if (blockValidate(_target)) return this.copyObject(_template);
+
+      return Object.keys(_template).reduce((acc, key) => ({
+        ...acc,
+        [key]: _target[key] ?? _template[key]
+      }), {} as TR);
+    };
+    const arrayMerger = <TR extends T>(_target: Record<any, any>, _template: TR[]): TR[] => {
+      if (!Array.isArray(_target)) return this.copyObject(_template);
+
+      const result: TR[] = [];
+
+      for (let i = 0; i < Object.values(_template).length; i++) {
+        const block = _template[i];
+
+        if (blockValidate(block)) {
+          const targetBlock = _target.find((tBlock: T) => tBlock.id === block.id);
+
+          result.push({ ...block, styles: arrayMerger(targetBlock?.styles, block.styles as any) });
+        } else {
+          result.push(objectMerger(_target[i], block));
+        }
+      }
+
+      return result;
+    };
+
+    return arrayMerger(target, template);
   }
 
   mergeObjects<T>(target: Record<any, any>, template: T): T {

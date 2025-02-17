@@ -35,7 +35,7 @@ export default defineThemeBlockRoot({
       a: '#f1f1f1'
     }
   ]),
-  defineThemeBlock('abc', [
+  defineThemeBlock('system', [
     {
       a: '#fff',
       b: '#000'

@@ -191,7 +191,7 @@ export class Client {
         .filter(themeName => themeName !== defaultThemeName)
         .reduce<ModuleTheme[]>((accum, themeName) => {
           const buildTheme = this._buildSystemTheme(getConnectorTheme(themeName), themeName, 'system');
-          buildTheme.setStyles(utils.mergeObjects(
+          buildTheme.setStyles(utils.mergeThemes(
             buildTheme.getStyles().value,
             defaultTheme.getStylesCopy().value
           ));
@@ -268,7 +268,7 @@ export class Client {
       themeRAW.type,
       previewMode
         ? themeRAW.styles
-        : utils.mergeObjects(themeRAW.styles, unwrap.get(this.getThemeById(this.configThemeSystem.default)!.getStyles())),
+        : utils.mergeThemes(themeRAW.styles, unwrap.get(this.getThemeById(this.configThemeSystem.default)!.getStyles())),
       themeRAW.name,
       themeRAW.description
     );

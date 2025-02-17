@@ -1,6 +1,4 @@
 <script setup lang="ts">
-import Test from '~/components/Test.vue';
-
 const router = useRouter();
 const themesEditor = useThemeEditor();
 const scopeStyles = useThemeBlock('sidebar.test');
@@ -61,11 +59,6 @@ console.log('second.vue useThemeBlock =>', scopeStyles.value);
     <!--        ]" -->
     <!--      /> -->
     <!--    </div> -->
-    <Test />
-    <Test />
-    <Test />
-    <Test />
-    <Test />
   </div>
 </template>
 

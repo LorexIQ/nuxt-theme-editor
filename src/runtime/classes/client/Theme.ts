@@ -355,7 +355,7 @@ export class Theme {
         this.setName(theme.name);
         this.setDescription(theme.description);
         this.setUpdatedAt(theme.updatedAt);
-        this.setStyles(utils.mergeObjects(
+        this.setStyles(utils.mergeThemes(
           JSON.parse(theme.stylesJSON),
           utils.copyObject(unwrap.get(this.ctx.getThemeById(this.configDefaultTheme)!.getStyles()))
         ), undefined, true);
