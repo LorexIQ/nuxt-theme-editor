@@ -625,18 +625,19 @@ export class Client {
     }
   }
 
-  createScopeStyles(scopeId: string, blockPath: ModuleDefaultBlockKeys, styles: ComputedRef<ModuleObject>): void {
+  createScopeStyles(scopeId: string, blockPath: ModuleDefaultBlockKeys, styles: ComputedRef<ModuleObject>, mod: string = ''): void {
     const blockPathStyles = this.usesScopesProperties[blockPath];
+    const prepareScopeId = `${scopeId}][${mod.length ? `te-mod-${mod}` : 'te-no-mod'}`;
 
     if (blockPathStyles) {
-      if (!blockPathStyles.scopes[scopeId]) {
-        blockPathStyles.scopes[scopeId] = 1;
+      if (!blockPathStyles.scopes[prepareScopeId]) {
+        blockPathStyles.scopes[prepareScopeId] = 1;
       } else {
-        blockPathStyles.scopes[scopeId]++;
+        blockPathStyles.scopes[prepareScopeId]++;
       }
     } else {
       this.usesScopesProperties[blockPath] = {
-        scopes: { [scopeId]: 1 },
+        scopes: { [prepareScopeId]: 1 },
         styles
       };
     }
@@ -656,12 +657,13 @@ export class Client {
     if (errorIndex !== -1) this.errorsMessages.splice(errorIndex, 1);
   }
 
-  deleteScopeStyles(scopeId: string, blockPath: ModuleDefaultBlockKeys): void {
+  deleteScopeStyles(scopeId: string, blockPath: ModuleDefaultBlockKeys, mod: string = ''): void {
     const blockPathStyles = this.usesScopesProperties[blockPath];
+    const prepareScopeId = `${scopeId}][${mod.length ? `te-mod-${mod}` : 'te-no-mod'}`;
 
     if (blockPathStyles) {
-      if (blockPathStyles.scopes[scopeId] > 1) blockPathStyles.scopes[scopeId]--;
-      else delete blockPathStyles.scopes[scopeId];
+      if (blockPathStyles.scopes[prepareScopeId] > 1) blockPathStyles.scopes[prepareScopeId]--;
+      else delete blockPathStyles.scopes[prepareScopeId];
       if (Object.keys(blockPathStyles.scopes).length === 0) delete this.usesScopesProperties[blockPath];
     }
   }

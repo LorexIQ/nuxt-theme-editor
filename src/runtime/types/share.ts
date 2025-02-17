@@ -22,7 +22,6 @@ export type ModulePageAnimations = 'tab-fade-lr' | 'tab-fade-rl' | undefined;
 export type ModulePagesNames = (ReturnType<typeof pagesMeta> extends { name: infer U }[] ? U : never) | string;
 export type ModuleIcons = keyof typeof iconsConnector;
 export type ModuleErrorType = 'INFO' | 'TIP' | 'WARN' | 'ERROR';
-export type ModuleUUID = `${string}-${string}-${string}-${string}-${string}-${string}-${string}-${string}-${string}-${string}`;
 export type ModuleErrorMessage = {
   id: number;
   page: ModulePagesNames[];
@@ -31,9 +30,9 @@ export type ModuleErrorMessage = {
   title?: string;
   uuid?: string;
 };
-export type ModuleServerError = {
-  statusCode: number;
-  message: string;
+export type ModuleUseThemeBlockConfig = {
+  inheritanceParent?: boolean;
+  pathModificator?: string;
 };
 
 export type ModuleClient = Client;

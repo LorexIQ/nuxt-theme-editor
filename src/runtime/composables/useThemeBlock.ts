@@ -1,6 +1,6 @@
 import type { ComponentInternalInstance } from '@vue/runtime-core';
 import useClient from '../helpers/client/useClient';
-import type { ModuleDefaultBlockKeys } from '../types';
+import type { ModuleDefaultBlockKeys, ModuleUseThemeBlockConfig } from '../types';
 import unwrap from '../helpers/client/unwrap';
 import { computed, getCurrentInstance, onMounted, onUnmounted } from '#imports';
 
@@ -21,14 +21,36 @@ function getComponentId(instance: ComponentInternalInstance) {
 
   return scopeId;
 }
+function registerComponentModificator(instance: ComponentInternalInstance, mod: string) {
+  const modAttr = mod.length ? `te-mod-${mod}` : 'te-no-mod';
 
-export default function useBlock(block: ModuleDefaultBlockKeys, withInheritance: boolean = false) {
+  const subTree = instance.subTree;
+
+  if (subTree.type === Symbol.for('v-fgt')) {
+    for (const child of subTree.children as any[]) {
+      child.el?.setAttribute?.(modAttr, '');
+    }
+  } else {
+    subTree.el?.setAttribute?.(modAttr, '');
+  }
+}
+
+export default function useBlock(block: ModuleDefaultBlockKeys, config: ModuleUseThemeBlockConfig = {}) {
+  const _config: Required<ModuleUseThemeBlockConfig> = {
+    inheritanceParent: config.inheritanceParent ?? false,
+    pathModificator: config.pathModificator ?? ''
+  };
+
   const client = useClient().value;
-  const blockStyles = computed(() => unwrap.get(client.getSelectedTheme()?.getPreparedStylesBlock(block, withInheritance)) ?? {});
+  const prepareBlock = block + (_config.pathModificator.length ? `.${_config.pathModificator}` : '');
+  const blockStyles = computed(() => unwrap.get(client.getSelectedTheme()?.getPreparedStylesBlock(prepareBlock, _config.inheritanceParent)) ?? {});
   const currentInstance = getCurrentInstance()!;
 
-  onMounted(() => client.createScopeStyles(getComponentId(currentInstance), block, blockStyles));
-  onUnmounted(() => client.deleteScopeStyles(getComponentId(currentInstance), block));
+  onMounted(() => {
+    registerComponentModificator(currentInstance, _config.pathModificator);
+    client.createScopeStyles(getComponentId(currentInstance), prepareBlock, blockStyles, _config.pathModificator);
+  });
+  onUnmounted(() => client.deleteScopeStyles(getComponentId(currentInstance), prepareBlock, _config.pathModificator));
 
   return blockStyles;
 }
