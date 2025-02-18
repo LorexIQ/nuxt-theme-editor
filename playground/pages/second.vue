@@ -25,12 +25,6 @@ const isEditEnabled = useState('test-editing', () => true);
     <button @click="themesEditor.setAutoThemeModeStatus(!themesEditor.getAutoThemeModeStatus())">
       AUTO [{{ themesEditor.getAutoThemeModeStatus() ? 'ON' : 'OFF' }}]
     </button>
-    <button
-      style="z-index: 10; position: absolute; top: 0"
-      @click="loader1.status.value ? loader1.hide() : loader1.show()"
-    >
-      Loader [{{ loader1.status.value ? 'ON' : 'OFF' }}]
-    </button>
     <button @click="isEditEnabled = !isEditEnabled">
       Edit [{{ isEditEnabled ? 'ON' : 'OFF' }}]
     </button>
