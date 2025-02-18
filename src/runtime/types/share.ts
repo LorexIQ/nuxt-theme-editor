@@ -34,6 +34,7 @@ export type ModuleErrorMessage = {
 export type ModuleUseThemeBlockConfig = {
   inheritanceParent?: boolean;
   pathModificator?: string;
+  renderTriggers?: UnwrapRefSimple<any>[];
 };
 
 export type ModuleClient = Client;

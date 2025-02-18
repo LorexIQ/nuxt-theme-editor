@@ -31,10 +31,11 @@ export default defineThemeBlockRoot({
     name: 'Лютый фонк',
     inheritanceParent: true
   }),
-  defineThemeBlock('abcd', [
+  defineThemeBlock('loader', [
     {
-      a: '#fff',
-      b: '#000'
+      bg: '#000',
+      color: '#333',
+      textColor: '#fff'
     }
   ])
 ]);

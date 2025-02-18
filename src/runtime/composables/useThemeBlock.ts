@@ -2,19 +2,29 @@ import type { ComponentInternalInstance } from '@vue/runtime-core';
 import useClient from '../helpers/client/useClient';
 import type { ModuleDefaultBlockKeys, ModuleUseThemeBlockConfig } from '../types';
 import unwrap from '../helpers/client/unwrap';
-import { computed, getCurrentInstance, onMounted, onUnmounted, onUpdated } from '#imports';
+import {
+  computed,
+  getCurrentInstance,
+  nextTick,
+  onMounted,
+  onUnmounted,
+  onUpdated,
+  watch
+} from '#imports';
 
 function mountAndGetComponentId(instance: ComponentInternalInstance, mod: string) {
   const instanceType = instance.type as any;
   const subTree = instance.subTree;
   const scopeId = `te-${instanceType.__hmrId}-${mod.length ? `mod-${mod}` : 'no-mod'}`;
 
-  if (subTree.type === Symbol.for('v-fgt')) {
-    for (const child of subTree.children as any[]) {
-      child.el?.setAttribute?.(scopeId, '');
+  if (subTree.el?.nodeType !== Node.COMMENT_NODE) {
+    if (subTree.type === Symbol.for('v-fgt')) {
+      for (const child of subTree.children as any[]) {
+        child.el?.setAttribute?.(scopeId, '');
+      }
+    } else {
+      subTree.el?.setAttribute?.(scopeId, '');
     }
-  } else {
-    subTree.el?.setAttribute?.(scopeId, '');
   }
 
   return scopeId;
@@ -23,7 +33,8 @@ function mountAndGetComponentId(instance: ComponentInternalInstance, mod: string
 export default function useBlock(block: ModuleDefaultBlockKeys, config: ModuleUseThemeBlockConfig = {}) {
   const _config: Required<ModuleUseThemeBlockConfig> = {
     inheritanceParent: config.inheritanceParent ?? false,
-    pathModificator: config.pathModificator ?? ''
+    pathModificator: config.pathModificator ?? '',
+    renderTriggers: config.renderTriggers ?? []
   };
 
   const client = useClient().value;
@@ -33,7 +44,11 @@ export default function useBlock(block: ModuleDefaultBlockKeys, config: ModuleUs
 
   onMounted(() => client.createScopeStyles(mountAndGetComponentId(currentInstance, _config.pathModificator), prepareBlock, blockStyles));
   onUpdated(() => mountAndGetComponentId(currentInstance, _config.pathModificator));
-  onUnmounted(() => client.deleteScopeStyles(mountAndGetComponentId(currentInstance, _config.pathModificator), prepareBlock));
+  const watchHandle = watch(_config.renderTriggers, () => nextTick(() => mountAndGetComponentId(currentInstance, _config.pathModificator)));
+  onUnmounted(() => {
+    client.deleteScopeStyles(mountAndGetComponentId(currentInstance, _config.pathModificator), prepareBlock);
+    watchHandle();
+  });
 
   return blockStyles;
 }

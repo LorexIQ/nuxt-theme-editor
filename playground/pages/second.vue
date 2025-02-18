@@ -2,13 +2,11 @@
 const router = useRouter();
 const themesEditor = useThemeEditor();
 const isEditEnabled = useState('test-editing', () => true);
-useThemeBlock('sidebar');
 </script>
 
 <template>
   <div class="page-second">
     <h4>PAGE: SECOND</h4>
-
     <button @click="router.push({ path: '/' })">
       Go Index Page
     </button>
@@ -18,17 +16,6 @@ useThemeBlock('sidebar');
     <test-blocks />
     <test-blocks decor="1" />
     <test-blocks decor="2" />
-    <tabs>
-      <tabs-tab
-        key="1"
-        with-frame
-      >
-        123
-      </tabs-tab>
-      <tabs-tab key="2">
-        123
-      </tabs-tab>
-    </tabs>
     <button @click="themesEditor.setThemeSelectedAsMain('light')">
       LIGHT
     </button>
@@ -37,6 +24,12 @@ useThemeBlock('sidebar');
     </button>
     <button @click="themesEditor.setAutoThemeModeStatus(!themesEditor.getAutoThemeModeStatus())">
       AUTO [{{ themesEditor.getAutoThemeModeStatus() ? 'ON' : 'OFF' }}]
+    </button>
+    <button
+      style="z-index: 10; position: absolute; top: 0"
+      @click="loader1.status.value ? loader1.hide() : loader1.show()"
+    >
+      Loader [{{ loader1.status.value ? 'ON' : 'OFF' }}]
     </button>
     <button @click="isEditEnabled = !isEditEnabled">
       Edit [{{ isEditEnabled ? 'ON' : 'OFF' }}]
@@ -72,4 +65,7 @@ useThemeBlock('sidebar');
 </template>
 
 <style lang="scss" scoped>
+.page-second {
+  position: relative;
+}
 </style>
