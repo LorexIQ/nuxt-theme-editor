@@ -2,9 +2,9 @@ import type { ComponentInternalInstance } from '@vue/runtime-core';
 import useClient from '../helpers/client/useClient';
 import type { ModuleDefaultBlockKeys, ModuleUseThemeBlockConfig } from '../types';
 import unwrap from '../helpers/client/unwrap';
-import { computed, getCurrentInstance, onMounted, onUnmounted } from '#imports';
+import { computed, getCurrentInstance, onMounted, onUnmounted, onUpdated } from '#imports';
 
-function getComponentId(instance: ComponentInternalInstance, mod: string) {
+function mountAndGetComponentId(instance: ComponentInternalInstance, mod: string) {
   const instanceType = instance.type as any;
   const subTree = instance.subTree;
   const scopeId = `te-${instanceType.__hmrId}-${mod.length ? `mod-${mod}` : 'no-mod'}`;
@@ -31,8 +31,9 @@ export default function useBlock(block: ModuleDefaultBlockKeys, config: ModuleUs
   const blockStyles = computed(() => unwrap.get(client.getSelectedTheme()?.getPreparedStylesBlock(prepareBlock, _config.inheritanceParent)) ?? {});
   const currentInstance = getCurrentInstance()!;
 
-  onMounted(() => client.createScopeStyles(getComponentId(currentInstance, _config.pathModificator), prepareBlock, blockStyles));
-  onUnmounted(() => client.deleteScopeStyles(getComponentId(currentInstance, _config.pathModificator), prepareBlock));
+  onMounted(() => client.createScopeStyles(mountAndGetComponentId(currentInstance, _config.pathModificator), prepareBlock, blockStyles));
+  onUpdated(() => mountAndGetComponentId(currentInstance, _config.pathModificator));
+  onUnmounted(() => client.deleteScopeStyles(mountAndGetComponentId(currentInstance, _config.pathModificator), prepareBlock));
 
   return blockStyles;
 }

@@ -49,6 +49,7 @@ export default defineNuxtConfig({
   },
 
   themesEditor: {
+    systemUUID: 'system-HASD',
     themesConfig: {
       system: {
         default: 'light'

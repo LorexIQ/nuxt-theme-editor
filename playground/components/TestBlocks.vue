@@ -13,7 +13,6 @@ useThemeBlock('sidebar', {
   <div class="test-blocks">
     <div class="test-blocks__left" />
     <div class="test-blocks__right" />
-    <test-blocks-2 />
   </div>
 </template>
 

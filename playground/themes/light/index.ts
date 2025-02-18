@@ -17,22 +17,9 @@ export default defineThemeBlockRoot({
     dssssss3: '#5da239'
   },
   sidebar,
-  defineThemeBlock('navbar', [
-    defineThemeBlock('road321312312312313123', [
-      {
-        test12: '#fff', // Это navbar road test 1 описание
-        a2: '#f1f1f1'
-      },
-      defineThemeBlock('road12312321312312321', [
-        {
-          test1: '#fff', // Это navbar road test 1 описание
-          a: '#f1f1f1'
-        }
-      ])
-    ]),
+  defineThemeBlock('tabs', [
     {
-      test1: '$sidebar.test.testtesttest2',
-      a: '#f1f1f1'
+      bg: '#000000'
     }
   ]),
   defineThemeBlock('system', [

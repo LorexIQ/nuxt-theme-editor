@@ -12,10 +12,23 @@ useThemeBlock('sidebar');
     <button @click="router.push({ path: '/' })">
       Go Index Page
     </button>
-    <p>Is using useThemeBlock('sidebar.test')</p>
+    <p style="background-color: var(--bg)">
+      Is using useThemeBlock('sidebar.test')
+    </p>
     <test-blocks />
     <test-blocks decor="1" />
     <test-blocks decor="2" />
+    <tabs>
+      <tabs-tab
+        key="1"
+        with-frame
+      >
+        123
+      </tabs-tab>
+      <tabs-tab key="2">
+        123
+      </tabs-tab>
+    </tabs>
     <button @click="themesEditor.setThemeSelectedAsMain('light')">
       LIGHT
     </button>
