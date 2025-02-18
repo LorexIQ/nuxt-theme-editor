@@ -1,6 +1,19 @@
 # Changelog
 
 
+## v1.3.4
+
+[compare changes](https://github.com/LorexIQ/nuxt-theme-editor/compare/v1.3.3...v1.3.4)
+
+### 🩹 Fixes
+
+- Исправлен баг с потерей аттрибута идентификации помеченных useThemeBlock компонентов ([1c73f82](https://github.com/LorexIQ/nuxt-theme-editor/commit/1c73f82))
+- Очищен от мусора playground ([42fbff0](https://github.com/LorexIQ/nuxt-theme-editor/commit/42fbff0))
+
+### ❤️ Contributors
+
+- LorexIQ <dmitrymurashko0@gmail.com>
+
 ## v1.3.3
 
 [compare changes](https://github.com/LorexIQ/nuxt-theme-editor/compare/v1.3.2...v1.3.3)
