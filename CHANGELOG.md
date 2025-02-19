@@ -1,6 +1,18 @@
 # Changelog
 
 
+## v1.3.6
+
+[compare changes](https://github.com/LorexIQ/nuxt-theme-editor/compare/v1.3.5...v1.3.6)
+
+### 🩹 Fixes
+
+- Доделан механизм клеймирования элементов DOM ([92385f9](https://github.com/LorexIQ/nuxt-theme-editor/commit/92385f9))
+
+### ❤️ Contributors
+
+- LorexIQ <dmitrymurashko0@gmail.com>
+
 ## v1.3.5
 
 [compare changes](https://github.com/LorexIQ/nuxt-theme-editor/compare/v1.3.4...v1.3.5)
