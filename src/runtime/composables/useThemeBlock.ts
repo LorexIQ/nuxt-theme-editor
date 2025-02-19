@@ -4,9 +4,8 @@ import type { ModuleDefaultBlockKeys, ModuleUseThemeBlockConfig } from '../types
 import unwrap from '../helpers/client/unwrap';
 import {
   computed,
-  getCurrentInstance,
-  onBeforeMount,
-  onUnmounted, watch
+  getCurrentInstance, onBeforeMount,
+  onUnmounted, onUpdated, watch
 } from '#imports';
 
 function mountAndGetComponentId(instance: ComponentInternalInstance, mod: string) {
@@ -15,6 +14,9 @@ function mountAndGetComponentId(instance: ComponentInternalInstance, mod: string
 
   if (instance.vnode.component && !instance.vnode.component.attrs[scopeId]) {
     instance.vnode.component.attrs[scopeId] = '';
+  }
+  if (instance?.subTree?.el) {
+    instance.subTree.el.setAttribute?.(scopeId, '');
   }
 
   return scopeId;
@@ -34,6 +36,7 @@ export default function useBlock(block: ModuleDefaultBlockKeys, config: ModuleUs
 
   onBeforeMount(() => client.createScopeStyles(mountAndGetComponentId(currentInstance, _config.pathModificator), prepareBlock, blockStyles));
   watch(_config.renderTriggers, () => mountAndGetComponentId(currentInstance, _config.pathModificator));
+  onUpdated(() => mountAndGetComponentId(currentInstance, _config.pathModificator));
   onUnmounted(() => {
     const targetNode = currentInstance.vnode.el!;
     const observer = new MutationObserver((mutationsList) => {
