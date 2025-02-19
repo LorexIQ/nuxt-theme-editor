@@ -5,26 +5,16 @@ import unwrap from '../helpers/client/unwrap';
 import {
   computed,
   getCurrentInstance,
-  nextTick,
-  onMounted,
-  onUnmounted,
-  onUpdated,
-  watch
+  onBeforeMount,
+  onUnmounted, watch
 } from '#imports';
 
 function mountAndGetComponentId(instance: ComponentInternalInstance, mod: string) {
   const instanceType = instance.type as any;
-  const subTree = instance.subTree;
   const scopeId = `te-${instanceType.__hmrId}-${mod.length ? `mod-${mod}` : 'no-mod'}`;
 
-  if (subTree.el?.nodeType !== Node.COMMENT_NODE) {
-    if (subTree.type === Symbol.for('v-fgt')) {
-      for (const child of subTree.children as any[]) {
-        child.el?.setAttribute?.(scopeId, '');
-      }
-    } else {
-      subTree.el?.setAttribute?.(scopeId, '');
-    }
+  if (instance.vnode.component && !instance.vnode.component.attrs[scopeId]) {
+    instance.vnode.component.attrs[scopeId] = '';
   }
 
   return scopeId;
@@ -42,12 +32,25 @@ export default function useBlock(block: ModuleDefaultBlockKeys, config: ModuleUs
   const blockStyles = computed(() => unwrap.get(client.getSelectedTheme()?.getPreparedStylesBlock(prepareBlock, _config.inheritanceParent)) ?? {});
   const currentInstance = getCurrentInstance()!;
 
-  onMounted(() => client.createScopeStyles(mountAndGetComponentId(currentInstance, _config.pathModificator), prepareBlock, blockStyles));
-  onUpdated(() => mountAndGetComponentId(currentInstance, _config.pathModificator));
-  const watchHandle = watch(_config.renderTriggers, () => nextTick(() => mountAndGetComponentId(currentInstance, _config.pathModificator)));
+  onBeforeMount(() => client.createScopeStyles(mountAndGetComponentId(currentInstance, _config.pathModificator), prepareBlock, blockStyles));
+  watch(_config.renderTriggers, () => mountAndGetComponentId(currentInstance, _config.pathModificator));
   onUnmounted(() => {
-    client.deleteScopeStyles(mountAndGetComponentId(currentInstance, _config.pathModificator), prepareBlock);
-    watchHandle();
+    const targetNode = currentInstance.vnode.el!;
+    const observer = new MutationObserver((mutationsList) => {
+      for (const mutation of mutationsList) {
+        if (mutation.removedNodes.length) {
+          for (const node of mutation.removedNodes) {
+            if (node === targetNode) {
+              client.deleteScopeStyles(mountAndGetComponentId(currentInstance, _config.pathModificator), prepareBlock);
+              observer.disconnect();
+            }
+          }
+        }
+      }
+    });
+
+    if (targetNode.parentNode) observer.observe(targetNode.parentNode, { childList: true });
+    else client.deleteScopeStyles(mountAndGetComponentId(currentInstance, _config.pathModificator), prepareBlock);
   });
 
   return blockStyles;

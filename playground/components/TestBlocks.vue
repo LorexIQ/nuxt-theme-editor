@@ -4,6 +4,9 @@ type Props = {
 };
 
 const props = defineProps<Props>();
+const isVisible = ref(false);
+const isVisible2 = ref(false);
+
 useThemeBlock('sidebar', {
   pathModificator: props.decor
 });
@@ -11,8 +14,21 @@ useThemeBlock('sidebar', {
 
 <template>
   <div class="test-blocks">
-    <div class="test-blocks__left" />
-    <div class="test-blocks__right" />
+    <div
+      class="test-blocks__left"
+      @click="isVisible = !isVisible"
+    />
+    <div
+      class="test-blocks__right"
+      @click="isVisible2 = !isVisible2"
+    />
+    <test-blocks2
+      v-if="isVisible"
+      :decor="decor"
+    />
+    <transition name="fade">
+      <test-blocks2 v-if="isVisible2" />
+    </transition>
   </div>
 </template>
 
