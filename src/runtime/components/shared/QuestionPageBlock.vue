@@ -149,6 +149,11 @@ onBeforeMount(() => {
       display: flex;
       align-items: center;
       height: 100%;
+      color: inherit;
+
+      & svg {
+        color: inherit;
+      }
     }
   }
 }

@@ -206,6 +206,10 @@ onBeforeMount(() => {
       gap: 5px;
       padding: 8px 0;
       color: var(--titleTransparent);
+
+      & span {
+        color: inherit;
+      }
     }
     &__error {
       & svg {

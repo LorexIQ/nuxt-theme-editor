@@ -141,10 +141,9 @@ const styles = computed(() => {
       overflow-x: hidden;
       overflow-y: auto;
 
-      &--transparent {
-        color: var(--titleTransparent)
+      & span {
+        color: inherit;
       }
-
       &::after {
         position: absolute;
         content: '';
@@ -153,6 +152,10 @@ const styles = computed(() => {
         right: 4px;
         height: 15px;
         background: linear-gradient(180deg, transparent 0%, var(--bg) 100%);
+      }
+
+      &--transparent {
+        color: var(--titleTransparent)
       }
     }
   }
