@@ -17,11 +17,6 @@ export default defineThemeBlockRoot({
     dssssss3: '#5da239'
   },
   sidebar,
-  defineThemeBlock('tabs', [
-    {
-      bg: '#000000'
-    }
-  ]),
   defineThemeBlock('system', [
     {
       a: '#fff',
@@ -30,12 +25,5 @@ export default defineThemeBlockRoot({
   ], {
     name: 'Лютый фонк',
     inheritanceParent: true
-  }),
-  defineThemeBlock('loader', [
-    {
-      bg: '#000',
-      color: '#333',
-      textColor: '#fff'
-    }
-  ])
+  })
 ]);

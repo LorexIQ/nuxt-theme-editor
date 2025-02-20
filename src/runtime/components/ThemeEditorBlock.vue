@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import useThemeEditor from '../../composables/useThemeEditor';
-import EditorHeader from '../widgets/EditorHeader.vue';
-import Error404 from '../views/Error404.vue';
+import useThemeEditor from '../composables/useThemeEditor';
+import EditorHeader from './widgets/EditorHeader.vue';
+import Error404 from './views/Error404.vue';
 import { computed } from '#imports';
 
 const client = useThemeEditor();

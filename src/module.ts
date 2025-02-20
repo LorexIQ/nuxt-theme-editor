@@ -4,7 +4,7 @@ import {
   createResolver,
   addImportsDir,
   installModule,
-  addComponentsDir
+  addComponentsDir, extendPages
 } from '@nuxt/kit';
 import defu from 'defu';
 import { name, version } from '../package.json';
@@ -62,5 +62,12 @@ export default defineNuxtModule<ModuleOptions>({
     addImportsDir(resolver.resolve('./runtime/composables'));
     addPlugin(resolver.resolve('./runtime/plugin'));
     addComponentsDir({ path: resolver.resolve('./runtime/components/exports') });
+    extendPages((pages) => {
+      pages.push({
+        name: 'popup',
+        path: '/popup',
+        file: resolver.resolve('./runtime/pages/popup.vue')
+      });
+    });
   }
 });

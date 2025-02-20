@@ -232,16 +232,30 @@ export class Client {
     this._selectThemeAs('main', mainId, true);
   }
 
-  private _readStorage(): void {
+  private _readStorage(compareLocals = false): void {
     const storage = JSON.parse(localStorage.getItem(this.config.keys.storage) as string) as ModuleStorage | null;
 
     if (storage) {
-      const themes = [...storage.localThemes, ...storage.globalThemesCache]
+      const storageThemes = [...storage.localThemes, ...storage.globalThemesCache];
+
+      const themesForAdd = storageThemes
+        .filter(theme => !this.getThemeById(theme.id) || !compareLocals)
         .map(theme => this._buildCustomTheme(theme))
         .filter(Boolean)
         .map(theme => reactive(theme!));
 
-      this.themes.push(...themes);
+      for (const theme of storageThemes.filter(theme => this.getThemeById(theme.id) && compareLocals)) {
+        const localTheme = this.getThemeById(theme.id)!;
+
+        localTheme.setName(theme.name);
+        localTheme.setDescription(theme.description);
+        localTheme.setStyles(theme.styles);
+      }
+      for (const theme of this.themes.filter(theme => theme.type === 'local' && !storageThemes.find(sTheme => sTheme.id === theme.id))) {
+        this.themes.splice(this.themes.findIndex(sTheme => sTheme.id === theme!.id), 1);
+      }
+
+      this.themes.push(...themesForAdd);
 
       this._replaceSelectedThemes(
         this._checkThemeAvailableAndGetActual(storage.selectedLightThemeId, 'light'),
@@ -439,6 +453,10 @@ export class Client {
 
   getBlockStatus(): boolean {
     return unwrap.get(this.isBlockVisible);
+  }
+
+  getStorage(): ModuleStorage {
+    return unwrap.get(this.storageSettings);
   }
 
   getGlobalBlockEnabledStatus(): boolean {
@@ -671,6 +689,10 @@ export class Client {
   unselectAllThemesAs(as: ThemeSelectableType): void {
     const functionName = `setSelectedAs${as[0].toUpperCase() + as.slice(1)}`;
     this.themes.forEach((theme: any) => theme[functionName](false));
+  }
+
+  updateStorage(compareLocals = false): void {
+    this._readStorage(compareLocals);
   }
 
   async loadGlobalThemes(): Promise<void> {
