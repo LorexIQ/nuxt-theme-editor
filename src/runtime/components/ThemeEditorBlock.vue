@@ -80,6 +80,7 @@ const addStyles = computed(() => ({
   width: 400px;
   height: 100%;
   border-left: 1px solid var(--border);
+  border-right: 1px solid var(--border);
   background-color: var(--bg);
   overflow: hidden;
   user-select: none;

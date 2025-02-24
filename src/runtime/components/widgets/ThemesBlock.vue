@@ -56,7 +56,7 @@ function onChangeStatus(status: boolean) {
     @change-status="onChangeStatus"
   >
     <template #title>
-      {{ blockTitle }} {{ expandStatus }}
+      {{ blockTitle }}
     </template>
     <template #default>
       <transition-expand>

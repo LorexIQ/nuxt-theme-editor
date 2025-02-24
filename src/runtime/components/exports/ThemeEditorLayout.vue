@@ -5,17 +5,9 @@ import ThemeEditorBlock from '../ThemeEditorBlock.vue';
 import { computed } from '#imports';
 
 const client = useThemeEditor();
-const isBlockVisible = computed(() => client.getBlockStatus());
+const isBlockVisible = computed(() => client.getBlockStatus() && !client.getPopupStatus());
 
-function togglePopup() {
-  if (client.getPopupStatus()) {
-    client.setPopupStatus(null);
-  } else {
-    client.setPopupStatus(window.open('/popup', 'popupWindow', `width=402,height=${window.innerHeight},resizable=no`));
-  }
-}
-
-window.onunload = () => client.setPopupStatus(null);
+window.onunload = () => client.setPopupStatus(false);
 </script>
 
 <template>
@@ -24,9 +16,6 @@ window.onunload = () => client.setPopupStatus(null);
     :class="{ 'TE-layout--opened': isBlockVisible }"
   >
     <div class="TE-layout__custom">
-      <button @click="togglePopup">
-        {{ client.getPopupStatus() ? 'Вернуть на место' : 'Открыть во всплывающем окне' }}
-      </button>
       <slot />
     </div>
     <transition-expand direction="horizontal">

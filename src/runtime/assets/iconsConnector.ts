@@ -9,6 +9,7 @@ import Error from '../components/icons/Error.vue';
 import I404 from '../components/icons/I404.vue';
 import Info from '../components/icons/Info.vue';
 import Moon from '../components/icons/Moon.vue';
+import Open from '../components/icons/Open.vue';
 import Palette from '../components/icons/Palette.vue';
 import Palette2 from '../components/icons/Palette2.vue';
 import PaperPen from '../components/icons/PaperPen.vue';
@@ -37,6 +38,7 @@ export default {
   I404,
   Info,
   Moon,
+  Open,
   Palette,
   Palette2,
   PaperPen,

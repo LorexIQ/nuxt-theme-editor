@@ -1,10 +1,21 @@
 import type { ComputedRef } from 'vue';
 import type {
   ModuleClient,
-  ModuleDefaultBlockKeys, ModuleDefaultStyleKeys, ModuleDefineThemeBlockReturn,
-  ModuleDefineThemeMetaPreview, ModuleDefineThemeMetaUI, ModuleLocalStorageTheme, ModuleLocalStorageThemeMini,
-  ModuleObject, ModuleOptionsExtend, ModulePathsCache, ModuleThemeCleanedStyles, ModuleThemeEditData,
-  ModuleThemeSelectedStyles, ModuleThemeType
+  ModuleDefaultBlockKeys,
+  ModuleDefaultStyleKeys,
+  ModuleDefineThemeBlockReturn,
+  ModuleDefineThemeMetaPreview,
+  ModuleDefineThemeMetaUI, ModuleEvBusTheme,
+  ModuleEvBusThemeExtend,
+  ModuleLocalStorageTheme,
+  ModuleLocalStorageThemeMini,
+  ModuleObject,
+  ModuleOptionsExtend,
+  ModulePathsCache,
+  ModuleThemeCleanedStyles,
+  ModuleThemeEditData,
+  ModuleThemeSelectedStyles,
+  ModuleThemeType
 } from '../../types';
 import utils from '../../helpers/utils';
 import unwrap from '../../helpers/client/unwrap';
@@ -84,7 +95,11 @@ export class Theme {
       this._buildAllStyles(status ? 'edited' : 'main');
     });
 
-    watch(this.editedStyles, () => {
+    watch(this.editedStyles, (styles) => {
+      this.useEvBus({
+        type: 'themeEditStyles',
+        styles: JSON.parse(JSON.stringify(styles))
+      });
       this._buildAllStyles('edited');
     });
 
@@ -207,6 +222,18 @@ export class Theme {
     if (async) setTimeout(() => this.loadInfo(), this.config.themesConfig.global.awaitTicksBeforeInitFetch);
     else if (!await this.loadInfo()) return false;
     return true;
+  }
+
+  private _evBusListener(message: any): void {
+    const config = message.data as ModuleEvBusThemeExtend;
+
+    switch (config.type) {
+      case 'themeEditStyles':
+        if (unwrap.get(this.isSelectedAsEdited)) {
+          this.setStyles(config.styles, 'edited');
+        }
+        break;
+    }
   }
 
   setId(id: string): void {
@@ -592,5 +619,12 @@ export class Theme {
       );
       return true;
     }
+  }
+
+  useEvBus(config: ModuleEvBusTheme): void {
+    (this.ctx as any).popupChannel.postMessage({
+      scope: 'theme',
+      ...config
+    });
   }
 }

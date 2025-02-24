@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type { ModuleClient } from '../../types';
+import IconsStore from '../shared/IconsStore.vue';
 import { computed } from '#imports';
 
 type Props = {
@@ -19,6 +20,7 @@ const logoParts: string[] = [
 
 const openedPage = computed(() => router.route.path);
 const isAnotherPage = computed(() => openedPage.value !== 'index');
+const isButtonsVisible = computed(() => !isAnotherPage.value && !client.getPopupSelfStatus());
 const isEditedPage = computed(() => client.getSelectedEditedThemeId());
 
 function onGoHome() {
@@ -27,6 +29,12 @@ function onGoHome() {
   } else {
     router.push('index', 'tab-fade-rl');
   }
+}
+function onOpenPopupWindow() {
+  client.setPopupStatus(true);
+}
+function onClose() {
+  client.setBlockStatus(false);
 }
 </script>
 
@@ -54,6 +62,25 @@ function onGoHome() {
         &nbsp;&nbsp;&nbsp; > {{ router.route?.title ?? router.route.path }}
       </div>
     </transition-expand>
+    <transition name="fade">
+      <div
+        v-if="isButtonsVisible"
+        class="TE-editor-header__buttons"
+      >
+        <div
+          class="TE-editor-header__buttons__popup-opener"
+          @click="onOpenPopupWindow"
+        >
+          <IconsStore icon="Open" />
+        </div>
+        <div
+          class="TE-editor-header__buttons__close"
+          @click="onClose"
+        >
+          <IconsStore icon="Times" />
+        </div>
+      </div>
+    </transition>
   </div>
 </template>
 
@@ -88,6 +115,38 @@ function onGoHome() {
     color: #fff;
     background-color: var(--title);
     border-radius: 4px;
+  }
+  &__buttons {
+    position: absolute;
+    top: 0;
+    right: 0;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    height: 100%;
+    padding: 0 10px;
+
+    & > div {
+      cursor: pointer;
+
+      & svg {
+        width: 22px;
+        height: 22px;
+      }
+      &:hover {
+        opacity: 0.7;
+      }
+    }
+    &__popup-opener {
+      & svg {
+        color: var(--iconPopupHeader)
+      }
+    }
+    &__close {
+      & svg {
+        color: var(--iconCloseHeader)
+      }
+    }
   }
   &--another-page {
     grid-template-columns: auto 0 auto 0 0 auto;

@@ -24,7 +24,7 @@ import type {
   ModuleThemeCleanedStyles,
   ModuleDefineThemeBlockReturn,
   ModuleLocalStorageThemeMini,
-  ModuleDefineThemeBlockSettings, ModuleEvBus
+  ModuleDefineThemeBlockSettings, ModuleEvBusClient, ModuleEvBusClientExtend, ModuleEvBusThemeExtend
 } from '../../types';
 // @ts-ignore
 import connectorMeta from '../../meta/connector';
@@ -72,10 +72,12 @@ export class Client {
   private readonly errorsMessages = reactive<ModuleErrorMessage[]>([]);
   private readonly usesScopesProperties = reactive<ModuleThemeScopes>({});
 
+  private readonly isPopupSelf = ref(window.opener !== null || window.name === 'popupWindow');
   private readonly isPopupActive = ref(false);
   private readonly popupWindowRef = ref<WindowProxy | null>(null);
+  private readonly popupChannel = new BroadcastChannel('client_channel');
 
-  private readonly isBlockVisible = ref(false);
+  private readonly isBlockVisible = ref(unwrap.get(this.isPopupSelf) || false);
   private readonly isAutoThemeMode = ref(false);
   private readonly selectedMainThemeId = computed(() => this.themes.find(theme => theme.isSelectedAsMain)?.id);
   private readonly selectedLightThemeId = computed(() => this.themes.find(theme => theme.isSelectedAsLight)?.id);
@@ -172,7 +174,10 @@ export class Client {
       );
     });
 
-    watch(this.selectedEditedThemeId, themeId => this.reloadMiddleware[themeId ? 'on' : 'off']());
+    watch(this.selectedEditedThemeId, (themeId) => {
+      if (!this.getPopupSelfStatus()) this.reloadMiddleware[themeId ? 'on' : 'off']();
+      this.useEvBus({ type: 'themeEditedStatus', id: themeId });
+    });
 
     watch(this.storageSettings, this._saveStorage.bind(this));
 
@@ -441,16 +446,27 @@ export class Client {
   }
 
   private _evBusListener(message: any): void {
-    console.log(message);
-    const config = message.data as ModuleEvBus;
+    if (this.getPopupSelfStatus()) return;
+    const config = message.data as ModuleEvBusClientExtend | ModuleEvBusThemeExtend;
 
-    switch (config.type) {
-      case 'close':
-        this.setPopupStatus(null);
+    switch (config.scope) {
+      case 'client':
+        switch (config.type) {
+          case 'close':
+            if (config.page.startsWith('editThemeStyles')) this.router.push(config.page);
+            this.setPopupStatus(false);
+            break;
+          case 'updateStorage':
+            this._readStorage(true);
+            setTimeout(() => this._openOnlySelectedThemeBlock());
+            break;
+          case 'themeEditedStatus':
+            this.setThemeSelectedAsEdited(config.id);
+            break;
+        }
         break;
-      case 'updateStorage':
-        this._readStorage(true);
-        setTimeout(() => this._openOnlySelectedThemeBlock());
+      case 'theme':
+        this.themes.forEach((theme: any) => theme._evBusListener(message));
         break;
     }
   }
@@ -469,6 +485,10 @@ export class Client {
 
   getThemes(): ModuleThemes {
     return this.themes;
+  }
+
+  getPopupSelfStatus(): boolean {
+    return unwrap.get(this.isPopupSelf);
   }
 
   getPopupStatus(): boolean {
@@ -576,14 +596,21 @@ export class Client {
     return unwrap.get(this.themesBlockLocalStatus);
   }
 
-  setPopupStatus(win: WindowProxy | null): void {
-    const bindEvBusListener = this._evBusListener.bind(this);
+  setPopupStatus(status: boolean): void {
+    if (this.getPopupSelfStatus()) return;
     const storageWin = unwrap.get(this.popupWindowRef);
+    let win = null;
 
-    if (win) {
-      window.addEventListener('message', bindEvBusListener);
+    if (status) {
+      const width = 402;
+      const height = window.innerHeight;
+      const left = window.screenX + window.innerWidth - width;
+      const top = window.screenY + (window.innerHeight - height) / 2;
+
+      win = window.open('/popup', 'popupWindow', `width=${width},height=${height},left=${left},top=${top},resizable=no`);
+      this.popupChannel.onmessage = this._evBusListener.bind(this);
     } else if (storageWin) {
-      window.removeEventListener('message', bindEvBusListener);
+      this.popupChannel.onmessage = () => {};
       storageWin.close();
     }
 
@@ -734,8 +761,13 @@ export class Client {
     this.themes.forEach((theme: any) => theme[functionName](false));
   }
 
-  useEvBus(config: ModuleEvBus): void {
-    window.opener?.postMessage(config, '*');
+  useEvBus(config: ModuleEvBusClient): void {
+    if (!this.getPopupSelfStatus()) return;
+
+    this.popupChannel.postMessage({
+      scope: 'client',
+      ...config
+    });
   }
 
   async loadGlobalThemes(): Promise<void> {

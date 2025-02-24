@@ -3,10 +3,9 @@ import { createApp } from 'vue';
 import useThemeEditor from '../composables/useThemeEditor';
 import ThemeEditorBlock from '../components/ThemeEditorBlock.vue';
 import ThemePreview from '../components/features/ThemePreview.vue';
-import { onMounted, ref, h, useHead } from '#imports';
+import { onMounted, h, useHead } from '#imports';
 
 const client = useThemeEditor();
-const isPopup = ref(false);
 client.setBlockStatus(true);
 
 function getChildByClassName(element: HTMLElement, name: string) {
@@ -15,18 +14,20 @@ function getChildByClassName(element: HTMLElement, name: string) {
   }
 }
 function checkPopupWindow() {
-  isPopup.value = window.opener !== null || window.name === 'popupWindow';
-  if (!isPopup.value) window.location.href = '/';
+  if (!client.getPopupSelfStatus()) window.location.href = '/';
 }
 
-window.onunload = () => client.useEvBus({ type: 'close' });
+window.onunload = () => client.useEvBus({
+  type: 'close',
+  page: client.getRouter().route.fullPath
+});
 
 onMounted(() => {
   checkPopupWindow();
 
   const nuxtElement = document.getElementById('__nuxt');
 
-  if (nuxtElement && isPopup.value) {
+  if (nuxtElement && client.getPopupSelfStatus()) {
     const popupContainer = getChildByClassName(nuxtElement, 'TE-popup') || document.createElement('div');
     popupContainer.className = 'TE-popup';
 
