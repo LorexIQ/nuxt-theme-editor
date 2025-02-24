@@ -94,6 +94,9 @@ onMounted(() => {
           id="search"
           v-model="searchRef"
           :placeholder="searchText"
+          post-icon="Times"
+          :post-icon-visible="value => !!value.length"
+          @click:post-icon="searchRef = ''"
         />
       </div>
       <div
@@ -170,6 +173,10 @@ onMounted(() => {
       &:deep(.TE-is-input__input) {
         font-size: 12px;
         border-color: var(--border);
+      }
+      &:deep(.TE-is-input__post-icon svg) {
+        width: 20px;
+        height: 20px;
       }
     }
     &__items {

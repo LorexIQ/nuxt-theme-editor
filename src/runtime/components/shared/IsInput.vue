@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import type { ModuleIcons } from '../../types';
 import IconsStore from './IconsStore.vue';
 import { ref, watch, computed } from '#imports';
 
@@ -10,16 +11,22 @@ type Props = {
   isDisabled?: boolean;
   isRequiredIcon?: boolean;
   maxLength?: number;
+  postIcon?: ModuleIcons;
+  postIconVisible?: (value: string) => boolean;
 };
 type Emits = {
   (e: 'update:modelValue', value: string): void;
+  (e: 'click:postIcon', value: MouseEvent): void;
 };
 
-const props = defineProps<Props>();
+const props = withDefaults(defineProps<Props>(), {
+  postIconVisible: () => () => true
+});
 const emit = defineEmits<Emits>();
 const maxLength = props.maxLength;
 
 const isAnimation = ref(false);
+const isPostIconVisible = computed(() => props.postIcon && props.postIconVisible(innerValue.value));
 const innerValue = ref(props.modelValue);
 const maxLengthRemained = computed(() => {
   const remained = (props.maxLength ?? 0) - innerValue.value.length;
@@ -41,7 +48,9 @@ watch(innerValue, (value) => {
   <div
     class="TE-is-input"
     :class="{
-      'TE-is-input--with-max-length': maxLength,
+      'TE-is-input--with-max-length': maxLength && !isPostIconVisible,
+      'TE-is-input--with-post-icon': isPostIconVisible && !maxLength,
+      'TE-is-input--with-post-icon-and-max-length': maxLength && isPostIconVisible,
       'TE-is-input--disabled': isDisabled,
       'x-shake': isAnimation,
     }"
@@ -71,6 +80,17 @@ watch(innerValue, (value) => {
     >
       {{ maxLengthRemained }}
     </div>
+    <transition name="fade">
+      <div
+        v-if="isPostIconVisible"
+        class="TE-is-input__post-icon"
+      >
+        <icons-store
+          :icon="postIcon!"
+          @click="emit('click:postIcon', $event)"
+        />
+      </div>
+    </transition>
   </div>
 </template>
 
@@ -129,6 +149,21 @@ watch(innerValue, (value) => {
       color: var(--inputRequired);
     }
   }
+  &__post-icon {
+    position: absolute;
+    top: 0;
+    right: 0;
+    display: flex;
+    align-items: center;
+    height: 100%;
+    padding: 0 5px;
+    color: var(--inputPostIcon);
+    cursor: pointer;
+
+    &:hover {
+      opacity: 0.7;
+    }
+  }
 
   &--disabled {
     opacity: 0.5;
@@ -140,6 +175,29 @@ watch(innerValue, (value) => {
       }
       &__length {
         display: flex;
+      }
+      &__post-icon {
+        right: 41px;
+      }
+    }
+  }
+  &--with-post-icon {
+    .TE-is-input {
+      &__input {
+        padding: 8px 28px 8px 10px;
+      }
+    }
+  }
+  &--with-post-icon-and-max-length {
+    .TE-is-input {
+      &__input {
+        padding: 8px 70px 8px 10px;
+      }
+      &__length {
+        display: flex;
+      }
+      &__post-icon {
+        right: 41px;
       }
     }
   }

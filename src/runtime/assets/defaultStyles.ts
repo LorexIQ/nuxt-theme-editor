@@ -31,6 +31,7 @@ export const DEFAULT_UI_STYLES: Required<ModuleDefineThemeMetaUI> = {
   inputTitle: '#333',
   inputText: '#333',
   inputPlaceholder: '#999',
+  inputPostIcon: '#333',
 
   radioStatic: '#000',
   radioActive: '#2ecc71',

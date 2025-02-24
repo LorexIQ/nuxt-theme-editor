@@ -1,13 +1,18 @@
 <script setup lang="ts">
-import StyleEditBlock from '../features/StyleEditBlock.vue';
-import DropDownBlock from '../shared/DropDownBlock.vue';
-import type { ModuleDefineThemeBlockSettings, ModuleSandboxStyleContextMenuData, ModuleTheme } from '../../types';
+import type {
+  ModuleDefineThemeBlockSettings,
+  ModuleSandboxStyleContextMenuData,
+  ModuleTheme,
+  ModuleThemeEditMeta
+} from '../../types';
+import ThemeStylesBlockStyles from './ThemeStylesBlockStyles.vue';
 import { computed } from '#imports';
 
 type Props = {
   theme: ModuleTheme;
   styles: Record<string, any>[];
   rawStyles: Record<string, any>[];
+  search: string;
   settings?: ModuleDefineThemeBlockSettings;
   id?: string;
   ctxPath?: string[];
@@ -21,9 +26,7 @@ type Emits = {
 const props = defineProps<Props>();
 const emit = defineEmits<Emits>();
 
-const ctxPathComputed = computed(() => (props.ctxPath ?? []).join(' > '));
-const styleCtxPathComputed = computed(() => (props.ctxPath ?? []).join('.'));
-const stylesBlocks = computed(() => props.styles.map((stylesBlock, index) => ({
+const stylesBlocks = computed<ModuleThemeEditMeta[]>(() => props.styles.map((stylesBlock, index) => ({
   id: stylesBlock.id,
   stylesBlock,
   rawStylesBlock: props.rawStyles[index],
@@ -40,6 +43,7 @@ const stylesBlocks = computed(() => props.styles.map((stylesBlock, index) => ({
       <ThemeStylesBlock
         v-if="block.id"
         :id="block.id"
+        :search="search"
         :theme="theme"
         :styles="block.stylesBlock.styles"
         :raw-styles="block.rawStylesBlock.styles"
@@ -49,30 +53,18 @@ const stylesBlocks = computed(() => props.styles.map((stylesBlock, index) => ({
         @context-menu-open="emit('contextMenuOpen', $event)"
         @inheritance-click="emit('inheritanceClick', $event)"
       />
-      <DropDownBlock v-else-if="Object.keys(block.stylesBlock).length">
-        <template #title>
-          {{ settings?.name || ctxPathComputed }}
-        </template>
-        <template #default>
-          <div class="TE-theme-styles-block__styles">
-            <template
-              v-for="styleKey of Object.keys(block.stylesBlock)"
-              :key="`${id}.${styleKey}`"
-            >
-              <StyleEditBlock
-                :id="`${styleCtxPathComputed}.${styleKey}`"
-                :style-key="styleKey"
-                :theme="theme"
-                :styles="block.stylesBlock"
-                :raw-styles="block.rawStylesBlock"
-                @click="emit('click', $event)"
-                @context-menu-open="emit('contextMenuOpen', $event)"
-                @inheritance-click="emit('inheritanceClick', $event)"
-              />
-            </template>
-          </div>
-        </template>
-      </DropDownBlock>
+      <ThemeStylesBlockStyles
+        v-else
+        :id="id"
+        :theme="theme"
+        :block="block"
+        :settings="settings"
+        :ctxPath="ctxPath"
+        :search="search"
+        @click="emit('click', $event)"
+        @context-menu-open="emit('contextMenuOpen', $event)"
+        @inheritance-click="emit('inheritanceClick', $event)"
+      />
     </template>
   </div>
 </template>

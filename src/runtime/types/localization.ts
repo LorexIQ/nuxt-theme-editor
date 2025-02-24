@@ -164,6 +164,7 @@ export type ModuleLocalizationStructure = {
     uiHeader: string;
     circularInheritance: string;
     inheritanceFrom: string;
+    search: string;
 
     buttons: {
       goBack: string;

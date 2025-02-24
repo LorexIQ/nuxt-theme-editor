@@ -164,6 +164,7 @@ const EN: ModuleLocalizationStructure = {
     uiHeader: 'Editor UI',
     circularInheritance: 'Circular Inheritance',
     inheritanceFrom: 'Inheritance from',
+    search: 'Search',
 
     buttons: {
       goBack: 'Go back',
@@ -358,6 +359,7 @@ const RU: ModuleLocalizationStructure = {
     uiHeader: 'UI редактора',
     circularInheritance: 'Цикличное наследование',
     inheritanceFrom: 'Наследование от',
+    search: 'Поиск',
 
     buttons: {
       goBack: 'Назад',

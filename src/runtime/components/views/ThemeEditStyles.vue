@@ -5,6 +5,7 @@ import ViewPage from '../widgets/ViewPage.vue';
 import ThemeStylesPreviewBlock from '../widgets/ThemeStylesPreviewBlock.vue';
 import ThemeStylesUIBlock from '../widgets/ThemeStylesUIBlock.vue';
 import ThemeStylesBlock from '../widgets/ThemeStylesBlock.vue';
+import IsInput from '../shared/IsInput.vue';
 import unwrap from '../../helpers/client/unwrap';
 import useLang from '../../helpers/client/useLang';
 import { computed, onBeforeMount, ref } from '#imports';
@@ -19,6 +20,7 @@ const router = client.getRouter();
 const sandbox = client.getSandbox();
 
 const viewPageRef = ref();
+const searchText = ref('');
 const alertInheritance = ref<HTMLElement>();
 const themeId = computed(() => router.route.query.themeId);
 const theme = computed(() => client.getThemeById(themeId.value));
@@ -120,7 +122,18 @@ onBeforeMount(() => {
           @context-menu-open="sandbox.openStyleContextMenu(...$event)"
           @inheritance-click="goToInheritance"
         />
+        <div class="TE-theme-edit-styles__search">
+          <IsInput
+            id="styles-search"
+            v-model="searchText"
+            :placeholder="useLang('pageEditThemeStyles.search')"
+            post-icon="Times"
+            :post-icon-visible="value => !!value.length"
+            @click:post-icon="searchText = ''"
+          />
+        </div>
         <ThemeStylesBlock
+          :search="searchText"
           :theme="theme"
           :styles="themeStyles"
           :raw-styles="themeTargetStyles"
@@ -148,6 +161,18 @@ onBeforeMount(() => {
 
 <style scoped lang="scss">
 .TE-theme-edit-styles {
+  &__search {
+    position: sticky;
+    top: 0;
+    z-index: 2;
+    border-bottom: 1px solid var(--border);
+    background-color: var(--bgBlockHeader);
+    padding: 5px;
+
+    &:deep(.TE-is-input__input) {
+      border-color: var(--border);
+    }
+  }
   &-footer {
     display: flex;
     justify-content: flex-end;

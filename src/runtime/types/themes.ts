@@ -33,6 +33,12 @@ export type ModuleThemeScopes = ModuleObject<{
 }>;
 export type ModuleThemeScopesStyles = ModuleObject | ComputedRef<ModuleObject>;
 
+export type ModuleThemeEditMeta = {
+  id: string;
+  stylesBlock: Record<string, any>;
+  rawStylesBlock: Record<string, any>;
+  settings: ModuleDefineThemeBlockSettings;
+};
 export type ModuleThemeEditData = {
   id: string;
   name: string;

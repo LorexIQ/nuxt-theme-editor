@@ -30,6 +30,7 @@ export type ModuleDefineThemeMetaUI = Partial<{
   inputTitle: string;
   inputText: string;
   inputPlaceholder: string;
+  inputPostIcon: string;
 
   radioStatic: string;
   radioActive: string;
