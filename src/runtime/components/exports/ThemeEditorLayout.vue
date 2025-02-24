@@ -2,36 +2,20 @@
 import useThemeEditor from '../../composables/useThemeEditor';
 import ThemePreview from '../features/ThemePreview.vue';
 import ThemeEditorBlock from '../ThemeEditorBlock.vue';
-import { computed, onMounted, onUnmounted, ref } from '#imports';
+import { computed } from '#imports';
 
-const popupWindow = ref<WindowProxy>();
 const client = useThemeEditor();
-const isPopup = ref(false);
-const isBlockVisible = computed(() => client.getBlockStatus() && !isPopup.value);
+const isBlockVisible = computed(() => client.getBlockStatus());
 
 function togglePopup() {
-  isPopup.value = !isPopup.value;
-
-  if (isPopup.value) {
-    popupWindow.value = window.open('/popup', 'popupWindow', `width=402,height=${window.innerHeight},resizable=no`)!;
+  if (client.getPopupStatus()) {
+    client.setPopupStatus(null);
   } else {
-    popupWindow.value!.close();
-  }
-}
-function parseMessage(event: any) {
-  const data = event.data;
-
-  if (data.popupClosed) {
-    isPopup.value = false;
-  }
-  if (data.storageUpdated) {
-    client.updateStorage(true);
-    client.setThemesBlockGlobalStatus(0);
+    client.setPopupStatus(window.open('/popup', 'popupWindow', `width=402,height=${window.innerHeight},resizable=no`));
   }
 }
 
-onMounted(() => window.addEventListener('message', parseMessage));
-onUnmounted(() => window.removeEventListener('message', parseMessage));
+window.onunload = () => client.setPopupStatus(null);
 </script>
 
 <template>
@@ -41,7 +25,7 @@ onUnmounted(() => window.removeEventListener('message', parseMessage));
   >
     <div class="TE-layout__custom">
       <button @click="togglePopup">
-        {{ isPopup ? 'Вернуть на место' : 'Открыть во всплывающем окне' }}
+        {{ client.getPopupStatus() ? 'Вернуть на место' : 'Открыть во всплывающем окне' }}
       </button>
       <slot />
     </div>

@@ -24,7 +24,7 @@ import type {
   ModuleThemeCleanedStyles,
   ModuleDefineThemeBlockReturn,
   ModuleLocalStorageThemeMini,
-  ModuleDefineThemeBlockSettings
+  ModuleDefineThemeBlockSettings, ModuleEvBus
 } from '../../types';
 // @ts-ignore
 import connectorMeta from '../../meta/connector';
@@ -71,6 +71,9 @@ export class Client {
   private readonly themesPathsCache = reactive<ModulePathsCache>({});
   private readonly errorsMessages = reactive<ModuleErrorMessage[]>([]);
   private readonly usesScopesProperties = reactive<ModuleThemeScopes>({});
+
+  private readonly isPopupActive = ref(false);
+  private readonly popupWindowRef = ref<WindowProxy | null>(null);
 
   private readonly isBlockVisible = ref(false);
   private readonly isAutoThemeMode = ref(false);
@@ -247,6 +250,7 @@ export class Client {
       for (const theme of storageThemes.filter(theme => this.getThemeById(theme.id) && compareLocals)) {
         const localTheme = this.getThemeById(theme.id)!;
 
+        localTheme.setType(theme.type);
         localTheme.setName(theme.name);
         localTheme.setDescription(theme.description);
         localTheme.setStyles(theme.styles);
@@ -268,6 +272,7 @@ export class Client {
 
   private _saveStorage(): void {
     localStorage.setItem(this.config.keys.storage, JSON.stringify(unwrap.get(this.storageSettings)));
+    this.useEvBus({ type: 'updateStorage' });
   }
 
   private _buildCustomTheme(themeRAW: ModuleThemeRAW, previewMode = false): ModuleThemeRef | undefined {
@@ -435,6 +440,21 @@ export class Client {
     }
   }
 
+  private _evBusListener(message: any): void {
+    console.log(message);
+    const config = message.data as ModuleEvBus;
+
+    switch (config.type) {
+      case 'close':
+        this.setPopupStatus(null);
+        break;
+      case 'updateStorage':
+        this._readStorage(true);
+        setTimeout(() => this._openOnlySelectedThemeBlock());
+        break;
+    }
+  }
+
   getConfig(): ModuleOptionsExtend {
     return this.config;
   }
@@ -449,6 +469,14 @@ export class Client {
 
   getThemes(): ModuleThemes {
     return this.themes;
+  }
+
+  getPopupStatus(): boolean {
+    return unwrap.get(this.isPopupActive);
+  }
+
+  getPopupWindow(): WindowProxy | null {
+    return unwrap.get(this.popupWindowRef);
   }
 
   getBlockStatus(): boolean {
@@ -546,6 +574,21 @@ export class Client {
 
   getThemesBlockLocalStatus(): ThemeBlockStatus {
     return unwrap.get(this.themesBlockLocalStatus);
+  }
+
+  setPopupStatus(win: WindowProxy | null): void {
+    const bindEvBusListener = this._evBusListener.bind(this);
+    const storageWin = unwrap.get(this.popupWindowRef);
+
+    if (win) {
+      window.addEventListener('message', bindEvBusListener);
+    } else if (storageWin) {
+      window.removeEventListener('message', bindEvBusListener);
+      storageWin.close();
+    }
+
+    unwrap.set(this, 'popupWindowRef', win);
+    unwrap.set(this, 'isPopupActive', !!win);
   }
 
   setBlockStatus(status: boolean): void {
@@ -691,8 +734,8 @@ export class Client {
     this.themes.forEach((theme: any) => theme[functionName](false));
   }
 
-  updateStorage(compareLocals = false): void {
-    this._readStorage(compareLocals);
+  useEvBus(config: ModuleEvBus): void {
+    window.opener?.postMessage(config, '*');
   }
 
   async loadGlobalThemes(): Promise<void> {

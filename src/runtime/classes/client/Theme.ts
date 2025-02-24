@@ -213,6 +213,10 @@ export class Theme {
     unwrap.set(this, 'id', id);
   }
 
+  setType(type: ModuleThemeType): void {
+    unwrap.set(this, 'type', type);
+  }
+
   setName(name: string): void {
     unwrap.set(this, 'name', name || unwrap.get(this.id));
   }

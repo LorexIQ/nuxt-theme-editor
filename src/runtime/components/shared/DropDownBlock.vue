@@ -61,6 +61,10 @@ async function onClickRefresh(event: Event) {
   await openContent(true);
 }
 
+defineExpose({
+  openContent
+});
+
 onBeforeMount(() => {
   if (props.expandEnabled && isExpanded.value) {
     openContent(true);

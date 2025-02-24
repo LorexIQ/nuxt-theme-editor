@@ -5,7 +5,7 @@ import ThemeBlockStatus from '../features/ThemeBlockStatus.vue';
 import IconsStore from '../shared/IconsStore.vue';
 import DropDownBlock from '../shared/DropDownBlock.vue';
 import useLang from '../../helpers/useLang';
-import { computed } from '#imports';
+import { computed, ref, watch } from '#imports';
 
 type Props = {
   type: ModuleThemeType;
@@ -20,6 +20,7 @@ type Emits = {
 const props = defineProps<Props>();
 const emit = defineEmits<Emits>();
 
+const dropDownBlockRef = ref();
 const isAddActive = computed(() => props.type === 'local');
 const themes = computed(() => Object.values(props.client.getThemes()).filter(theme => theme.type === props.type).sort((a, b) => a.name.localeCompare(b.name)));
 const typeUpper = computed(() => `${props.type[0].toUpperCase()}${props.type.slice(1)}`);
@@ -37,6 +38,8 @@ const blockTitle = computed(() => {
   }
 });
 
+watch(expandStatus, status => dropDownBlockRef.value?.openContent(!!status));
+
 function onChangeStatus(status: boolean) {
   (props.client as any)[`setThemesBlock${typeUpper.value}Status`](Number(status));
 }
@@ -44,6 +47,7 @@ function onChangeStatus(status: boolean) {
 
 <template>
   <DropDownBlock
+    ref="dropDownBlockRef"
     class="TE-block-themes"
     expand-enabled
     :expand-default="!!expandStatus"
@@ -52,7 +56,7 @@ function onChangeStatus(status: boolean) {
     @change-status="onChangeStatus"
   >
     <template #title>
-      {{ blockTitle }}
+      {{ blockTitle }} {{ expandStatus }}
     </template>
     <template #default>
       <transition-expand>

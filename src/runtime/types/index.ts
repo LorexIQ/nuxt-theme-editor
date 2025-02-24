@@ -3,6 +3,7 @@ import type { ModuleLang, ModuleLocalizationStructure } from './localization';
 
 export * from './apiSystem';
 export * from './defines';
+export * from './evBus';
 export * from './helpers';
 export * from './localization';
 export * from './metaFiles';

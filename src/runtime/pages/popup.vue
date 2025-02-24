@@ -3,7 +3,7 @@ import { createApp } from 'vue';
 import useThemeEditor from '../composables/useThemeEditor';
 import ThemeEditorBlock from '../components/ThemeEditorBlock.vue';
 import ThemePreview from '../components/features/ThemePreview.vue';
-import { onMounted, ref, h, useHead, watch } from '#imports';
+import { onMounted, ref, h, useHead } from '#imports';
 
 const client = useThemeEditor();
 const isPopup = ref(false);
@@ -19,8 +19,7 @@ function checkPopupWindow() {
   if (!isPopup.value) window.location.href = '/';
 }
 
-window.onunload = () => window.opener?.postMessage({ popupClosed: true }, '*');
-watch(() => client.getStorage(), () => window.opener?.postMessage({ storageUpdated: true }, '*'));
+window.onunload = () => client.useEvBus({ type: 'close' });
 
 onMounted(() => {
   checkPopupWindow();
