@@ -23,15 +23,18 @@ const sandboxRef = ref<HTMLDivElement>();
     name="list"
     tag="div"
   >
-    <component
-      :is="_component.component"
+    <template
       v-for="_component in components"
-      :id="`${sandboxId}:${_component.id}`"
       :key="_component.id"
-      class="TE-sandbox__component"
-      v-bind="{ ...(_component.props ?? {}), class: _component.transitionName }"
-      v-on="_component.emits ?? {}"
-    />
+    >
+      <component
+        :is="_component.component"
+        :id="`${sandboxId}:${_component.id}`"
+        class="TE-sandbox__component"
+        v-bind="{ ...(_component.props ?? {}), class: _component.transitionName }"
+        v-on="_component.emits ?? {}"
+      />
+    </template>
 
     <ResizeObserver
       key="resize-observer"

@@ -8,7 +8,8 @@ import type {
   APIFetchReturn, ModuleOptionsExtend
 } from '../../types';
 import useSwitch from './useSwitch';
-import { useRuntimeConfig, useState } from '#imports';
+import useConfig from './useConfig';
+import { useState } from '#imports';
 
 function preparePath(path: string, params?: APIFetchDefaultStructBody): string {
   if (params) {
@@ -60,7 +61,7 @@ export default async function useAPIFetch<
     ...config
   };
 
-  const runtimeConfig = useRuntimeConfig().public.themesEditor as unknown as ModuleOptionsExtend;
+  const runtimeConfig = useConfig();
   const typedOptions = options as Omit<APIFetchDefaultStructForMethodWithBody, 'response'>;
   const typedPath = path as string;
 

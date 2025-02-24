@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import TextRunner from '../shared/TextRunner.vue';
 import type { ModuleSandboxStyleContextMenuData, ModuleSandboxPickerRef, ModuleTheme } from '../../types';
-import useLang from '../../helpers/useLang';
+import useLang from '../../helpers/client/useLang';
 import { computed, ref } from '#imports';
 
 type Props = {

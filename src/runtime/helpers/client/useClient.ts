@@ -1,9 +1,10 @@
-import type { ModuleClient, ModuleOptionsExtend } from '../../types';
+import type { ModuleClient } from '../../types';
 import { Client } from '../../classes/client/Client';
-import { useRuntimeConfig, useState } from '#imports';
+import useConfig from './useConfig';
+import { useState } from '#imports';
 
 export default function () {
-  const moduleConfig = useRuntimeConfig().public.themesEditor as unknown as ModuleOptionsExtend;
+  const moduleConfig = useConfig();
   const client = useState<ModuleClient>(moduleConfig.keys.state);
   if (!client.value) client.value = new Client();
   return client;

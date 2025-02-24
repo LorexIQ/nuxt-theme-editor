@@ -8,8 +8,8 @@ import ViewPage from '../widgets/ViewPage.vue';
 import IsHr from '../shared/IsHr.vue';
 import ThemesBlockRadio from '../widgets/ThemesBlockRadio.vue';
 import useErrorMessages from '../../helpers/client/useErrorMessages';
-import useIdProtect from '../../helpers/useIdProtect';
-import useLang from '../../helpers/useLang';
+import useIdProtect from '../../helpers/client/useIdProtect';
+import useLang from '../../helpers/client/useLang';
 import { computed, onBeforeMount, reactive } from '#imports';
 
 type Props = {

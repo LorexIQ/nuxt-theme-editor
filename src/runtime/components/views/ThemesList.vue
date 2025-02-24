@@ -3,7 +3,7 @@ import type { ModuleClient, ModuleTheme } from '../../types';
 import ThemesBlock from '../widgets/ThemesBlock.vue';
 import ViewPage from '../widgets/ViewPage.vue';
 import IsSwitch from '../shared/IsSwitch.vue';
-import useLang from '../../helpers/useLang';
+import useLang from '../../helpers/client/useLang';
 
 type Props = {
   client: ModuleClient;

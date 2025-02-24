@@ -4,7 +4,7 @@ import ViewPage from '../widgets/ViewPage.vue';
 import ThemeBlock from '../features/ThemeBlock.vue';
 import IconsStore from '../shared/IconsStore.vue';
 import IsButton from '../shared/IsButton.vue';
-import useLang from '../../helpers/useLang';
+import useLang from '../../helpers/client/useLang';
 import { computed, onBeforeMount } from '#imports';
 
 type Props = {

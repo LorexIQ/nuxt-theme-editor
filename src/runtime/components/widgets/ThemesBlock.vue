@@ -4,7 +4,7 @@ import ThemeBlock from '../features/ThemeBlock.vue';
 import ThemeBlockStatus from '../features/ThemeBlockStatus.vue';
 import IconsStore from '../shared/IconsStore.vue';
 import DropDownBlock from '../shared/DropDownBlock.vue';
-import useLang from '../../helpers/useLang';
+import useLang from '../../helpers/client/useLang';
 import { computed, ref, watch } from '#imports';
 
 type Props = {

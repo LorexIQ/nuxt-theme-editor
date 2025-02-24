@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import useLang from '../../helpers/useLang';
+import useLang from '../../helpers/client/useLang';
 </script>
 
 <template>

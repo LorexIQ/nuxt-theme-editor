@@ -6,7 +6,7 @@ import ThemeStylesPreviewBlock from '../widgets/ThemeStylesPreviewBlock.vue';
 import ThemeStylesUIBlock from '../widgets/ThemeStylesUIBlock.vue';
 import ThemeStylesBlock from '../widgets/ThemeStylesBlock.vue';
 import unwrap from '../../helpers/client/unwrap';
-import useLang from '../../helpers/useLang';
+import useLang from '../../helpers/client/useLang';
 import { computed, onBeforeMount, ref } from '#imports';
 
 type Props = {

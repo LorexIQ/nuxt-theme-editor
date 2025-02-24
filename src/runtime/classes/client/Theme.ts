@@ -21,8 +21,8 @@ import utils from '../../helpers/utils';
 import unwrap from '../../helpers/client/unwrap';
 import useAPIFetch from '../../helpers/client/useAPIFetch';
 import useSwitch from '../../helpers/client/useSwitch';
-import useIdProtect from '../../helpers/useIdProtect';
-import useLang from '../../helpers/useLang';
+import useIdProtect from '../../helpers/client/useIdProtect';
+import useLang from '../../helpers/client/useLang';
 import { computed, reactive, ref, watch } from '#imports';
 
 type ThemeStylesScope = 'main' | 'edited';

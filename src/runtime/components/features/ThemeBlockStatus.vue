@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type { ModuleTheme } from '../../types';
-import useLang from '../../helpers/useLang';
+import useLang from '../../helpers/client/useLang';
 import { computed } from '#imports';
 
 type Props = {

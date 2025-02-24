@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { ModuleLocalStorageThemeMini, ModuleTheme } from '../../types';
 import IconsStore from '../shared/IconsStore.vue';
-import useLang from '../../helpers/useLang';
+import useLang from '../../helpers/client/useLang';
 import { computed } from '#imports';
 
 type Props = {

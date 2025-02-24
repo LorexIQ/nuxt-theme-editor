@@ -7,7 +7,7 @@ import ThemeEditStyles from '../components/views/ThemeEditStyles.vue';
 import ThemeEditStylesCancel from '../components/views/ThemeEditStylesCancel.vue';
 import ThemePublish from '../components/views/ThemePublish.vue';
 import ThemesList from '../components/views/ThemesList.vue';
-import useLang from '../helpers/useLang';
+import useLang from '../helpers/client/useLang';
 
 export default function () {
   return [

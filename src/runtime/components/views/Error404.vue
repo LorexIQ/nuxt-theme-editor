@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { ModuleClient } from '../../types';
 import QuestionPageBlock from '../shared/QuestionPageBlock.vue';
-import useLang from '../../helpers/useLang';
+import useLang from '../../helpers/client/useLang';
 
 type Props = {
   client: ModuleClient;

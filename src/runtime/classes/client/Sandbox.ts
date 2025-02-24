@@ -10,7 +10,7 @@ import type {
 } from '../../types';
 import ContextMenu from '../../components/shared/ContextMenu.vue';
 import ModuleSandbox from '../../components/views/ModuleSandbox.vue';
-import useLang from '../../helpers/useLang';
+import useLang from '../../helpers/client/useLang';
 import { markRaw, reactive } from '#imports';
 
 const CONTEXT_MENU_ID = 'context-menu';
@@ -222,14 +222,17 @@ export class Sandbox {
 
     this.components.push({
       id: UUID(),
-      component: markRaw(ContextMenu),
+      component: ContextMenu,
       transitionName: 'fade',
       props: {
         clickPosition,
         sandboxSize: this.boxSize,
         tipText: useLang('contextMenu.selectAnInheritanceTip'),
+        searchText: useLang('contextMenu.search'),
+        emptyText: useLang('contextMenu.empty'),
         maxWidth: 'min(100%, 300px)',
         maxHeight: 'min(100%, 400px)',
+        searchEnabled: true,
         items: <ModuleSandboxContextMenuItem[]>[
           ...stylesPaths.filter(stylePath => stylePath !== style).map(stylePath => ({
             title: stylePath,

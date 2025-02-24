@@ -3,7 +3,7 @@ import StyleEditBlock from '../features/StyleEditBlock.vue';
 import DropDownBlock from '../shared/DropDownBlock.vue';
 import type { ModuleSandboxStyleContextMenuData, ModuleTheme } from '../../types';
 import unwrap from '../../helpers/client/unwrap';
-import useLang from '../../helpers/useLang';
+import useLang from '../../helpers/client/useLang';
 import { computed } from '#imports';
 
 type Props = {

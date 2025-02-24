@@ -4,8 +4,8 @@ import { ref, watch, computed } from '#imports';
 
 type Props = {
   id: string;
-  title: string;
   modelValue: string;
+  title?: string;
   placeholder?: string;
   isDisabled?: boolean;
   isRequiredIcon?: boolean;
@@ -46,7 +46,10 @@ watch(innerValue, (value) => {
       'x-shake': isAnimation,
     }"
   >
-    <div class="TE-is-input__title">
+    <div
+      v-if="title"
+      class="TE-is-input__title"
+    >
       {{ title }}
       <IconsStore
         v-if="isRequiredIcon && !isDisabled"

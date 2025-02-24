@@ -32,6 +32,8 @@ export type ModuleLocalizationStructure = {
   contextMenu: {
     selectActionTip: string;
     selectAnInheritanceTip: string;
+    search: string;
+    empty: string;
 
     selectTheme: {
       main: string;

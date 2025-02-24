@@ -32,6 +32,8 @@ const EN: ModuleLocalizationStructure = {
   contextMenu: {
     selectActionTip: 'Select an action',
     selectAnInheritanceTip: 'Select an inheritance',
+    search: 'Search',
+    empty: 'Empty',
 
     selectTheme: {
       main: 'Select a theme',
@@ -224,6 +226,8 @@ const RU: ModuleLocalizationStructure = {
   contextMenu: {
     selectActionTip: 'Выбор действия',
     selectAnInheritanceTip: 'Выбор наследования',
+    search: 'Поиск',
+    empty: 'Пусто',
 
     selectTheme: {
       main: 'Выбрать тему',

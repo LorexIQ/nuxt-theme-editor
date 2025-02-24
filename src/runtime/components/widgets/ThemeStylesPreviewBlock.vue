@@ -4,7 +4,7 @@ import DropDownBlock from '../shared/DropDownBlock.vue';
 import type { ModuleSandboxStyleContextMenuData, ModuleTheme } from '../../types';
 import ThemeBlock from '../../components/features/ThemeBlock.vue';
 import unwrap from '../../helpers/client/unwrap';
-import useLang from '../../helpers/useLang';
+import useLang from '../../helpers/client/useLang';
 import { computed } from '#imports';
 
 type Props = {

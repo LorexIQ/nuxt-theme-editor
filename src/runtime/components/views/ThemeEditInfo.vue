@@ -7,7 +7,7 @@ import ThemeBlock from '../features/ThemeBlock.vue';
 import ViewPage from '../widgets/ViewPage.vue';
 import useErrorMessages from '../../helpers/client/useErrorMessages';
 import IsHr from '../shared/IsHr.vue';
-import useLang from '../../helpers/useLang';
+import useLang from '../../helpers/client/useLang';
 import { computed, onBeforeMount, reactive } from '#imports';
 
 type Props = {

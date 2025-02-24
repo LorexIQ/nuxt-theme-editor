@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import useSwitch from '../../helpers/client/useSwitch';
-import useLang from '../../helpers/useLang';
+import useLang from '../../helpers/client/useLang';
 import TextRunner from './TextRunner.vue';
 import IconsStore from './IconsStore.vue';
 import { computed, onBeforeMount, ref, watch } from '#imports';

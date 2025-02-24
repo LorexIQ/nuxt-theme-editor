@@ -6,12 +6,16 @@ import type {
 } from '../../types';
 import IconsStore from '../shared/IconsStore.vue';
 import TextRunner from './TextRunner.vue';
+import IsInput from './IsInput.vue';
 import { computed, onMounted, ref } from '#imports';
 
 type Props = {
   sandboxSize: ModuleSandboxSize;
   clickPosition: ModuleSandboxMousePosition;
   items: ModuleSandboxContextMenuItem[];
+  searchEnabled?: boolean;
+  emptyText?: string;
+  searchText?: string;
   tipText?: string;
   blurBg?: boolean;
   maxWidth?: string;
@@ -22,6 +26,7 @@ type Emits = {
 };
 
 const props = withDefaults(defineProps<Props>(), {
+  searchEnabled: false,
   blurBg: true,
   maxWidth: '100%',
   maxHeight: '100%'
@@ -30,6 +35,7 @@ const emit = defineEmits<Emits>();
 const sandboxSize = props.sandboxSize;
 const padding = 5;
 
+const searchRef = ref('');
 const menuRef = ref<HTMLDivElement>();
 const menuBoundingRect = ref<DOMRect>();
 const menuPosition = computed(() => {
@@ -44,6 +50,7 @@ const menuPosition = computed(() => {
     maxHeight: props.maxHeight
   };
 });
+const filteredItems = computed(() => props.items.filter(item => item.title.toLowerCase().includes(searchRef.value.toLowerCase())));
 
 function selectItem(event: MouseEvent, item: ModuleSandboxContextMenuItem) {
   closeContextMenu();
@@ -79,9 +86,22 @@ onMounted(() => {
       >
         {{ tipText }}
       </div>
-      <div class="TE-context-menu__menu__items">
+      <div
+        v-if="searchEnabled"
+        class="TE-context-menu__menu__search"
+      >
+        <IsInput
+          id="search"
+          v-model="searchRef"
+          :placeholder="searchText"
+        />
+      </div>
+      <div
+        v-if="filteredItems.length"
+        class="TE-context-menu__menu__items"
+      >
         <template
-          v-for="item of items"
+          v-for="item of filteredItems"
           :key="item.title"
         >
           <div
@@ -108,6 +128,12 @@ onMounted(() => {
             </div>
           </div>
         </template>
+      </div>
+      <div
+        v-else
+        class="TE-context-menu__menu__empty"
+      >
+        {{ emptyText }}
       </div>
     </div>
   </div>
@@ -137,6 +163,14 @@ onMounted(() => {
       padding: 2px 5px;
       color: var(--titleTransparent);
       border-bottom: 1px solid var(--border);
+    }
+    &__search {
+      padding: 5px;
+
+      &:deep(.TE-is-input__input) {
+        font-size: 12px;
+        border-color: var(--border);
+      }
     }
     &__items {
       height: 100%;
@@ -181,6 +215,12 @@ onMounted(() => {
           grid-template-columns: 16px auto;
         }
       }
+    }
+    &__empty {
+      font-size: 14px;
+      text-align: center;
+      padding: 5px;
+      color: var(--titleTransparent);
     }
   }
 

@@ -33,14 +33,15 @@ import unwrap from '../../helpers/client/unwrap';
 import useSystemTheme from '../../helpers/client/useSystemTheme';
 import defineChecker from '../../helpers/defineChecker';
 import useReloadMiddleware from '../../helpers/client/useReloadMiddleware';
-import useIdProtect from '../../helpers/useIdProtect';
+import useIdProtect from '../../helpers/client/useIdProtect';
+import useAPIFetch from '../../helpers/client/useAPIFetch';
+import useConfig from '../../helpers/client/useConfig';
 import utils from '../../helpers/utils';
 import { Theme } from '../../classes/client/Theme';
-import useAPIFetch from '../../helpers/client/useAPIFetch';
-import useLang from '../../helpers/useLang';
+import useLang from '../../helpers/client/useLang';
 import { Sandbox } from './Sandbox';
 import { Router } from './Router';
-import { useRuntimeConfig, reactive, ref, computed, watch, useState } from '#imports';
+import { reactive, ref, computed, watch, useState } from '#imports';
 
 type ThemeId = string | Ref<string | undefined>;
 type ThemeDefConfig = 'light' | 'dark' | 'system' | ThemeId | undefined;
@@ -56,7 +57,7 @@ export class Client {
   private readonly themesBlockGlobalStatus = ref<ThemeBlockStatus>(0);
   private readonly themesBlockLocalStatus = ref<ThemeBlockStatus>(0);
 
-  private readonly config = useRuntimeConfig().public.themesEditor as unknown as ModuleOptionsExtend;
+  private readonly config = useConfig();
   private readonly configThemeSystem = this.config.themesConfig.system;
   private readonly configThemeGlobal = this.config.themesConfig.global;
   private readonly configThemeLocal = this.config.themesConfig.local;

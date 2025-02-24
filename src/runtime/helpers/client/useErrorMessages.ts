@@ -1,4 +1,4 @@
-import useLang from '../useLang';
+import useLang from './useLang';
 import { computed, reactive } from '#imports';
 
 type ValidationError = {
