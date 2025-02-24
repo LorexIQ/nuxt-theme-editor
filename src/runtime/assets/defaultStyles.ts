@@ -12,7 +12,6 @@ export const DEFAULT_PREVIEW_STYLES: Required<ModuleDefineThemeMetaPreview> = {
 export const DEFAULT_UI_STYLES: Required<ModuleDefineThemeMetaUI> = {
   bg: '#fff',
   bgHover: '#fafafa',
-  bgHeader: '#f6f6f6',
   bgFooter: '#fff',
   bgBlockHeader: '#f6f6f6',
   bgGlass: '#00000019',
@@ -20,6 +19,11 @@ export const DEFAULT_UI_STYLES: Required<ModuleDefineThemeMetaUI> = {
   border: '#00000019',
   title: '#333',
   titleTransparent: '#999',
+
+  headerBg: '#f6f6f6',
+  headerTitle: '#333',
+  headerButtonPopup: '#333',
+  headerButtonClose: '#333',
 
   inputFocus: '#333',
   inputBg: '#fff',

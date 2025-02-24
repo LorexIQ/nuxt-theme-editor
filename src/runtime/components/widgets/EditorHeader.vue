@@ -92,7 +92,7 @@ function onClose() {
   grid-template-columns: auto 64px auto 60px 0 auto;
   align-items: center;
   justify-content: center;
-  background-color: var(--bgHeader);
+  background-color: var(--headerBg);
   box-shadow: 0 0 10px var(--shadow);
   transition: .3s grid-template-columns;
 
@@ -102,7 +102,7 @@ function onClose() {
     font-size: 24px;
     white-space: nowrap;
     padding: 4px 0;
-    color: var(--title);
+    color: var(--headerTitle);
     overflow: hidden;
     transition: .3s;
   }
@@ -113,7 +113,7 @@ function onClose() {
     margin: -15px 0 0 5px;
     padding: 1px 4px;
     color: #fff;
-    background-color: var(--title);
+    background-color: var(--headerTitle);
     border-radius: 4px;
   }
   &__buttons {
@@ -139,12 +139,12 @@ function onClose() {
     }
     &__popup-opener {
       & svg {
-        color: var(--iconPopupHeader)
+        color: var(--headerButtonPopup)
       }
     }
     &__close {
       & svg {
-        color: var(--iconCloseHeader)
+        color: var(--headerButtonClose)
       }
     }
   }

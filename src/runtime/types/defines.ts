@@ -11,7 +11,6 @@ export type ModuleDefineThemeMetaPreview = ModuleObject & Partial<{
 export type ModuleDefineThemeMetaUI = Partial<{
   bg: string;
   bgHover: string;
-  bgHeader: string;
   bgFooter: string;
   bgBlockHeader: string;
   bgGlass: string;
@@ -19,6 +18,11 @@ export type ModuleDefineThemeMetaUI = Partial<{
   border: string;
   title: string;
   titleTransparent: string;
+
+  headerBg: string;
+  headerTitle: string;
+  headerButtonPopup: string;
+  headerButtonClose: string;
 
   inputFocus: string;
   inputBg: string;
