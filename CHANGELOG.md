@@ -1,6 +1,28 @@
 # Changelog
 
 
+## v1.4.0
+
+[compare changes](https://github.com/LorexIQ/nuxt-theme-editor/compare/v1.3.6...v1.4.0)
+
+### 🚀 Enhancements
+
+- Начало работы над popup window ([dba2a23](https://github.com/LorexIQ/nuxt-theme-editor/commit/dba2a23))
+- Реализована первая версия механизма popup window ([9d999c9](https://github.com/LorexIQ/nuxt-theme-editor/commit/9d999c9))
+
+### 🩹 Fixes
+
+- Исправлены стили текста ([149f3e7](https://github.com/LorexIQ/nuxt-theme-editor/commit/149f3e7))
+
+### 💅 Refactors
+
+- Переписана шина общения между окнами в браузере ([959f07a](https://github.com/LorexIQ/nuxt-theme-editor/commit/959f07a))
+
+### ❤️ Contributors
+
+- LorexIQ <dmitrymurashko0@gmail.com>
+- Lorex <murashko100500@gmail.com>
+
 ## v1.3.6
 
 [compare changes](https://github.com/LorexIQ/nuxt-theme-editor/compare/v1.3.5...v1.3.6)
