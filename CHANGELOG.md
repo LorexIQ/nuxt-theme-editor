@@ -1,6 +1,18 @@
 # Changelog
 
 
+## v1.5.1
+
+[compare changes](https://github.com/LorexIQ/nuxt-theme-editor/compare/v1.5.0...v1.5.1)
+
+### 🩹 Fixes
+
+- Исправлена идентификация компонентов в prod режиме ([04f664d](https://github.com/LorexIQ/nuxt-theme-editor/commit/04f664d))
+
+### ❤️ Contributors
+
+- LorexIQ <dmitrymurashko0@gmail.com>
+
 ## v1.5.0
 
 [compare changes](https://github.com/LorexIQ/nuxt-theme-editor/compare/v1.4.0...v1.5.0)
