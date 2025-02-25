@@ -1,6 +1,23 @@
 # Changelog
 
 
+## v1.5.0
+
+[compare changes](https://github.com/LorexIQ/nuxt-theme-editor/compare/v1.4.0...v1.5.0)
+
+### 🚀 Enhancements
+
+- Добавлен поиск по списку наследований ([cd9545f](https://github.com/LorexIQ/nuxt-theme-editor/commit/cd9545f))
+- Добавлен поиск в списке стилей ([9421209](https://github.com/LorexIQ/nuxt-theme-editor/commit/9421209))
+
+### 🎨 Styles
+
+- Переделаны стили для header ([826b4cf](https://github.com/LorexIQ/nuxt-theme-editor/commit/826b4cf))
+
+### ❤️ Contributors
+
+- LorexIQ <dmitrymurashko0@gmail.com>
+
 ## v1.4.0
 
 [compare changes](https://github.com/LorexIQ/nuxt-theme-editor/compare/v1.3.6...v1.4.0)
