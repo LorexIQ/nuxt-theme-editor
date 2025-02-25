@@ -9,8 +9,7 @@ import {
 } from '#imports';
 
 function mountAndGetComponentId(instance: ComponentInternalInstance, mod: string) {
-  const instanceType = instance.type as any;
-  const scopeId = `te-${instanceType.__hmrId}-${mod.length ? `mod-${mod}` : 'no-mod'}`;
+  const scopeId = `te-${instance.uid}-${mod.length ? `mod-${mod}` : 'no-mod'}`;
 
   if (instance.vnode.component && !instance.vnode.component.attrs[scopeId]) {
     instance.vnode.component.attrs[scopeId] = '';
