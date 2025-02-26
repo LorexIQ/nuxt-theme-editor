@@ -1,6 +1,18 @@
 # Changelog
 
 
+## v1.5.2
+
+[compare changes](https://github.com/LorexIQ/nuxt-theme-editor/compare/v1.5.1...v1.5.2)
+
+### 🩹 Fixes
+
+- Мелкие исправления по модулю ([4054439](https://github.com/LorexIQ/nuxt-theme-editor/commit/4054439))
+
+### ❤️ Contributors
+
+- LorexIQ <dmitrymurashko0@gmail.com>
+
 ## v1.5.1
 
 [compare changes](https://github.com/LorexIQ/nuxt-theme-editor/compare/v1.5.0...v1.5.1)
