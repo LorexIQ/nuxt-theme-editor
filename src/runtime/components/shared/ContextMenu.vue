@@ -157,7 +157,7 @@ onMounted(() => {
     grid-template-rows: auto 1fr;
     width: max-content;
     border-radius: 5px;
-    background-color: var(--bg);
+    background-color: var(--contextMenuBg);
     box-shadow: 0 0 10px var(--shadow);
     overflow: hidden;
 

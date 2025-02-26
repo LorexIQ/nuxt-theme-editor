@@ -72,6 +72,7 @@ const styles = computed(() => {
   width: 100%;
   height: 62px;
   border: 1px solid var(--border);
+  background-color: var(--bgThemeBlock);
   border-radius: 5px;
   overflow: hidden;
   cursor: pointer;
@@ -94,6 +95,7 @@ const styles = computed(() => {
     width: 100%;
     height: 100%;
     padding: 0 10px 5px;
+    color: var(--title);
     overflow: hidden;
 
     &__name {
@@ -103,7 +105,7 @@ const styles = computed(() => {
       display: flex;
       align-items: flex-end;
       width: 100%;
-      color: var(--title);
+      color: inherit;
       text-wrap: nowrap;
       overflow: hidden;
 
@@ -114,7 +116,7 @@ const styles = computed(() => {
         right: 0;
         width: 50px;
         height: 30px;
-        background: linear-gradient(90deg, transparent 0%, var(--bg) 100%);
+        background: linear-gradient(90deg, transparent 0%, var(--bgThemeBlock) 100%);
       }
 
       &__cache {
@@ -151,7 +153,7 @@ const styles = computed(() => {
         left: 0;
         right: 4px;
         height: 15px;
-        background: linear-gradient(180deg, transparent 0%, var(--bg) 100%);
+        background: linear-gradient(180deg, transparent 0%, var(--bgThemeBlock) 100%);
       }
 
       &--transparent {

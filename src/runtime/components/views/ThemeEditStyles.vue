@@ -46,8 +46,8 @@ function goToInheritance(inheritanceId: string) {
   const inheritanceHeight = inheritanceBoundingRect.height;
   let scrollTo = 0;
 
-  if (inheritancePosition < templateScrollTop + 35) {
-    scrollTo = inheritancePosition - 35;
+  if (inheritancePosition < templateScrollTop + 83) {
+    scrollTo = inheritancePosition - 83;
   } else if (inheritancePosition > templateScrollBottom) {
     scrollTo = inheritancePosition - templateHeight + inheritanceHeight;
   } else {

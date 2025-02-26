@@ -144,6 +144,7 @@ const isCircular = computed(() => currentValue.value === 'CIRCULAR');
     display: flex;
     align-items: center;
     width: 100%;
+    color: var(--title);
     overflow: hidden;
   }
   &__inheritance {
@@ -166,6 +167,7 @@ const isCircular = computed(() => currentValue.value === 'CIRCULAR');
       border: 1px solid var(--border);
       border-radius: 3px;
       background-color: inherit;
+      color: var(--title);
       overflow: hidden;
       cursor: pointer;
       text-align: right;
@@ -180,6 +182,7 @@ const isCircular = computed(() => currentValue.value === 'CIRCULAR');
     display: flex;
     align-items: center;
     width: 100%;
+    color: var(--title);
     overflow: hidden;
     text-align: right;
   }

@@ -137,6 +137,7 @@ export class Client {
   private _initWatchers(): void {
     const rootStylesKey = ':root';
     const uiStylesKey = `#${this.config.keys.sandbox.replaceAll(':', '\\:')}, #${this.config.keys.editor.replaceAll(':', '\\:')}`;
+    let transitionLockTimeout: NodeJS.Timeout;
 
     watchEffect(() => {
       this._appendStyleToHead(
@@ -173,6 +174,22 @@ export class Client {
           [Object.keys(property.scopes).map(scopeId => `[${scopeId}]`).join(',\n')]: property.styles
         }), {})
       );
+    });
+
+    watch(this.selectedTheme, () => {
+      clearTimeout(transitionLockTimeout);
+
+      this._appendStyleToHead(
+        `${this.config.keys.style}:transition`,
+        { '*': { transition: 'color 0s, background-color 0s, border-color 0s, box-shadow 0s !important' } },
+        false
+      );
+
+      transitionLockTimeout = setTimeout(() => this._appendStyleToHead(
+        `${this.config.keys.style}:transition`,
+        {},
+        false
+      ), 100);
     });
 
     watch(this.selectedEditedThemeId, (themeId) => {
@@ -379,12 +396,16 @@ export class Client {
     }
   }
 
-  private _appendStyleToHead(id: string, scopes: ModuleObject<ModuleThemeScopesStyles>): void {
+  private _appendStyleToHead(id: string, scopes: ModuleObject<ModuleThemeScopesStyles>, keyAsVar = true): void {
     const styleContent = Object.keys(scopes).map((scopeId) => {
       const scopeStyles = scopes[scopeId];
       return [
         `${scopeId} {`,
-        ...Object.keys(scopeStyles).map(key => `  --${key}: ${unwrap.get(scopeStyles)[key]};`),
+        ...Object.keys(scopeStyles).map((key) => {
+          const isImportant = key.startsWith('_');
+          const viewKey = isImportant ? key.slice(1) : key;
+          return `  ${keyAsVar ? '--' : ''}${viewKey}: ${unwrap.get(scopeStyles)[key]}${isImportant ? ' !important' : ''};`;
+        }),
         '}'
       ].join('\n');
     }).join('\n\n');
@@ -603,7 +624,7 @@ export class Client {
     let win = null;
 
     if (status) {
-      const width = 402;
+      const width = 400;
       const height = window.innerHeight;
       const left = window.screenX + window.innerWidth - width;
       const top = window.screenY + (window.innerHeight - height) / 2;
@@ -620,6 +641,10 @@ export class Client {
   }
 
   setBlockStatus(status: boolean): void {
+    if (this.getPopupStatus()) {
+      this.setPopupStatus(false);
+    }
+
     if (!status) {
       const editedThemeId = unwrap.get(this.selectedEditedThemeId);
 

@@ -171,6 +171,9 @@ onBeforeMount(() => {});
         height: 100%;
       }
     }
+    &:not(&:last-child) {
+      border-bottom: 1px solid var(--border);
+    }
   }
 
   &-messages {

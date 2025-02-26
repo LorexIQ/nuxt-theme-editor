@@ -92,6 +92,7 @@ function onClose() {
   grid-template-columns: auto 64px auto 60px 0 auto;
   align-items: center;
   justify-content: center;
+  border-bottom: 1px solid var(--border);
   background-color: var(--headerBg);
   box-shadow: 0 0 10px var(--shadow);
   transition: .3s grid-template-columns;

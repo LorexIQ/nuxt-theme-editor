@@ -115,6 +115,7 @@ function onChangeStatus(status: boolean) {
       color: var(--title);
       border: 1px solid var(--border);
       border-radius: 5px;
+      background-color: var(--bgAddThemeButton);
       cursor: pointer;
       transition: .3s;
 

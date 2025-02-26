@@ -17,7 +17,7 @@ import useLang from '../../helpers/client/useLang';
   padding: 7px 0 5px;
   border-bottom: 1px solid var(--border);
   color: var(--title);
-  background-color: var(--bg);
+  background-color: var(--bgBlockHeader);
   box-shadow: 0 0 10px var(--bg);
 }
 </style>

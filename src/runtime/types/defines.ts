@@ -13,6 +13,8 @@ export type ModuleDefineThemeMetaUI = Partial<{
   bgHover: string;
   bgFooter: string;
   bgBlockHeader: string;
+  bgThemeBlock: string;
+  bgAddThemeButton: string;
   bgGlass: string;
   shadow: string;
   border: string;
@@ -31,6 +33,7 @@ export type ModuleDefineThemeMetaUI = Partial<{
   inputText: string;
   inputPlaceholder: string;
   inputPostIcon: string;
+  inputBorder: string;
 
   radioStatic: string;
   radioActive: string;
@@ -84,6 +87,7 @@ export type ModuleDefineThemeMetaUI = Partial<{
   messageErrorTitle: string;
   messageErrorContent: string;
 
+  contextMenuBg: string;
   contextMenuIcon: string;
   contextMenuIconSuccess: string;
   contextMenuIconError: string;

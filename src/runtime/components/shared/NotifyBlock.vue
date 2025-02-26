@@ -76,7 +76,7 @@ const isContent = computed(() => currentInstance?.slots.default);
   </div>
 </template>
 
-<style scoped lang="scss">
+<style lang="scss" scoped>
 .TE-notify-block {
   display: flex;
   flex-direction: column;
@@ -112,8 +112,13 @@ const isContent = computed(() => currentInstance?.slots.default);
     &__title {
       padding-top: 4px;
     }
-    &__content {
-      white-space: pre-line;
+  }
+  &__content {
+    white-space: pre-line;
+
+    &:deep(div), &:deep(p) {
+      color: inherit;
     }
-  }}
+  }
+}
 </style>

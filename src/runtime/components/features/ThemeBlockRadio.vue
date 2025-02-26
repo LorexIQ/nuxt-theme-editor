@@ -44,10 +44,14 @@ watch(innerValue, newVal => emit('update:modelValue', newVal));
   height: 30px;
   border: 1px solid var(--border);
   border-radius: 5px;
+  background-color: var(--bgThemeBlock);
   overflow: hidden;
   cursor: pointer;
   transition: .3s;
 
+  &__name {
+    color: var(--title)
+  }
   &:hover {
     background-color: var(--bgHover);
   }

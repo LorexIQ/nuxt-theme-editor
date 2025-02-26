@@ -121,7 +121,7 @@ watch(innerValue, (value) => {
     width: 100%;
     padding: 8px 10px;
     border-radius: 5px;
-    border: 1px solid var(--inputTitle);
+    border: 1px solid var(--inputBorder);
     color: var(--inputText);
     background-color: var(--inputBg);
 
@@ -129,6 +129,7 @@ watch(innerValue, (value) => {
       color: var(--inputPlaceholder);
     }
     &:focus {
+      border: 1px solid var(--inputFocus);
       outline: 1px solid var(--inputFocus);
     }
   }
@@ -143,7 +144,8 @@ watch(innerValue, (value) => {
     justify-content: center;
     width: 40px;
     padding: 0 8px;
-    border-left: 1px solid var(--inputTitle);
+    border-left: 1px solid var(--inputBorder);
+    color: var(--inputPostIcon);
 
     &--null {
       color: var(--inputRequired);

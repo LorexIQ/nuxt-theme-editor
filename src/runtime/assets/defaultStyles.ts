@@ -14,6 +14,8 @@ export const DEFAULT_UI_STYLES: Required<ModuleDefineThemeMetaUI> = {
   bgHover: '#fafafa',
   bgFooter: '#fff',
   bgBlockHeader: '#f6f6f6',
+  bgThemeBlock: '#fff',
+  bgAddThemeButton: '#fff',
   bgGlass: '#00000019',
   shadow: '#00000033',
   border: '#00000019',
@@ -32,6 +34,7 @@ export const DEFAULT_UI_STYLES: Required<ModuleDefineThemeMetaUI> = {
   inputText: '#333',
   inputPlaceholder: '#999',
   inputPostIcon: '#333',
+  inputBorder: '#333',
 
   radioStatic: '#000',
   radioActive: '#2ecc71',
@@ -85,6 +88,7 @@ export const DEFAULT_UI_STYLES: Required<ModuleDefineThemeMetaUI> = {
   messageErrorTitle: '#333',
   messageErrorContent: '#333',
 
+  contextMenuBg: '#fff',
   contextMenuIcon: '#444',
   contextMenuIconSuccess: '#2ecc71',
   contextMenuIconError: '#ff5151',
